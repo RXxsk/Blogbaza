@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Tio Baza Blog — About </title>
+  
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Estilos específicos para la vista Acerca de (Perfil Xbox / Archivero 📂 en Papel) */
+    .about-main-container {
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    /* Contenedor tipo Carpeta / Archivero con textura de Papel */
+    .xbox-dossier-card {
+      background: var(--bg-card, #1e1e2f);
+      border: 2px solid var(--border-color, #2a2a3c);
+      border-radius: 20px;
+      padding: 40px;
+      position: relative;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(16, 124, 16, 0.03);
+      overflow: hidden;
+      animation: dossierFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* Pestaña superior estilo Archivero de papel/carpeta */
+    .xbox-dossier-card::before {
+      content: "About OFFICIAL // Blog";
+      position: absolute;
+      top: 0;
+      left: 40px;
+      background: var(--primary-green, #107c10);
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 4px 16px;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 10px rgba(16, 124, 16, 0.3);
+    }
+
+    @keyframes dossierFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Cabecera del Perfil Principal */
+    .profile-hero {
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .profile-avatar-container {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 20px auto;
+    }
+
+    .profile-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--primary-green, #107c10);
+      box-shadow: 0 0 25px rgba(16, 124, 16, 0.4);
+      background: var(--bg-surface, #161622);
+      transition: transform 0.3s ease;
+    }
+
+    .profile-avatar:hover {
+      transform: scale(1.05) rotate(2deg);
+    }
+
+    /* Indicador de estado en línea estilo Xbox */
+    .xbox-status-badge {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      background: #107c10;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 3px solid var(--bg-card, #1e1e2f);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      box-shadow: 0 0 10px #107c10;
+    }
+
+    .profile-name {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-main, #fff);
+      margin: 0 0 6px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .profile-tagline {
+      font-size: 0.95rem;
+      color: var(--text-secondary, #aaa);
+      margin: 0;
+      font-weight: 500;
+    }
+
+    /* Redes Sociales con Íconos SVG Directos Estilizados */
+    .profile-social-grid {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      margin-bottom: 36px;
+    }
+
+    .social-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color, #333);
+      border-radius: 12px;
+      color: var(--text-main, #fff);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.25s ease;
+    }
+
+    .social-pill-btn svg {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .social-pill-btn:hover {
+      background: var(--primary-green, #107c10);
+      border-color: var(--primary-green, #107c10);
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(16, 124, 16, 0.35);
+    }
+
+    .social-pill-btn:hover svg {
+      transform: scale(1.1);
+    }
+
+    /* Línea de Separación Estilo Papel / Archivero */
+    .dossier-divider {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-color, #333), transparent);
+      margin: 40px 0;
+      position: relative;
+    }
+
+    .dossier-divider::after {
+      content: "✦ CREATED BY ✦";
+      position: center;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-card, #1e1e2f);
+      padding: 0 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary-green, #107c10);
+      letter-spacing: 2px;
+    }
+
+    /* SECCIÓN DE EQUIPO CONECTADO */
+    .team-section-container {
+      position: relative;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color, #2a2a3c);
+      padding: 30px 24px;
+      border-radius: 16px;
+    }
+
+    /* Fila de avatares vinculados con lazo */
+    .team-duo-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 24px;
+      gap: 30px;
+    }
+
+    .team-member-node {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .team-avatar {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-green, #107c10);
+      background: var(--bg-surface, #161622);
+      box-shadow: 0 0 15px rgba(16, 124, 16, 0.25);
+      margin-bottom: 8px;
+    }
+
+    .team-member-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main, #fff);
+      margin: 0;
+    }
+
+    /* Lazo / Línea de conexión central entre los dos perfiles */
+    .team-connection-rope {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 80px;
+      height: 2px;
+      background: var(--primary-green, #107c10);
+      box-shadow: 0 0 8px var(--primary-green, #107c10);
+    }
+
+    .rope-node-icon {
+      position: absolute;
+      background: var(--bg-card, #1e1e2f);
+      border: 2px solid var(--primary-green, #107c10);
+      color: var(--primary-green, #107c10);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    /* Enlaces minimalistas de Github de cada quien */
+    .member-github-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: var(--text-secondary, #aaa);
+      text-decoration: none;
+      margin-top: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .member-github-link svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .member-github-link:hover {
+      color: var(--primary-green, #107c10);
+    }
+
+    /* Árbol de ramas inferior representando responsabilidades */
+    .team-branches-tree {
+      position: relative;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border-color, #333);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    /* Conector gráfico de rama superior */
+    .team-branches-tree::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 10px;
+      background: var(--primary-green, #107c10);
+    }
+
+    .branch-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color, #2a2a3c);
+      padding: 16px;
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .branch-card::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      background: var(--primary-green, #107c10);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--primary-green, #107c10);
+    }
+
+    .branch-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--primary-green, #107c10);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .branch-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary, #aaa);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* Metadatos adicionales estilo consola / expediente */
+    .dossier-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .meta-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--border-color, #333);
+      padding: 14px 18px;
+      border-radius: 10px;
+    }
+
+    .meta-title {
+      font-size: 0.75rem;
+      color: var(--text-muted, #888);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main, #fff);
+    }
+
+    /* Responsive para móviles */
+    @media (max-width: 768px) {
+      .xbox-dossier-card {
+        padding: 24px 16px;
+      }
+      .team-duo-wrapper {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .team-connection-rope {
+        width: 2px;
+        height: 40px;
+      }
+      .team-branches-tree {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <!-- Logo / Brand -->
+      <a href="index.html" class="nav-logo">
+        <div class="avatar-badge">
+          <i data-lucide="gamepad-2"></i>
+        </div>
+        <span>El Tio Baza <span class="logo-accent">Blog</span></span>
+      </a>
+
+      <!-- Menú Multipartes (Escritorio) -->
+      <nav class="nav-sections desktop-only">
+        <a href="index.html" class="nav-link">Inicio</a>
+        <a href="noticias.html" class="nav-link">Noticias</a>
+        <a href="posts.html" class="nav-link">Posts</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="repos.html" class="nav-link">Repositorio</a>
+        <a href="about.html" class="nav-link active">Acerca de</a>
+      </nav>
+
+      <!-- Acciones de Usuario -->
+      <div class="nav-actions">
+
+        <!-- Menú Kebab de Accesos Rápidos -->
+        <div class="dropdown-wrapper">
+          <button id="kebabBtn" class="icon-btn" aria-label="Más opciones">
+            <i data-lucide="more-vertical"></i>
+          </button>
+
+          <div id="kebabDropdown" class="dropdown-menu kebab-menu hidden">
+            <ul>
+              <li><a href="index.html"><i data-lucide="home"></i> Ir a Inicio</a></li>
+              <li><a href="about.html"><i data-lucide="info"></i> Acerca de</a></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL: ACERCA DE (EXPEDIENTE / ARCHIVERO XBOX) -->
+  <main class="about-main-container">
+    <div class="xbox-dossier-card">
+      
+      <!-- HERO PRINCIPAL DE LA PERSONA / BLOG -->
+      <div class="profile-hero">
+        <div class="profile-avatar-container">
+          <img src="https://yt3.googleusercontent.com/vpYn_Tf3mp1LodbPG5HJ-leVlmRBCYTCm2buPZmFQ1rCJVMOARRagPJY8LnLwl8mN5QG8vWSUX8=s900-c-k-c0x00ffffff-no-rj" alt="El Tio Baza Avatar" class="profile-avatar">
+          <div class="xbox-status-badge" title="About">
+            <i data-lucide="check" style="width: 12px; height: 12px;"></i>
+          </div>
+        </div>
+
+        <h1 class="profile-name">El Tio Baza <i data-lucide="shield-check" style="width: 24px; height: 24px; color: var(--primary-green, #107c10);" title="Verificado Oficial"></i></h1>
+        <p class="profile-tagline">Centro Gaming, Emulación Retro y Personalización Xbox</p>
+
+        <!-- REDES SOCIALES CON ICONOS SVG DIRECTOS DECORATIVOS -->
+        <div class="profile-social-grid">
+          <a href="https://youtube.com/@tiobaza/" class="social-pill-btn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#FF0000"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            YouTube
+          </a>
+          <a href="https://discord.gg/RgWdGqzFxX" class="social-pill-btn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#5865F2"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+            Sobrinos del Tio Baza 
+          </a>
+          <a href="https://x.com/baza_tio" class="social-pill-btn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="#1DA1F2"><path d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 0 0-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.06a4.923 4.923 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.936 9.936 0 0 0 24 4.59z"/></svg>
+            Twitter / X
+          </a>
+        </div>
+      </div>
+
+      <!-- LÍNEA DE SEPARACIÓN "CREATED BY" -->
+      <div class="dossier-divider"></div>
+
+      <!-- SECCIÓN INFERIOR: EQUIPO CONECTADO Y RAMIFICACIONES DE TRABAJO -->
+      <div class="team-section-container">
+        
+        <!-- PARTE DEL DUO CONECTADO CON LAZO -->
+        <div class="team-duo-wrapper">
+          
+          <!-- Miembro 1 -->
+          <div class="team-member-node">
+            <img src="https://avatars.githubusercontent.com/u/60585034?v=4" alt="Avatar Miembro 1" class="team-avatar">
+            <h4 class="team-member-name">RXx8</h4>
+            <a href="https://github.com/RXxsk/" class="member-github-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              @rxx8
+            </a>
+          </div>
+
+          <!-- Lazo / Conector de Equipo -->
+          <div class="team-connection-rope">
+            <div class="rope-node-icon" title="Equipo Colaborativo">
+              <i data-lucide="git-commit" style="width: 14px; height: 14px;"></i>
+            </div>
+          </div>
+
+          <!-- Miembro 2 -->
+          <div class="team-member-node">
+            <img src="https://avatars.githubusercontent.com/u/310730206?v=4" alt="Avatar Miembro 2" class="team-avatar">
+            <h4 class="team-member-name">Mannue</h4>
+            <a href="https://github.com/mannuuplds-hub" class="member-github-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+              @mannuuplds
+            </a>
+          </div>
+
+        </div>
+
+        <!-- ÁRBOL DE RAMAS: QUÉ HIZO CADA QUIEN -->
+        <div class="team-branches-tree">
+          
+          <div class="branch-card">
+            <div class="branch-title">
+              <i data-lucide="git-branch" style="width: 14px; height: 14px;"></i> RXx8
+            </div>
+            <p class="branch-desc">Arquitectura del sistema, diseño de la interfaz desarrollo web, flujos interactivos, optimización general y despliegue del portal, sistema automatizado de Repositorios.</p>
+          </div>
+
+          <div class="branch-card">
+            <div class="branch-title">
+              <i data-lucide="git-branch" style="width: 14px; height: 14px;"></i> Mannue 
+            </div>
+            <p class="branch-desc">Soporte técnico de scripts, BIOS personalizados, lógica arquitectura, metadatos de archivos y control de repositorios de preservación.</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- METADATOS ADICIONALES TIPO EXPEDIENTE -->
+      <div class="dossier-meta-grid">
+        <div class="meta-box">
+          <div class="meta-title"><i data-lucide="monitor" style="width: 14px; height: 14px;"></i> Plataforma Principal</div>
+          <div class="meta-value">Xbox Series S/X & PC</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-title"><i data-lucide="activity" style="width: 14px; height: 14px;"></i> Estado del Sistema</div>
+          <div class="meta-value" style="color: var(--primary-green, #107c10);">Operativo / v2.6</div>
+        </div>
+        <div class="meta-box">
+          <div class="meta-title"><i data-lucide="folder-archive" style="width: 14px; height: 14px;"></i> Enfoque de Archivo</div>
+          <div class="meta-value">Emulación & Custom</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y herramientas de preservación.</p>
+  </footer>
+
+  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
+    <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
+    <a href="videos.html" class="mobile-nav-item"><i data-lucide="film"></i><span>Videos</span></a>
+    <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
+<a href="about.html" class="mobile-nav-item active"><i data-lucide="info"></i><span>Acerca</span></a>
+  </nav>
+
+  <!-- SCRIPT DE TEMA Y LUCIDE ICONS -->
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

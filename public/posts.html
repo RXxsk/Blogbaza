@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Posts — El Tío Baza Blog</title>
+  
+  <!-- Estilos Globales -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* CONTENEDOR DE ESTILOS DE VISTA (COMPACTO, LISTA, DETALLADO) */
+    .view-style-toolbar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin: 15px auto 25px auto;
+      max-width: 450px;
+      padding: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 30px;
+    }
+
+    .view-style-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .view-style-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .view-style-btn.active {
+      background: var(--primary-green);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 124, 16, 0.3);
+    }
+
+    /* ESTILOS DE VISTA: COMPACTO */
+    .posts-compact-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .post-compact-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .post-compact-card:hover {
+      border-color: var(--primary-green);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .post-compact-main {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .post-compact-author-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-green);
+      flex-shrink: 0;
+    }
+
+    .post-compact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .post-compact-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .post-compact-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+    }
+
+    .post-compact-badge {
+      background: rgba(16, 124, 16, 0.15);
+      border: 1px solid var(--primary-green);
+      color: var(--accent-green-bright);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .post-compact-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .post-compact-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .post-compact-meta-author {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ESTILOS DE VISTA: LISTA (Con miniatura lateral) */
+    .posts-list-view {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .post-list-card {
+      display: flex;
+      gap: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      padding: 14px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .post-list-card:hover {
+      border-color: var(--primary-green);
+      transform: translateY(-2px);
+    }
+
+    .post-list-thumb {
+      width: 140px;
+      height: 100px;
+      border-radius: 10px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--border-color);
+    }
+
+    .post-list-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .post-list-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .post-list-excerpt {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ESTILOS DE VISTA: DETALLADO (Tarjetas grandes tipo cuadrícula) */
+    .posts-detailed-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .post-detailed-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .post-detailed-card:hover {
+      border-color: var(--primary-green);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .post-detailed-media {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      background: var(--border-color);
+      position: relative;
+    }
+
+    .post-detailed-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .post-detailed-card:hover .post-detailed-media img {
+      transform: scale(1.05);
+    }
+
+    .post-detailed-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .post-detailed-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      line-height: 1.3;
+    }
+
+    .post-detailed-excerpt {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin: 0;
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .post-detailed-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 12px;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* ESTILOS DEL MODAL VISUALIZADOR DE POST COMPLETO */
+    .post-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .post-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .post-modal-container {
+      background: var(--bg-surface, #1e1e1e);
+      border: 1px solid var(--border-color, #333);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .post-modal-overlay.active .post-modal-container {
+      transform: translateY(0);
+    }
+
+    .post-modal-close-btn {
+      position: sticky;
+      top: 16px;
+      right: 16px;
+      align-self: flex-end;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border-color, #444);
+      color: var(--text-primary, #fff);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: background 0.2s ease, transform 0.2s ease;
+      margin-bottom: -36px;
+      margin-right: 16px;
+    }
+
+    .post-modal-close-btn:hover {
+      background: var(--primary-green, #107c10);
+      color: #ffffff;
+      transform: scale(1.08);
+    }
+
+    .post-modal-body {
+      padding: 32px;
+    }
+
+    /* ENCABEZADO MODAL: FECHA CENTRADA, TAMAÑO MEDIANO Y SEPARADA DE LA X */
+    .modal-post-header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 10px 0 16px 0;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .modal-post-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.25;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .modal-post-author-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+
+    .modal-post-author-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-green);
+    }
+
+    .modal-post-author-details {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .modal-post-featured-img {
+      width: 100%;
+      max-height: 380px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-post-content {
+      font-size: 1rem;
+      color: var(--text-primary);
+      line-height: 1.8;
+      word-break: break-word;
+    }
+
+    .modal-post-content p {
+      margin-bottom: 18px;
+    }
+
+    /* RESPONSIVO PARA MÓVILES */
+    @media (max-width: 600px) {
+      .view-style-toolbar {
+        max-width: 100%;
+        margin: 10px 15px 20px 15px;
+      }
+      .view-style-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+      .post-compact-card {
+        padding: 10px;
+        gap: 10px;
+      }
+      .post-compact-author-img {
+        width: 36px;
+        height: 36px;
+      }
+      .post-compact-title {
+        white-space: normal;
+        font-size: 0.95rem;
+      }
+      .post-list-thumb {
+        width: 90px;
+        height: 80px;
+      }
+      .post-modal-body {
+        padding: 20px 16px;
+      }
+      .modal-post-title {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <a href="index.html" class="nav-logo">
+        <div class="avatar-badge">
+          <i data-lucide="gamepad-2"></i>
+        </div>
+        <span>El Tio Baza <span class="logo-accent">Blog</span></span>
+      </a>
+
+      <nav class="nav-sections desktop-only">
+        <a href="index.html" class="nav-link">Inicio</a>
+        <a href="noticias.html" class="nav-link">Noticias</a>
+        <a href="posts.html" class="nav-link active">Posts</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="repos.html" class="nav-link">Repositorios</a>
+        <a href="About.html" class="nav-link">Acerca</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
+          <i data-lucide="lightbulb" class="icon-bulb"></i>
+        </button>
+
+        <div class="dropdown-wrapper">
+          <button id="kebabBtn" class="icon-btn" aria-label="Más opciones">
+            <i data-lucide="more-vertical"></i>
+          </button>
+
+          <div id="kebabDropdown" class="dropdown-menu kebab-menu hidden">
+            <ul>
+              <li><a href="posts.html"><i data-lucide="file-text"></i> Ver Todos los Posts</a></li>
+              <li><a href="noticias.html"><i data-lucide="newspaper"></i> Ver Noticias</a></li>
+              <li class="menu-divider"></li>
+              <li><a href="#"><i data-lucide="folder-down"></i> Descargas & Scripts</a></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- CABECERA DE LA SECCIÓN POSTS -->
+  <section class="page-header">
+    <div class="header-container">
+      <h1 class="page-title"><i data-lucide="file-text"></i> Publicaciones y Artículos</h1>
+      <p class="page-description">
+        Explora la lista completa de tutoriales, guías técnicas, artículos de opinión y aportes de la comunidad.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="content-section">
+    
+    <!-- Barra de Herramientas (Búsqueda + Filtros con Contador Dinámico) -->
+    <div class="posts-toolbar">
+      
+      <!-- Buscador en tiempo real por título -->
+      <div class="search-box">
+        <i data-lucide="search" class="search-icon"></i>
+        <input 
+          type="text" 
+          id="postSearchInput" 
+          placeholder="Buscar posts por título..."
+          autocomplete="off"
+        />
+        <button id="clearPostSearchBtn" class="clear-search-btn hidden" aria-label="Limpiar búsqueda">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Filtros de Categoría con Contadores Basados en la API -->
+      <div class="filter-bar" id="postsFilterBar">
+        <button class="filter-btn active" data-category="all" onclick="selectPostFilter('all', this)">
+          Todos <span class="filter-count" id="count-all">0</span>
+        </button>
+        <button class="filter-btn" data-category="Tutoriales" onclick="selectPostFilter('Tutoriales', this)">
+          Tutoriales <span class="filter-count" id="count-Tutoriales">0</span>
+        </button>
+        <button class="filter-btn" data-category="Guías" onclick="selectPostFilter('Guías', this)">
+          Guías <span class="filter-count" id="count-Guías">0</span>
+        </button>
+        <button class="filter-btn" data-category="Desarrollo" onclick="selectPostFilter('Desarrollo', this)">
+          Desarrollo <span class="filter-count" id="count-Desarrollo">0</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Barra de Estilos de Vista Centrados (Compacto, Lista, Detallado) -->
+    <div class="view-style-toolbar">
+      <button class="view-style-btn active" data-view="compact" onclick="changePostViewStyle('compact', this)">
+        <i data-lucide="list" style="width: 16px; height: 16px;"></i> Compacto
+      </button>
+      <button class="view-style-btn" data-view="list" onclick="changePostViewStyle('list', this)">
+        <i data-lucide="rows" style="width: 16px; height: 16px;"></i> Lista
+      </button>
+      <button class="view-style-btn" data-view="detailed" onclick="changePostViewStyle('detailed', this)">
+        <i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i> Detallado
+      </button>
+    </div>
+
+    <!-- Info de Resultados -->
+    <div class="results-info-bar">
+      <span id="postsResultsText">Mostrando publicaciones...</span>
+    </div>
+
+    <!-- CONTENEDOR DINÁMICO DE POSTS -->
+    <div id="postsListContainer" class="posts-compact-list">
+      <!-- Carga inicial con Skeleton Loader -->
+      <div class="post-compact-card skeleton-card">
+        <div class="skeleton-line skeleton-anim" style="width: 40px; height: 40px; border-radius: 50%;"></div>
+        <div style="flex: 1;">
+          <div class="skeleton-line medium skeleton-anim" style="height: 18px;"></div>
+          <div class="skeleton-line short skeleton-anim" style="height: 14px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- VENTANA MODAL VISUALIZADORA DE PREVISUALIZACIÓN DE POST -->
+  <div id="postPreviewModal" class="post-modal-overlay" onclick="closePostPreviewModalOnOverlay(event)">
+    <div class="post-modal-container">
+      <button class="post-modal-close-btn" onclick="closePostPreviewModal()" aria-label="Cerrar vista previa">
+        <i data-lucide="x"></i>
+      </button>
+      <div id="postModalBody" class="post-modal-body">
+        <!-- Se inyectará dinámicamente el contenido traído desde la API -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y videos.</p>
+  </footer>
+
+  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
+    <a href="posts.html" class="mobile-nav-item active"><i data-lucide="file-text"></i><span>Posts</span></a>
+    <a href="videos.html" class="mobile-nav-item"><i data-lucide="film"></i><span>Videos</span></a>
+    <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
+<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+  <script>
+    let allPostsData = [];
+    let activePostCategory = 'all';
+    let activeViewStyle = 'compact'; // 'compact', 'list', 'detailed'
+
+    const AVATAR_FRONTEND_MAP = {
+      'el tio baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+      'el tío baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+      'baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+      'rxx8': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKPhcbxJpIBqKRVJ7R_FNOHclLLV2s_eA4caJBzDpm2Q&s=10',
+      'mannuee': 'https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj'
+    };
+
+    function resolveAuthorAvatar(authorName, avatarFromApi) {
+      if (avatarFromApi && avatarFromApi.startsWith('http')) {
+        return avatarFromApi;
+      }
+      const key = (authorName || '').toLowerCase().trim();
+      return AVATAR_FRONTEND_MAP[key] || AVATAR_FRONTEND_MAP['el tío baza'];
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      fetchAndRenderPosts();
+
+      const searchInput = document.getElementById('postSearchInput');
+      const clearBtn = document.getElementById('clearPostSearchBtn');
+
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const query = e.target.value.trim();
+          if (clearBtn) clearBtn.classList.toggle('hidden', query === '');
+          applyPostFilters();
+        });
+      }
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          if (searchInput) {
+            searchInput.value = '';
+            clearBtn.classList.add('hidden');
+            applyPostFilters();
+          }
+        });
+      }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closePostPreviewModal();
+      });
+    });
+
+    async function fetchAndRenderPosts() {
+      const container = document.getElementById('postsListContainer');
+
+      try {
+        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/posts` : '/api/posts';
+        
+        let response;
+        try {
+          response = await fetch(apiEndpoint);
+          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+        } catch (err) {
+          response = await fetch('data/posts.json');
+        }
+
+        const data = await response.json();
+        allPostsData = Array.isArray(data) ? data : (data.posts || []);
+
+        updatePostCategoryCounts(allPostsData);
+        applyPostFilters();
+
+      } catch (error) {
+        console.error('Error al cargar publicaciones:', error);
+        if (container) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i data-lucide="alert-triangle" class="empty-state-icon" style="color: #ef4444;"></i>
+              <h3>No se pudieron cargar las publicaciones</h3>
+              <p>Ocurrió un problema al comunicarse con el servidor o la API.</p>
+              <button class="btn-secondary" onclick="fetchAndRenderPosts()">Reintentar</button>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    function updatePostCategoryCounts(postsList) {
+      const counts = { all: postsList.length, Tutoriales: 0, Guías: 0, Desarrollo: 0 };
+
+      postsList.forEach(post => {
+        const cat = post.category || post.categoria;
+        if (cat && counts.hasOwnProperty(cat)) counts[cat]++;
+      });
+
+      Object.keys(counts).forEach(cat => {
+        const badge = document.getElementById(`count-${cat}`);
+        if (badge) badge.textContent = counts[cat];
+      });
+    }
+
+    function selectPostFilter(category, btnElement) {
+      activePostCategory = category;
+      const buttons = document.querySelectorAll('#postsFilterBar .filter-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+      applyPostFilters();
+    }
+
+    function changePostViewStyle(style, btnElement) {
+      activeViewStyle = style;
+      const buttons = document.querySelectorAll('.view-style-toolbar .view-style-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+
+      const container = document.getElementById('postsListContainer');
+      if (container) {
+        container.className = '';
+        if (style === 'compact') container.classList.add('posts-compact-list');
+        else if (style === 'list') container.classList.add('posts-list-view');
+        else if (style === 'detailed') container.classList.add('posts-detailed-grid');
+      }
+
+      applyPostFilters();
+    }
+
+    function applyPostFilters() {
+      const container = document.getElementById('postsListContainer');
+      const searchInput = document.getElementById('postSearchInput');
+      const resultsText = document.getElementById('postsResultsText');
+
+      if (!container) return;
+
+      const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      const filtered = allPostsData.filter(post => {
+        const category = post.category || post.categoria || '';
+        const title = (post.title || post.titulo || '').toLowerCase();
+        
+        const matchesCat = (activePostCategory === 'all') || (category.toLowerCase() === activePostCategory.toLowerCase());
+        const matchesSearch = !searchTerm || title.includes(searchTerm);
+
+        return matchesCat && matchesSearch;
+      });
+
+      if (resultsText) {
+        resultsText.textContent = `Mostrando ${filtered.length} publicación(es)`;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i data-lucide="file-text" class="empty-state-icon"></i>
+            <h3>No se encontraron resultados</h3>
+            <p>Intenta con otros términos en el título o cambia la categoría seleccionada.</p>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      // Renderizado basado en el estilo activo (Compacto, Lista o Detallado)
+      if (activeViewStyle === 'compact') {
+        container.innerHTML = filtered.map(post => {
+          const id = post.id || post._id || '';
+          const title = post.title || post.titulo || 'Sin título';
+          const category = post.category || post.categoria || 'General';
+          const author = post.author || post.autor || 'El Tío Baza';
+          const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
+          const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+
+          return `
+            <div class="post-compact-card" onclick="openPostPreviewModal('${id}')">
+              <div class="post-compact-main">
+                <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="post-compact-author-img" loading="lazy" />
+                <div class="post-compact-info">
+                  <div class="post-compact-title-row">
+                    <h3 class="post-compact-title">${escapeHTML(title)}</h3>
+                    <span class="post-compact-badge">${escapeHTML(category)}</span>
+                  </div>
+                  <div class="post-compact-meta">
+                    <span class="post-compact-meta-item">
+                      <i data-lucide="user" style="width: 12px; height: 12px;"></i>
+                      <span class="post-compact-meta-author">${escapeHTML(author)}</span>
+                    </span>
+                    <span class="post-compact-meta-item">
+                      <i data-lucide="calendar" style="width: 12px; height: 12px;"></i>
+                      <span>${escapeHTML(date)}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="post-compact-action">
+                <i data-lucide="chevron-right" style="width: 20px; height: 20px; color: var(--primary-green);"></i>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } else if (activeViewStyle === 'list') {
+        container.innerHTML = filtered.map(post => {
+          const id = post.id || post._id || '';
+          const title = post.title || post.titulo || 'Sin título';
+          const category = post.category || post.categoria || 'General';
+          const author = post.author || post.autor || 'El Tío Baza';
+          const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+          // Corrección clave para leer correctamente la imagen propia del post desde la API (coverUrl, image, imagen, cover)
+          const image = post.coverUrl || post.image || post.imagen || post.cover || 'blogpre.jpg';
+          const summary = post.summary || post.excerpt || post.content || 'Sin descripción disponible.';
+
+          return `
+            <div class="post-list-card" onclick="openPostPreviewModal('${id}')">
+              <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" class="post-list-thumb" loading="lazy" />
+              <div class="post-list-content">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <span class="post-compact-badge">${escapeHTML(category)}</span>
+                  <span style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHTML(date)}</span>
+                </div>
+                <h3 class="post-list-title">${escapeHTML(title)}</h3>
+                <p class="post-list-excerpt">${escapeHTML(summary.replace(/<[^>]*>?/gm, ''))}</p>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } else if (activeViewStyle === 'detailed') {
+        container.innerHTML = filtered.map(post => {
+          const id = post.id || post._id || '';
+          const title = post.title || post.titulo || 'Sin título';
+          const category = post.category || post.categoria || 'General';
+          const author = post.author || post.autor || 'El Tío Baza';
+          const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+          // Corrección clave para leer correctamente la imagen propia del post desde la API (coverUrl, image, imagen, cover)
+          const image = post.coverUrl || post.image || post.imagen || post.cover || 'blogpre.jpg';
+          const summary = post.summary || post.excerpt || post.content || 'Sin descripción disponible.';
+
+          return `
+            <div class="post-detailed-card" onclick="openPostPreviewModal('${id}')">
+              <div class="post-detailed-media">
+                <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" loading="lazy" />
+                <div style="position: absolute; top: 10px; left: 10px;">
+                  <span class="post-compact-badge">${escapeHTML(category)}</span>
+                </div>
+              </div>
+              <div class="post-detailed-body">
+                <h3 class="post-detailed-title">${escapeHTML(title)}</h3>
+                <p class="post-detailed-excerpt">${escapeHTML(summary.replace(/<[^>]*>?/gm, ''))}</p>
+                <div class="post-detailed-footer">
+                  <span>Por ${escapeHTML(author)}</span>
+                  <span>${escapeHTML(date)}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function openPostPreviewModal(postId) {
+      const modal = document.getElementById('postPreviewModal');
+      const modalBody = document.getElementById('postModalBody');
+
+      if (!modal || !modalBody) return;
+
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      modalBody.innerHTML = `
+        <div style="padding: 10px;">
+          <div class="skeleton-line short skeleton-anim" style="margin: 0 auto 16px auto; width: 120px;"></div>
+          <div class="skeleton-line long skeleton-anim" style="height: 32px; margin-bottom: 20px;"></div>
+          <div class="skeleton-line skeleton-anim" style="height: 220px; border-radius: 12px; margin-bottom: 24px;"></div>
+          <div class="skeleton-line skeleton-anim" style="height: 80px;"></div>
+        </div>
+      `;
+
+      try {
+        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/posts/${postId}` : `/api/posts/${postId}`;
+        
+        let postData;
+        try {
+          const response = await fetch(apiEndpoint);
+          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+          postData = await response.json();
+        } catch (err) {
+          postData = allPostsData.find(p => String(p.id || p._id) === String(postId));
+          if (!postData) {
+            const fallbackRes = await fetch('data/posts.json');
+            const fallbackData = await fallbackRes.json();
+            const list = Array.isArray(fallbackData) ? fallbackData : (fallbackData.posts || []);
+            postData = list.find(p => String(p.id || p._id) === String(postId));
+          }
+        }
+
+        if (!postData) throw new Error('No se encontró la información del post.');
+
+        renderModalContent(postData);
+
+      } catch (error) {
+        console.error('Error al obtener detalle del post:', error);
+        modalBody.innerHTML = `
+          <div style="text-align: center; padding: 30px 10px;">
+            <i data-lucide="alert-triangle" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
+            <h3>Error al cargar el post</h3>
+            <p style="color: var(--text-secondary); margin-top: 6px;">No se pudo recuperar la información completa desde la API.</p>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+
+    function renderModalContent(post) {
+      const modalBody = document.getElementById('postModalBody');
+      if (!modalBody) return;
+
+      const title = post.title || post.titulo || 'Sin título';
+      const category = post.category || post.categoria || 'General';
+      const author = post.author || post.autor || 'El Tío Baza';
+      const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
+      const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+      // Corrección en el modal para extraer la imagen propia de la API de forma segura
+      const image = post.coverUrl || post.image || post.imagen || post.cover || '';
+      const content = post.content || post.contenido || post.body || post.summary || '<p>No hay detalles adicionales disponibles para esta publicación.</p>';
+
+      modalBody.innerHTML = `
+        <div class="modal-post-header-meta">
+          <span class="post-compact-badge">${escapeHTML(category)}</span>
+          <div class="post-compact-meta-item">
+            <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+            <span>${escapeHTML(date)}</span>
+          </div>
+        </div>
+
+        <h1 class="modal-post-title">${escapeHTML(title)}</h1>
+
+        <div class="modal-post-author-box">
+          <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="modal-post-author-avatar" />
+          <div class="modal-post-author-details">
+            <span class="post-compact-meta-author">${escapeHTML(author)}</span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Autor oficial</span>
+          </div>
+        </div>
+
+        ${image ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" class="modal-post-featured-img" />` : ''}
+
+        <div class="modal-post-content">
+          ${content}
+        </div>
+      `;
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closePostPreviewModal() {
+      const modal = document.getElementById('postPreviewModal');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    function closePostPreviewModalOnOverlay(event) {
+      if (event.target.classList.contains('post-modal-overlay')) {
+        closePostPreviewModal();
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

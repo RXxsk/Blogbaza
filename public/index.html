@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Tio Baza Blog — Inicio</title>
+
+<link rel="icon" href="../img/logo1.jpg" type="image/jpeg">
+
+<meta property="og:site_name" content="El Tio Baza Blog">
+  <meta property="og:title" content="Baza Blog">
+  <meta property="og:description" content="Blog Oficial de la comunidad del Tío Baza.">
+  <meta property="og:type" content="website">
+
+  
+  <meta property="og:image" content="https:/img/banner.jpg">
+  <meta property="og:image:secure_url" content="https://xbaurora.pages.dev/img/banner.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Tarjeta para Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Datos estructurados JSON-LD para Google -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Xb Aurora",
+    "alternateName": "XbAurora",
+    "url": "https://xbaurora.pages.dev/"
+  }
+  </script>
+  
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Estilos específicos para las nuevas secciones del Index */
+    .featured-diagonal-card {
+      position: relative;
+      background: var(--bg-card, #1e293b);
+      border: 1px solid var(--border-color, #334155);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .featured-diagonal-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--primary-green, #107c10);
+    }
+    .diagonal-media-wrapper {
+      position: relative;
+      height: 220px;
+      width: 100%;
+      overflow: hidden;
+    }
+    .diagonal-media-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* Máscara con borde desvanecido en dirección diagonal "/" */
+      mask-image: linear-gradient(135deg, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(135deg, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+    }
+    .diagonal-content {
+      padding: 20px;
+    }
+
+    /* Fuentes Recomendadas - Scroll horizontal fluido tipo app */
+    .sources-scroll-container {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 10px 4px 20px 4px;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary-green) var(--border-color);
+    }
+    .source-app-card {
+      min-width: 140px;
+      max-width: 140px;
+      background: var(--bg-card, #1e293b);
+      border: 1px solid var(--border-color, #334155);
+      border-radius: 16px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+    .source-app-card:hover {
+      border-color: var(--primary-green, #107c10);
+      transform: translateY(-3px);
+    }
+    .source-app-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      object-fit: cover;
+      background: rgba(16, 124, 16, 0.1);
+      border: 1px solid var(--border-color);
+    }
+    .source-app-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary, #fff);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+
+    /* Carrusel de Videos */
+    .video-carousel-wrapper {
+      position: relative;
+      background: var(--bg-card, #1e293b);
+      border: 1px solid var(--border-color, #334155);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .video-carousel-slide {
+      display: none;
+      padding: 20px;
+      align-items: center;
+      gap: 20px;
+    }
+    .video-carousel-slide.active {
+      display: flex;
+      animation: fadeInSlide 0.5s ease-in-out;
+    }
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .video-carousel-thumb {
+      width: 240px;
+      height: 135px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--border-color);
+    }
+    @media(max-width: 650px) {
+      .video-carousel-slide { flex-direction: column; text-align: center; }
+      .video-carousel-thumb { width: 100%; height: 180px; }
+    }
+
+    /* Ventana Modal Genérica */
+    .preview-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .preview-modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .preview-modal-box {
+      background: var(--bg-card, #1e293b);
+      border: 1px solid var(--primary-green, #107c10);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 550px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 24px;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+      transform: translateY(20px);
+      transition: transform 0.25s ease;
+    }
+    .preview-modal-overlay.show .preview-modal-box {
+      transform: translateY(0);
+    }
+    .preview-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .preview-modal-close:hover {
+      background: #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. NOTIFICACIÓN ESTILO LOGRO DE XBOX (RESPONSIVA Y ÚNICA) -->
+  <div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
+    <div class="achievement-icon-wrapper">
+      <i data-lucide="award" class="achievement-icon"></i>
+    </div>
+    <div class="achievement-text">
+      <span class="achievement-title">¡LOGRO DESBLOQUEADO!</span>
+      <div class="achievement-desc-container">
+        <span id="achievementDesc" class="achievement-desc">¡Bienvenido! Explora nuestras nuevas guías de Emuladores y utilidades de ayuda.</span>
+      </div>
+    </div>
+    <div class="achievement-g">
+      <span>G</span> <span id="achievementPoints">100</span>
+    </div>
+  </div>
+
+  <style>
+    /* Estilos de la notificación de Logro Xbox */
+    .xbox-achievement {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #0e1711;
+      border: 2px solid var(--primary-green, #107c10);
+      color: #ffffff;
+      padding: 14px 18px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(16, 124, 16, 0.4);
+      max-width: 380px;
+      width: calc(100% - 50px);
+      transform: translateY(120px);
+      opacity: 0;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    }
+
+    .xbox-achievement.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .achievement-icon-wrapper {
+      background: var(--primary-green, #107c10);
+      color: #fff;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 10px var(--primary-green, #107c10);
+    }
+
+    .achievement-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .achievement-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .achievement-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--primary-green, #107c10);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .achievement-desc-container {
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      width: 100%;
+    }
+
+    .achievement-desc {
+      display: inline-block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #f0fdf4;
+      padding-left: 100%;
+      animation: textScrollOnce 8s linear forwards;
+    }
+
+    @keyframes textScrollOnce {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .achievement-g {
+      background: #141c17;
+      border: 1px solid var(--primary-green, #107c10);
+      color: #00ff66;
+      font-weight: 900;
+      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .xbox-achievement {
+        bottom: 75px;
+        right: 15px;
+        left: 15px;
+        width: auto;
+      }
+    }
+  </style>
+
+  <script>
+    function triggerSingleXboxAchievement() {
+      const banner = document.getElementById('xboxAchievementBanner');
+      if (!banner) return;
+      banner.style.display = 'flex';
+      setTimeout(() => banner.classList.add('show'), 50);
+      setTimeout(() => {
+        banner.classList.remove('show');
+        setTimeout(() => { banner.style.display = 'none'; }, 500);
+      }, 7500);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(triggerSingleXboxAchievement, 1500);
+    });
+  </script>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <a href="index.html" class="nav-logo">
+        <div class="avatar-badge">
+          <i data-lucide="gamepad-2"></i>
+        </div>
+        <span>El Tio Baza <span class="logo-accent">Blog</span></span>
+      </a>
+
+      <nav class="nav-sections desktop-only">
+        <a href="index.html" class="nav-link active">Inicio</a>
+        <a href="noticias.html" class="nav-link">Noticias</a>
+        <a href="posts.html" class="nav-link">Posts</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="repos.html" class="nav-link">Repositorios</a>
+        <a href="About.html" class="nav-link">Acerca</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
+          <i data-lucide="lightbulb" class="icon-bulb"></i>
+        </button>
+
+        <div class="dropdown-wrapper">
+          <button id="kebabBtn" class="icon-btn" aria-label="Más opciones">
+            <i data-lucide="more-vertical"></i>
+          </button>
+          <div id="kebabDropdown" class="dropdown-menu kebab-menu hidden">
+            <ul>
+              <li><a href="noticias.html"><i data-lucide="newspaper"></i> Ver Noticias</a></li>
+              <li><a href="repos.html"><i data-lucide="database"></i> Recursos</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO PRINCIPAL CON IMAGEN ESTÁTICA DE PRESENTACIÓN -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-badge">
+        <span class="live-dot"></span> PORTAL PRINCIPAL XBOX
+      </div>
+      <h1 class="hero-title">Home</h1>
+      <p class="hero-description">
+        Comunidad dedicada a la preservación, modificaciones, tutoriales de consolas y debate técnico.
+      </p>
+
+      <!-- 2. PÍLDORAS DE CATEGORÍAS RÁPIDAS -->
+      <div class="quick-tags-bar" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 30px;">
+        <a href="repos.html?cat=modding" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="cpu" style="width: 14px; height: 14px; color: var(--primary-green);"></i> Emus
+        </a>
+        <a href="videos.html?cat=tutoriales" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="book-open" style="width: 14px; height: 14px; color: var(--primary-green);"></i> Tutoriales
+        </a>
+        <a href="posts.html?cat=preservacion" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="database" style="width: 14px; height: 14px; color: var(--primary-green);"></i> Preservación
+        </a>
+        <a href="noticias.html" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 14px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+          <i data-lucide="film" style="width: 14px; height: 14px; color: var(--primary-green);"></i> Anuncios
+        </a>
+      </div>
+
+      <!-- Tarjeta Presentación Estática (Fija) -->
+<div class="featured-card">
+  <div class="featured-media">
+    <img src="blogpre.jpg" alt="Presentación del Blog" style="width:100%; height:100%; object-fit:cover;">
+  </div>
+  <div class="featured-info">
+    <span class="tag">Recarga Tus Baterías</span>
+    <h2>Bienvenidos al Baza Blog</h2>
+    <p>Explora nuestros artículos técnicos, guías, preservación, emulación, noticias recientes y videos exclusivos.</p>
+    <div style="margin-top: 15px; display: flex; gap: 15px; align-items: center;">
+      <a href="posts.html" class="btn-read-more" style="padding: 8px 16px; background: var(--primary-green, #107c10); color: #fff; border-radius: 6px; text-decoration: none; font-weight: bold;">Explorar Posts→</a>
+      <span style="font-size: 0.85rem; color: var(--text-secondary);">Portal Oficial</span>
+    </div>
+  </div>
+</div>
+
+    </div>
+  </section>
+
+  <!-- RESUMEN LO MÁS RECIENTE DE CADA SECCIÓN -->
+  <main class="content-section">
+    
+    <!-- Avance de Noticias -->
+    <div class="section-header">
+      <h2 class="section-title"><i data-lucide="newspaper"></i> Últimas Noticias</h2>
+      <a href="noticias.html" class="view-all">Ir a Noticias →</a>
+    </div>
+    
+    <div id="homeNoticiasContainer" class="news-ticker mb-4">
+      <p style="color: var(--text-secondary);">Cargando últimas noticias...</p>
+    </div>
+
+    <!-- SECCIÓN DESTACADO (CARGADO DE LA API DE POSTS CON BORDE DIAGONAL) -->
+    <section class="carousel-section" style="margin-top: 40px;">
+      <div class="section-header">
+        <h2 class="section-title"><i data-lucide="layers"></i> Destacado</h2>
+        <a href="posts.html" class="view-all">Ver todos →</a>
+      </div>
+      <div id="homeDestacadoContainer">
+        <p style="color: var(--text-secondary);">Cargando post destacado...</p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN FUENTES RECOMENDADAS (REPOSITORIOS CON SCROLL HORIZONTAL TIPO APP) -->
+    <section class="list-section" style="margin-top: 40px; margin-bottom: 20px;">
+      <div class="section-header">
+        <h2 class="section-title"><i data-lucide="database"></i> Fuentes Recomendadas</h2>
+        <a href="repos.html" class="view-all">Ver repositorio →</a>
+      </div>
+      <div id="homeReposContainer" class="sources-scroll-container">
+        <p style="color: var(--text-secondary); padding: 10px;">Cargando fuentes recomendadas...</p>
+      </div>
+    </section>
+
+    <!-- SECCIÓN CARRUSEL DE VIDEOS DE YOUTUBE -->
+    <section class="list-section" style="margin-top: 40px; margin-bottom: 30px;">
+      <div class="section-header">
+        <h2 class="section-title"><i data-lucide="film"></i> Videos Destacados</h2>
+        <a href="videos.html" class="view-all">Ver canal →</a>
+      </div>
+      <div id="homeVideoCarousel" class="video-carousel-wrapper">
+        <p style="color: var(--text-secondary); padding: 20px; text-align: center;">Cargando videos...</p>
+      </div>
+    </section>
+
+    <!-- 3. TARJETA DE COMUNIDAD Y REDES -->
+    <section class="community-card-section" style="margin-top: 40px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; text-align: center;">
+      <div style="max-width: 600px; margin: 0 auto;">
+        <div style="background: rgba(16, 124, 16, 0.15); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+          <i data-lucide="users" style="width: 24px; height: 24px; color: var(--primary-green);"></i>
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">¡Únete a la Comunidad!</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">Comparte experiencias con nosotros, y descubre más contenido exclusivo del blog.</p>
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <a href="https://youtube.com/@tiobaza?si=Ts_4SBuRHoFBQuhP" style="background: var(--primary-green); color: #fff; padding: 8px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 6px;">
+            <i data-lucide="video" style="width: 16px; height: 16px;"></i> Ver Canal
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div style="margin-top: 30px; display: flex; justify-content: center;">
+      <iframe src="https://discord.com/widget?id=891052967376080936&theme=dark" width="300" height="450" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+    </div>
+
+  </main>
+
+  <!-- VENTANA MODAL UNIVERSAL PARA PREVISUALIZACIÓN -->
+  <div id="universalPreviewModal" class="preview-modal-overlay">
+    <div class="preview-modal-box">
+      <button class="preview-modal-close" onclick="closeUniversalModal()">
+        <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+      </button>
+      <div id="universalModalContent">
+        <!-- Contenido dinámico inyectado por JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y videos.</p>
+  </footer>
+
+  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a href="index.html" class="mobile-nav-item active"><i data-lucide="home"></i><span>Inicio</span></a>
+    <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
+    <a href="videos.html" class="mobile-nav-item"><i data-lucide="film"></i><span>Videos</span></a>
+    <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
+<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+  </nav>
+
+  <script src="script.js"></script>
+  <script>
+    // Inicialización de íconos de Lucide
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      loadHomeDynamicSections();
+    });
+
+    function openUniversalModal(htmlContent) {
+      document.getElementById('universalModalContent').innerHTML = htmlContent;
+      document.getElementById('universalPreviewModal').classList.add('show');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeUniversalModal() {
+      document.getElementById('universalPreviewModal').classList.remove('show');
+    }
+
+    // Cerrar modal haciendo clic fuera de la caja
+    document.getElementById('universalPreviewModal').addEventListener('click', (e) => {
+      if (e.target.id === 'universalPreviewModal') closeUniversalModal();
+    });
+
+    // Cargar dinámicamente Destacados, Fuentes (Repositorios) y Carrusel de Videos
+    async function loadHomeDynamicSections() {
+      try {
+        // 1. Cargar Posts para la sección "Destacado"
+        const resPosts = await fetch('/api/posts');
+        if (resPosts.ok) {
+          const posts = await resPosts.json();
+          const destContainer = document.getElementById('homeDestacadoContainer');
+          // Buscar el primer post marcado como destacado o tomar el primero de la lista
+          const featured = posts.find(p => p.destacado) || posts[0];
+
+          if (featured) {
+            const title = featured.titulo || featured.title || 'Sin título';
+            const subtitle = featured.subtitulo || featured.descripcion || 'Sin descripción disponible...';
+            const cover = featured.coverUrl || 'blogpre.jpg';
+            const fullContent = featured.content || subtitle;
+
+            destContainer.innerHTML = `
+              <div class="featured-diagonal-card" onclick='showPostModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)})'>
+                <div class="diagonal-media-wrapper">
+                  <img src="${cover}" alt="${title}">
+                </div>
+                <div class="diagonal-content">
+                  <span class="tag" style="background: rgba(16,124,16,0.2); color: var(--primary-green); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${featured.categoria || 'Destacado'}</span>
+                  <h3 style="margin: 10px 0 6px 0; font-size: 1.15rem; color: #fff;">${title}</h3>
+                  <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">${subtitle}</p>
+                </div>
+              </div>
+            `;
+          } else {
+            destContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay publicaciones destacadas.</p>';
+          }
+        }
+
+        // 2. Cargar Repositorios para "Fuentes Recomendadas"
+        const resRepos = await fetch('/api/repos');
+        if (resRepos.ok) {
+          const repos = await resRepos.json();
+          const reposContainer = document.getElementById('homeReposContainer');
+
+          if (repos && repos.length > 0) {
+            reposContainer.innerHTML = repos.map(repo => {
+              const name = repo.titulo || repo.title || 'Herramienta';
+              const logo = repo.logoUrl || repo.coverUrl || 'blogpre.jpg';
+              const desc = repo.descripcion || 'Sin descripción.';
+              const extDesc = repo.extendedDesc || desc;
+              const download = repo.downloadUrl || '#';
+              const version = repo.version || 'v1.0';
+
+              return `
+                <div class="source-app-card" onclick='showRepoModal(${JSON.stringify(name)}, ${JSON.stringify(logo)}, ${JSON.stringify(desc)}, ${JSON.stringify(extDesc)}, ${JSON.stringify(download)}, ${JSON.stringify(version)})'>
+                  <img src="${logo}" alt="${name}" class="source-app-logo">
+                  <span class="source-app-name">${name}</span>
+                  <span style="font-size: 0.7rem; color: var(--text-secondary);">${version}</span>
+                </div>
+              `;
+            }).join('');
+          } else {
+            reposContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay fuentes registradas.</p>';
+          }
+        }
+
+        // 3. Cargar Videos para el Carrusel
+        const resVideos = await fetch('/api/videos');
+        if (resVideos.ok) {
+          const videos = await resVideos.json();
+          const videoContainer = document.getElementById('homeVideoCarousel');
+
+          if (videos && videos.length > 0) {
+            videoContainer.innerHTML = videos.map((vid, idx) => {
+              const ytId = vid.youtubeId || vid.id || '';
+              const title = vid.titulo || vid.title || 'Video de YouTube';
+              const desc = vid.descripcion || vid.desc || 'Video exclusivo del canal.';
+              const thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+              const ytLink = `https://www.youtube.com/watch?v=${ytId}`;
+
+              return `
+                <div class="video-carousel-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                  <img src="${thumbUrl}" alt="${title}" class="video-carousel-thumb">
+                  <div style="flex: 1;">
+                    <span style="font-size: 0.75rem; color: var(--primary-green); font-weight: 700;"><i data-lucide="youtube"></i> YouTube Video</span>
+                    <h3 style="margin: 6px 0; font-size: 1.1rem; color: #fff;">${title}</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">${desc}</p>
+                    <a href="${ytLink}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #ef4444; color: #fff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold;">
+                      <i data-lucide="play"></i> Ver en YouTube
+                    </a>
+                  </div>
+                </div>
+              `;
+            }).join('');
+
+            // Iniciar intervalo del carrusel cada 5 segundos
+            initVideoCarousel();
+          } else {
+            videoContainer.innerHTML = '<p style="color: var(--text-secondary); padding: 20px; text-align: center;">No hay videos disponibles.</p>';
+          }
+        }
+
+      } catch (err) {
+        console.error('Error cargando elementos dinámicos en el Index:', err);
+      }
+    }
+
+    // Funciones de previsualización para el Modal
+    function showPostModal(title, content, cover) {
+      const html = `
+        ${cover ? `<img src="${cover}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : ''}
+        <h2 style="margin-top:0; color:#fff; font-size:1.3rem;">${title}</h2>
+        <div style="color: var(--text-secondary); font-size:0.95rem; line-height:1.6; max-height: 350px; overflow-y: auto;">
+          ${content}
+        </div>
+      `;
+      openUniversalModal(html);
+    }
+
+    function showRepoModal(name, logo, desc, extDesc, downloadUrl, version) {
+      const html = `
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+          <img src="${logo}" style="width:64px; height:64px; border-radius:12px; object-fit:cover; border:1px solid var(--border-color);">
+          <div>
+            <h2 style="margin:0 0 4px 0; color:#fff; font-size:1.2rem;">${name}</h2>
+            <span style="font-size:0.8rem; background: rgba(16,124,16,0.2); color: var(--primary-green); padding:2px 8px; border-radius:4px; font-weight:bold;">${version}</span>
+          </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size:0.9rem; margin-bottom:15px;">${desc}</p>
+        <div style="background: rgba(15,23,42,0.5); padding:12px; border-radius:8px; border:1px solid var(--border-color); margin-bottom:20px; font-size:0.88rem; line-height:1.5;">
+          ${extDesc}
+        </div>
+        ${downloadUrl && downloadUrl !== '#' ? `
+          <a href="${downloadUrl}" target="_blank" style="display:block; text-align:center; background: var(--primary-green); color:#fff; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;">
+            <i data-lucide="download"></i> Descargar / Ver Enlace
+          </a>
+        ` : ''}
+      `;
+      openUniversalModal(html);
+    }
+
+    // Lógica del Carrusel de Videos automático con intervalos de segundos
+    function initVideoCarousel() {
+      const slides = document.querySelectorAll('.video-carousel-slide');
+      if (slides.length <= 1) return;
+
+      let currentIndex = 0;
+      setInterval(() => {
+        slides[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % slides.length;
+        slides[currentIndex].classList.add('active');
+        if (window.lucide) lucide.createIcons();
+      }, 5000); // Cambia cada 5 segundos
+    }
+  </script>
+</body>
+</html>
+

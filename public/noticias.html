@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noticias — El Tio Baza Blog</title>
+  
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <!-- Logo / Brand -->
+      <a href="index.html" class="nav-logo">
+        <div class="avatar-badge">
+          <i data-lucide="gamepad-2"></i>
+        </div>
+        <span>El Tio Baza <span class="logo-accent">Blog</span></span>
+      </a>
+
+      <!-- Menú Multipartes (Escritorio) -->
+      <nav class="nav-sections desktop-only">
+        <a href="index.html" class="nav-link">Inicio</a>
+        <a href="noticias.html" class="nav-link active">Noticias</a>
+        <a href="posts.html" class="nav-link">Posts</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="repos.html" class="nav-link">Repositorio</a>
+      </nav>
+
+      <!-- Acciones de Usuario -->
+      <div class="nav-actions">
+        
+        <!-- Botón de Tema Blanco/Negro con Icono Foco (💡) -->
+        <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
+          <i data-lucide="lightbulb" class="icon-bulb"></i>
+        </button>
+
+        <!-- Menú Kebab -->
+        <div class="dropdown-wrapper">
+          <button id="kebabBtn" class="icon-btn" aria-label="Más opciones">
+            <i data-lucide="more-vertical"></i>
+          </button>
+
+          <div id="kebabDropdown" class="dropdown-menu kebab-menu hidden">
+            <ul>
+              <li><a href="noticias.html"><i data-lucide="newspaper"></i> Ver Noticias</a></li>
+              <li class="menu-divider"></li>
+              <li><a href="#"><i data-lucide="folder-down"></i> Descargas & Scripts</a></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- CABECERA DE LA SECCIÓN NOTICIAS -->
+  <section class="page-header">
+    <div class="header-container">
+      <h1 class="page-title"><i data-lucide="newspaper"></i> Panel de Noticias</h1>
+      <p class="page-description">
+        Entérate de las últimas novedades sobre actualizaciones de software, liberaciones, emulación y cambios en el servidor.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL DE NOTICIAS -->
+  <main class="content-section">
+    
+    <!-- Info de Resultados -->
+    <div class="results-info-bar">
+      <span id="newsResultsText">Cargando noticias...</span>
+    </div>
+
+    <!-- FEED DE NOTICIAS COMPLETO (INYECCIÓN DINÁMICA DE LA API DEL ADMIN) -->
+    <div id="noticiasGridContainer" class="news-ticker">
+      <!-- Carga inicial con Skeleton Loader -->
+      <div class="news-item skeleton-card">
+        <div class="skeleton-line short skeleton-anim" style="width: 80px; height: 20px;"></div>
+        <div style="flex: 1;">
+          <div class="skeleton-line medium skeleton-anim" style="height: 22px;"></div>
+          <div class="skeleton-line full skeleton-anim" style="height: 16px;"></div>
+          <div class="skeleton-line short skeleton-anim" style="height: 14px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y videos.</p>
+  </footer>
+
+  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
+  </nav>
+
+  <script src="script.js"></script>
+  <script>
+    let allNewsData = [];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+
+      // Cargar directamente las noticias desde la API del admin
+      fetchAndRenderNoticias();
+    });
+
+    /**
+     * Petición de noticias conectada a la API del admin backend (con fallback local)
+     */
+    async function fetchAndRenderNoticias() {
+      const container = document.getElementById('noticiasGridContainer');
+      const resultsText = document.getElementById('newsResultsText');
+
+      try {
+        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
+        
+        let response;
+        try {
+          response = await fetch(apiEndpoint);
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        } catch (err) {
+          response = await fetch('data/noticias.json');
+        }
+
+        const data = await response.json();
+        allNewsData = Array.isArray(data) ? data : (data.noticias || []);
+
+        if (resultsText) {
+          resultsText.textContent = `Mostrando ${allNewsData.length} noticia(s)`;
+        }
+
+        if (allNewsData.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i data-lucide="newspaper" class="empty-state-icon"></i>
+              <h3>No se encontraron noticias</h3>
+              <p>No hay publicaciones disponibles en este momento.</p>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+          return;
+        }
+
+        // Renderizar las noticias obtenidas de la API del admin
+        container.innerHTML = allNewsData.map(item => {
+          const category = item.categoria || item.category || 'General';
+          const title = item.titulo || item.title || 'Noticia sin título';
+          const content = item.contenido || item.description || '';
+          const date = item.fecha || item.date || 'Reciente';
+
+          let badgeClass = '';
+          if (category.toLowerCase() === 'mantenimiento') badgeClass = 'warning';
+          if (category.toLowerCase() === 'lanzamientos') badgeClass = 'info';
+
+          return `
+            <article class="news-item">
+              <span class="news-badge ${badgeClass}">${escapeHTML(category)}</span>
+              <div class="news-content" style="flex: 1;">
+                <h4>${escapeHTML(title)}</h4>
+                <p>${escapeHTML(content)}</p>
+                <div class="news-date">
+                  <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                  <span>${escapeHTML(date)}</span>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        if (window.lucide) {
+          lucide.createIcons();
+        }
+
+      } catch (error) {
+        console.error('Error al cargar noticias de la API:', error);
+        if (container) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <i data-lucide="alert-triangle" class="empty-state-icon" style="color: #ef4444;"></i>
+              <h3>No se pudieron cargar las noticias</h3>
+              <p>Verifica la conexión con el servidor o la API del admin.</p>
+              <button class="btn-secondary" onclick="fetchAndRenderNoticias()">Reintentar</button>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
+

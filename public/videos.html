@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Videos — El Tío Baza Blog</title>
+  
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+
+  <style>
+    /* ESTILOS DE LAYOUTS DE VIDEOS */
+    .videos-layout-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .videos-layout-compact {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .videos-layout-immersive {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* CARD DE VIDEO (CUADRÍCULA / DEFAULT) */
+    .video-card {
+      background: var(--bg-surface, #1e1e1e);
+      border: 1px solid var(--border-color, #333);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .video-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary-green, #107c10);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .video-thumbnail-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .video-thumbnail-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .video-card:hover .video-thumbnail-img {
+      transform: scale(1.05);
+    }
+
+    .video-play-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease;
+    }
+
+    .video-card:hover .video-play-overlay {
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .video-play-icon-btn {
+      width: 48px;
+      height: 48px;
+      background: var(--primary-green, #107c10);
+      color: #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s ease;
+    }
+
+    .video-card:hover .video-play-icon-btn {
+      transform: scale(1.12);
+    }
+
+    .video-duration-tag {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    .video-card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .video-card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary, #fff);
+      line-height: 1.35;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ESTILOS DEL BLOQUE DEL AUTOR Y AVATAR */
+    .video-author-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .video-author-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary-green, #107c10);
+      flex-shrink: 0;
+      background-color: #222;
+    }
+
+    .video-author-info {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+
+    .video-author-name {
+      font-weight: 600;
+      color: var(--text-primary, #ffffff);
+    }
+
+    .video-meta-date {
+      color: var(--text-secondary, #aaa);
+      font-size: 0.75rem;
+    }
+
+    /* DISEÑO COMPACTO (AUSTERO / LISTA) */
+    .videos-layout-compact .video-card {
+      flex-direction: row;
+      align-items: stretch;
+    }
+
+    .videos-layout-compact .video-thumbnail-box {
+      width: 220px;
+      aspect-ratio: 16 / 9;
+      flex-shrink: 0;
+    }
+
+    .videos-layout-compact .video-card-body {
+      padding: 12px 16px;
+      justify-content: space-between;
+    }
+
+    .videos-layout-compact .video-author-avatar {
+      width: 28px;
+      height: 28px;
+    }
+
+    .videos-layout-compact .video-card-title {
+      font-size: 1rem;
+    }
+
+    /* DISEÑO INMERSIVO (DESTACADO / GRANDE) */
+    .videos-layout-immersive .video-card {
+      border-radius: 18px;
+    }
+
+    .videos-layout-immersive .video-card-title {
+      font-size: 1.4rem;
+    }
+
+    .videos-layout-immersive .video-author-avatar {
+      width: 42px;
+      height: 42px;
+    }
+
+    .videos-layout-immersive .video-author-name {
+      font-size: 0.95rem;
+    }
+
+    /* ESTILOS DEL MODAL DE VIDEO Y BACKDROP */
+    .video-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .video-modal:not(.hidden) {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-content {
+      position: relative;
+      width: 90%;
+      max-width: 900px;
+      background: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+      z-index: 10;
+      border: 1px solid var(--border-color, #333);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 20;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: var(--primary-green, #107c10);
+      transform: scale(1.1);
+    }
+
+    .video-responsive {
+      position: relative;
+      padding-bottom: 56.25%; /* Ratio 16:9 */
+      height: 0;
+      overflow: hidden;
+    }
+
+    .video-responsive iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .videos-layout-compact .video-card {
+        flex-direction: column;
+      }
+      .videos-layout-compact .video-thumbnail-box {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <!-- Logo / Brand -->
+      <a href="index.html" class="nav-logo">
+        <div class="avatar-badge">
+          <i data-lucide="gamepad-2"></i>
+        </div>
+        <span>El Tio Baza <span class="logo-accent">Blog</span></span>
+      </a>
+
+      <!-- Menú Multipartes (Escritorio) -->
+      <nav class="nav-sections desktop-only">
+        <a href="index.html" class="nav-link">Inicio</a>
+        <a href="noticias.html" class="nav-link">Noticias</a>
+        <a href="posts.html" class="nav-link">Posts</a>
+        <a href="videos.html" class="nav-link active">Videos</a>
+        <a href="repos.html" class="nav-link">Repositorio</a>
+      </nav>
+
+      <!-- Acciones de Usuario -->
+      <div class="nav-actions">
+        
+        <!-- Botón de Tema con Foco (💡) -->
+        <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
+          <i data-lucide="lightbulb" class="icon-bulb"></i>
+        </button>
+
+        <!-- Menú Kebab -->
+        <div class="dropdown-wrapper">
+          <button id="kebabBtn" class="icon-btn" aria-label="Más opciones">
+            <i data-lucide="more-vertical"></i>
+          </button>
+
+          <div id="kebabDropdown" class="dropdown-menu kebab-menu hidden">
+            <ul>
+              <li><a href="posts.html"><i data-lucide="file-text"></i> Ver Todos los Posts</a></li>
+              <li><a href="noticias.html"><i data-lucide="newspaper"></i> Ver Noticias</a></li>
+              <li class="menu-divider"></li>
+              <li><a href="#"><i data-lucide="folder-down"></i> Descargas & Scripts</a></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+
+<div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
+    <div class="achievement-icon-wrapper">
+      <i data-lucide="award" class="achievement-icon"></i>
+    </div>
+    <div class="achievement-text">
+      <span class="achievement-title">¡LOGRO DESBLOQUEADO!</span>
+      <div class="achievement-desc-container">
+        <span id="achievementDesc" class="achievement-desc">¡Explora! Aprende.. !No Olvides Suscribirte! .</span>
+      </div>
+    </div>
+    <div class="achievement-g">
+      <span>G</span> <span id="achievementPoints">50</span>
+    </div>
+  </div>
+
+  <style>
+    /* Estilos de la notificación de Logro Xbox */
+    .xbox-achievement {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #0e1711;
+      border: 2px solid var(--primary-green, #107c10);
+      color: #ffffff;
+      padding: 14px 18px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(16, 124, 16, 0.4);
+      max-width: 380px;
+      width: calc(100% - 50px);
+      transform: translateY(120px);
+      opacity: 0;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    }
+
+    .xbox-achievement.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .achievement-icon-wrapper {
+      background: var(--primary-green, #107c10);
+      color: #fff;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 0 10px var(--primary-green, #107c10);
+    }
+
+    .achievement-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .achievement-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .achievement-title {
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: var(--primary-green, #107c10);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .achievement-desc-container {
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+      width: 100%;
+    }
+
+    .achievement-desc {
+      display: inline-block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #f0fdf4;
+      padding-left: 100%;
+      animation: textScrollOnce 8s linear forwards;
+    }
+
+    @keyframes textScrollOnce {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .achievement-g {
+      background: #141c17;
+      border: 1px solid var(--primary-green, #107c10);
+      color: #00ff66;
+      font-weight: 900;
+      font-size: 0.85rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+      .xbox-achievement {
+        bottom: 75px;
+        right: 15px;
+        left: 15px;
+        width: auto;
+      }
+    }
+  </style>
+
+  <script>
+    function triggerSingleXboxAchievement() {
+      const banner = document.getElementById('xboxAchievementBanner');
+      if (!banner) return;
+      banner.style.display = 'flex';
+      setTimeout(() => banner.classList.add('show'), 50);
+      setTimeout(() => {
+        banner.classList.remove('show');
+        setTimeout(() => { banner.style.display = 'none'; }, 500);
+      }, 7500);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(triggerSingleXboxAchievement, 1500);
+    });
+  </script>
+
+
+  <!-- CABECERA DE LA SECCIÓN VIDEOS CON CONTROLES DE DISEÑO -->
+  <section class="page-header">
+    <div class="header-container">
+      <div class="header-action-wrapper">
+        <div class="header-text-info">
+          <h1 class="page-title"><i data-lucide="film"></i> Galería de Videos</h1>
+          <p class="page-description">
+            Tutoriales en video, demostraciones de rendimiento, reviews de consolas y directos explicativos.
+          </p>
+        </div>
+        
+        <!-- Controles dinámicos para cambiar la visualización -->
+        <div class="view-mode-selector">
+          <button class="view-mode-btn active" data-view="grid" aria-label="Vista de cuadrícula moderna">
+            <i data-lucide="layout-grid"></i>
+            <span class="btn-text">Cuadrícula</span>
+          </button>
+          <button class="view-mode-btn" data-view="compact" aria-label="Vista compacta tipo feed">
+            <i data-lucide="list-video"></i>
+            <span class="btn-text">Compacto</span>
+          </button>
+          <button class="view-mode-btn" data-view="immersive" aria-label="Vista inmersiva destacada">
+            <i data-lucide="tv"></i>
+            <span class="btn-text">Inmersivo</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL DE VIDEOS -->
+  <main class="content-section">
+    
+    <!-- Contenedor dinámico principal -->
+    <div id="videosGridContainer" class="videos-layout-grid">
+      <div class="loading-state-card" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
+        <div class="loading-spinner-xbox" style="margin: 0 auto 16px;"></div>
+        <p>Sincronizando transmisiones y recuperando metadatos...</p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y videos.</p>
+  </footer>
+
+  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
+    <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
+    <a href="videos.html" class="mobile-nav-item active"><i data-lucide="film"></i><span>Videos</span></a>
+    <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
+<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+  </nav>
+
+  <!-- MODAL DE REPRODUCTOR DE VIDEO -->
+  <div id="videoModal" class="video-modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" id="modalBackdrop" onclick="closeVideoModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modalCloseBtn" onclick="closeVideoModal()" aria-label="Cerrar video">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="video-responsive">
+        <iframe id="youtubeIframe" src="" title="Video El Tio Baza" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    let allVideosData = [];
+
+    // MAPA OFICIAL DE AVATARES REGISTRADOS (Fallback local)
+    const DEFAULT_AVATAR = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10';
+    const AVATAR_FRONTEND_MAP = {
+      'el tio baza': DEFAULT_AVATAR,
+      'el tío baza': DEFAULT_AVATAR,
+      'baza': DEFAULT_AVATAR,
+      'rxx8': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKPhcbxJpIBqKRVJ7R_FNOHclLLV2s_eA4caJBzDpm2Q&s=10',
+      'mannuee': 'https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj'
+    };
+
+    function resolveAuthorAvatar(authorName, avatarFromApi) {
+      if (avatarFromApi && avatarFromApi.trim().startsWith('http')) {
+        return avatarFromApi.trim();
+      }
+      const key = (authorName || '').toLowerCase().trim();
+      return AVATAR_FRONTEND_MAP[key] || DEFAULT_AVATAR;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+
+      // Cargar lista de videos desde la API
+      fetchVideos();
+
+      // Control del selector de layout / vistas
+      const viewButtons = document.querySelectorAll('.view-mode-btn');
+      const container = document.getElementById('videosGridContainer');
+
+      viewButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          viewButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const mode = btn.getAttribute('data-view');
+          
+          container.className = '';
+          if (mode === 'grid') {
+            container.classList.add('videos-layout-grid');
+          } else if (mode === 'compact') {
+            container.classList.add('videos-layout-compact');
+          } else if (mode === 'immersive') {
+            container.classList.add('videos-layout-immersive');
+          }
+
+          // Volvemos a renderizar los ítems para garantizar que se apliquen las imágenes del autor
+          if (allVideosData && allVideosData.length > 0) {
+            renderVideosGrid(allVideosData);
+          }
+        });
+      });
+
+      // Tecla Escape para cerrar modal
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeVideoModal();
+      });
+    });
+
+    /**
+     * Consume la API /api/videos o usa data/videos.json como fallback
+     */
+    async function fetchVideos() {
+      const container = document.getElementById('videosGridContainer');
+
+      try {
+        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/videos` : '/api/videos';
+        let response;
+
+        try {
+          response = await fetch(apiEndpoint);
+          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+        } catch (err) {
+          response = await fetch('data/videos.json');
+        }
+
+        const data = await response.json();
+        allVideosData = Array.isArray(data) ? data : (data.videos || []);
+
+        renderVideosGrid(allVideosData);
+
+      } catch (error) {
+        console.error('Error al cargar videos:', error);
+        if (container) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+              <i data-lucide="alert-triangle" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
+              <h3>No se pudieron recuperar los videos</h3>
+              <p style="color: var(--text-secondary); margin-top: 6px;">Verifica la conexión con el servidor o inténtalo nuevamente.</p>
+              <button class="btn-secondary" onclick="fetchVideos()" style="margin-top: 14px;">Reintentar</button>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    /**
+     * Renderiza la lista de videos en la cuadrícula asegurando la carga de los avatares
+     */
+    function renderVideosGrid(videos) {
+      const container = document.getElementById('videosGridContainer');
+      if (!container) return;
+
+      if (!videos || videos.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+            <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px;"></i>
+            <h3>Aún no hay videos disponibles</h3>
+            <p style="color: var(--text-secondary);">Regresa más tarde para ver nuevo contenido en video.</p>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = videos.map(video => {
+        const title = video.title || video.titulo || 'Sin título';
+        const author = video.author || video.autor || 'El Tío Baza';
+        const rawAvatar = video.authorAvatar || video.avatar || video.avatarUrl || video.author_avatar;
+        const avatar = resolveAuthorAvatar(author, rawAvatar);
+        const date = video.date || video.fecha || 'Reciente';
+        const duration = video.duration || video.duracion || '10:00';
+        const youtubeUrl = video.youtubeUrl || video.url || video.videoUrl || '';
+        const videoId = extractYouTubeId(youtubeUrl) || video.youtubeId || '';
+        
+        // Miniatura oficial de YouTube o fallback
+        const thumbnail = video.thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');
+
+        return `
+          <article class="video-card" onclick="openVideoModal('${escapeHTML(youtubeUrl)}', '${escapeHTML(videoId)}')">
+            <div class="video-thumbnail-box">
+              <img src="${escapeHTML(thumbnail)}" alt="${escapeHTML(title)}" class="video-thumbnail-img" loading="lazy" />
+              <div class="video-play-overlay">
+                <div class="video-play-icon-btn">
+                  <i data-lucide="play" style="width: 22px; height: 22px; fill: currentColor;"></i>
+                </div>
+              </div>
+              <span class="video-duration-tag">${escapeHTML(duration)}</span>
+            </div>
+            
+            <div class="video-card-body">
+              <h3 class="video-card-title">${escapeHTML(title)}</h3>
+              
+              <div class="video-author-box">
+                <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="video-author-avatar" onerror="this.onerror=null; this.src='${DEFAULT_AVATAR}';" />
+                <div class="video-author-info">
+                  <span class="video-author-name">${escapeHTML(author)}</span>
+                  <span class="video-meta-date">${escapeHTML(date)}</span>
+                </div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    /**
+     * Extrae el ID de un enlace de YouTube (soporta shorts, watch, embed y youtu.be)
+     */
+    function extractYouTubeId(url) {
+      if (!url) return '';
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : url;
+    }
+
+    /**
+     * Abre el modal e inyecta el iframe de YouTube con autoplay
+     */
+    function openVideoModal(url, rawId) {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('youtubeIframe');
+
+      const videoId = rawId || extractYouTubeId(url);
+
+      if (!modal || !iframe || !videoId) return;
+
+      iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    /**
+     * Cierra el modal de reproductor y detiene el audio del video
+     */
+    function closeVideoModal() {
+      const modal = document.getElementById('videoModal');
+      const iframe = document.getElementById('youtubeIframe');
+
+      if (modal) modal.classList.add('hidden');
+      if (iframe) iframe.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

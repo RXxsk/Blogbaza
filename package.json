@@ -1,0 +1,25 @@
+{
+  "name": "el-tio-baza-blog",
+  "version": "1.0.0",
+  "description": "Portal web dinámico El Tio Baza Blog con panel de administración",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "blog",
+    "xbox",
+    "express",
+    "nodejs"
+  ],
+  "author": "El Tio Baza",
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
+    "jsonwebtoken": "^9.0.3"
+  }
+}

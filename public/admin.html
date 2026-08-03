@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controlador Admin — El Tío Baza</title>
+  
+  <!-- Fuentes Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Afacad+Flux:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons & CSS Principal -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Estilos adaptados para la interfaz del Panel Admin */
+    .admin-wrapper {
+      max-width: 1000px;
+      margin: 30px auto 100px auto;
+      padding: 0 16px;
+    }
+
+    /* PANTALLA DE LOGIN */
+    .login-box {
+      max-width: 400px;
+      margin: 60px auto;
+      background: var(--card-bg, #1e293b);
+      border: 1px solid var(--accent-green, #107c41);
+      border-radius: 16px;
+      padding: 30px 24px;
+      box-shadow: 0 10px 30px rgba(0, 255, 102, 0.1);
+      text-align: center;
+    }
+
+    .login-box h2 {
+      font-family: 'Comfortaa', cursive;
+      color: var(--accent-green-bright, #00ff66);
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: var(--text-muted, #94a3b8);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border-color, #334155);
+      border-radius: 8px;
+      color: var(--text-color, #fff);
+      font-family: 'Afacad Flux', sans-serif;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--accent-green-bright, #00ff66);
+      box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
+    }
+
+    .author-avatar-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      background: rgba(15, 23, 42, 0.4);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px dashed var(--accent-green, #107c41);
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .author-avatar-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn-admin {
+      width: 100%;
+      background: var(--accent-green, #107c41);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(16, 124, 65, 0.3);
+    }
+
+    .btn-admin:hover {
+      background: #14934d;
+      transform: translateY(-1px);
+    }
+
+    .btn-admin:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-cancel {
+      background: #475569;
+      margin-top: 10px;
+      box-shadow: none;
+    }
+
+    .btn-cancel:hover {
+      background: #64748b;
+    }
+
+    /* DASHBOARD ADAPTATIVO */
+    .admin-header-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--border-color, #334155);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 1px solid var(--border-color, #334155);
+      padding-bottom: 10px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted, #94a3b8);
+      padding: 10px 18px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      background: rgba(16, 124, 65, 0.2);
+      color: var(--accent-green-bright, #00ff66);
+      border: 1px solid var(--accent-green, #107c41);
+    }
+
+    .admin-card {
+      background: var(--card-bg, #1e293b);
+      border: 1px solid var(--border-color, #334155);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .item-list-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border-color, #334155);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .item-info {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .item-info h4 {
+      margin: 0 0 6px 0;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    .item-info span {
+      font-size: 0.8rem;
+      color: var(--text-muted, #94a3b8);
+      display: block;
+      line-height: 1.4;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      background: transparent;
+      border: 1px solid var(--border-color, #334155);
+      color: var(--text-muted, #94a3b8);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-action.star { color: #eab308; border-color: #eab308; }
+    .btn-action.star.active { background: #eab308; color: #000; }
+    .btn-action.edit { color: #3b82f6; border-color: #3b82f6; }
+    .btn-action.edit:hover { background: #3b82f6; color: #fff; }
+    .btn-action.delete { color: #ef4444; border-color: #ef4444; }
+    .btn-action.delete:hover { background: #ef4444; color: #fff; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR (ESCRITORIO & MÓVIL) -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <!-- Logo / Identidad Admin -->
+      <a href="index.html" class="nav-logo">
+        <div class="avatar-badge">
+          <i class="fa-brands fa-xbox logo-icon"></i>
+        </div>
+        <span>El Tio Baza <span class="logo-accent">Admin</span></span>
+      </a>
+
+      <!-- Navegación de Escritorio -->
+      <nav class="nav-sections desktop-only">
+        <a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i> Ir a la Web</a>
+        <a href="posts.html" class="nav-link">Posts</a>
+        <a href="noticias.html" class="nav-link">Noticias</a>
+        <a href="repos.html" class="nav-link">Repositorio</a>
+      </nav>
+
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <!-- Botón de Tema con Foco (💡) y Animación -->
+        <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
+          <i data-lucide="lightbulb" class="icon-bulb"></i>
+        </button>
+
+        <a href="index.html" class="icon-btn desktop-only" title="Volver al inicio">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="admin-wrapper">
+
+    <!-- 1. PANTALLA DE LOGIN -->
+    <section id="loginSection" class="login-box">
+      <h2><i class="fa-brands fa-xbox"></i> Acceso Admin</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+        Ingresa tus credenciales para administrar el portal.
+      </p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label><i class="fa-solid fa-user"></i> Usuario</label>
+          <input type="text" id="loginUser" class="form-input" placeholder="admin" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-lock"></i> Contraseña</label>
+          <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" id="loginBtn" class="btn-admin">
+          <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+        </button>
+      </form>
+      <div id="loginError" style="color: #ef4444; margin-top: 15px; font-size: 0.85rem;" class="hidden"></div>
+    </section>
+
+    <!-- 2. PANEL ADMINISTRATIVO (DASHBOARD) -->
+    <section id="dashboardSection" class="hidden">
+      
+      <div class="admin-header-panel">
+        <div>
+          <h1 style="font-family: 'Comfortaa', cursive; margin: 0 0 5px 0; font-size: 1.6rem;">Controlador de Contenido</h1>
+          <span style="color: var(--accent-green-bright); font-family: 'Share Tech Mono', monospace; font-size: 0.85rem;">
+            <i class="fa-solid fa-circle-check"></i> Sesión Autenticada
+          </span>
+        </div>
+        <button id="logoutBtn" class="btn-action delete">
+          <i class="fa-solid fa-power-off"></i> Cerrar Sesión
+        </button>
+      </div>
+
+      <!-- TABS DE NAVEGACIÓN DENTRO DEL ADMIN -->
+      <div class="admin-tabs">
+        <button id="tabBtnCreate" class="tab-btn active" data-tab="create">
+          <i class="fa-solid fa-plus-circle"></i> <span id="tabCreateText">Publicar Nuevo</span>
+        </button>
+        <button id="tabBtnManage" class="tab-btn" data-tab="manage">
+          <i class="fa-solid fa-list-check"></i> Administrar Existentes
+        </button>
+      </div>
+
+      <!-- TAB 1: FORMULARIO DE PUBLICACIÓN / EDICIÓN -->
+      <div id="tabCreate" class="tab-content">
+        <div class="admin-card">
+          <h3 id="formCardTitle" style="margin-top:0; font-family: 'Comfortaa', cursive; color: var(--accent-green-bright); font-size: 1.2rem;">
+            <i class="fa-solid fa-pen-to-square"></i> Crear Nueva Publicación
+          </h3>
+          
+          <form id="createForm">
+            <!-- Campo oculto para guardar el ID si estamos editando -->
+            <input type="hidden" id="editingItemId" value="">
+
+            <div class="form-group">
+              <label>Tipo de Contenido</label>
+              <select id="contentType" class="form-select">
+                <option value="posts">📝 Post / Artículo de Blog</option>
+                <option value="noticias">📰 Noticia Rápida</option>
+                <option value="videos">🎬 Video de YouTube</option>
+                <option value="repos">💾 Repositorio / Herramienta</option>
+              </select>
+            </div>
+
+            <!-- SECCIÓN: SELECCIÓN DE AUTOR Y AVATAR -->
+            <div class="author-avatar-grid">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label><i class="fa-solid fa-user-ninja"></i> Autor de la publicación</label>
+                <select id="itemAuthor" class="form-select" onchange="updateDefaultAvatar(this.value)">
+                  <option value="RXx8">RXx8</option>
+                  <option value="El Tio Baza" selected>El Tio Baza</option>
+                  <option value="Mannuee">Mannuee</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label><i class="fa-solid fa-image-portrait"></i> Avatar para mostrar</label>
+                <select id="itemAvatar" class="form-select">
+                  <option value="Avatar RXx8">Avatar RXx8</option>
+                  <option value="Avatar Baza" selected>Avatar Baza</option>
+                  <option value="Avatar Mannuee">Avatar Mannuee</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Título / Encabezado</label>
+              <input type="text" id="itemTitle" class="form-input" placeholder="Ej: Nuevo Release de Xb Aurora..." required>
+            </div>
+
+            <!-- Campos dinámicos para Posts y Noticias -->
+            <div id="postFields">
+              <div class="form-group">
+                <label>Subtítulo / Resumen Corto</label>
+                <input type="text" id="itemSubtitle" class="form-input" placeholder="Breve descripción del artículo">
+              </div>
+
+              <div class="form-group">
+                <!-- Etiqueta dinámica de categoría/Sub-tag -->
+                <label id="categoryLabel">Categoría</label>
+                <input type="text" id="itemCategory" class="form-input" placeholder="Tutoriales, Modding, Software...">
+                
+                <!-- Contenedor para Sub-Tag / Aviso específico de Noticias -->
+                <select id="newsSubTagSelect" class="form-select hidden" style="margin-top: 8px;">
+                  <option value="📌 Aviso" selected>📌 Aviso</option>
+                  <option value="🔄 Actualización">🔄 Actualización</option>
+                  <option value="🛠️ Mantenimiento">🛠️ Mantenimiento</option>
+                  <option value="🎉 Sorteo">🎉 Sorteo</option>
+                  <option value="custom">✏️ Otro (Especificar arriba)</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="coverUrlBox">
+                <label>URL de Imagen de Portada</label>
+                <input type="text" id="itemCoverUrl" class="form-input" placeholder="https://ejemplo.com/imagen.jpg">
+              </div>
+
+              <div class="form-group" id="contentBox">
+                <label>Cuerpo del Post (Soporta etiquetas HTML como &lt;h2&gt;, &lt;p&gt;, &lt;code&gt;)</label>
+                <textarea id="itemContent" class="form-textarea" rows="8" placeholder="Escribe el contenido completo aquí..."></textarea>
+              </div>
+            </div>
+
+            <!-- Campos dinámicos para Videos -->
+            <div id="videoFields" class="hidden">
+              <div class="form-group">
+                <label>ID de Video de YouTube</label>
+                <input type="text" id="youtubeId" class="form-input" placeholder="Ej: dQw4w9WgXcQ (solo el ID)">
+              </div>
+              <div class="form-group">
+                <label>Descripción del Video</label>
+                <textarea id="videoDesc" class="form-textarea" rows="3" placeholder="Detalles sobre este video..."></textarea>
+              </div>
+            </div>
+
+            <!-- Campos dinámicos avanzados para Repositorios -->
+            <div id="reposFields" class="hidden">
+              <div class="form-group">
+                <label>Categoría del Repositorio (Filtro web)</label>
+                <select id="repoCategory" class="form-select">
+                  <option value="xbox">🎮 Emu / Consolas (xbox)</option>
+                  <option value="scripts">💻 BIOS & DEP (scripts)</option>
+                  <option value="utilidades">🛠️ Utilidades PC (utilidades)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Versión del Software / Tool</label>
+                <input type="text" id="repoVersion" class="form-input" placeholder="Ej: v1.0.4 o Release Final">
+              </div>
+              <div class="form-group">
+                <label>Badge / Tamaño (Se muestra en la tarjeta)</label>
+                <input type="text" id="repoSize" class="form-input" placeholder="Ej: 15.4 MB o Open Source">
+              </div>
+              <div class="form-group">
+                <label>Enlace de Descarga (GitHub, MediaFire, Mega, etc.)</label>
+                <input type="text" id="repoDownloadUrl" class="form-input" placeholder="https://github.com/... o enlace directo">
+              </div>
+              <div class="form-group">
+                <label>URL del Logo Pequeño (Esquina de la tarjeta)</label>
+                <input type="text" id="repoLogoUrl" class="form-input" placeholder="https://ejemplo.com/logo.png">
+              </div>
+              <div class="form-group">
+                <label>URL de Imagen Banner (Horizontal para la ventana modal)</label>
+                <input type="text" id="repoBannerUrl" class="form-input" placeholder="https://ejemplo.com/banner.jpg">
+              </div>
+              <div class="form-group">
+                <label>URL del Sitio Web Oficial del Creador (Opcional)</label>
+                <input type="text" id="repoWebUrl" class="form-input" placeholder="https://github.com/tu-usuario">
+              </div>
+              <div class="form-group">
+                <label>Descripción Corta (Vista previa en la tarjeta)</label>
+                <textarea id="repoDesc" class="form-textarea" rows="2" placeholder="Breve explicación visible en la tarjeta..."></textarea>
+              </div>
+              <div class="form-group">
+                <label>Información Detallada / Extensa (Se muestra al hacer clic en la ventana emergente)</label>
+                <textarea id="repoExtendedDesc" class="form-textarea" rows="5" placeholder="Instrucciones completas, características, notas del desarrollador..."></textarea>
+              </div>
+            </div>
+
+            <button type="submit" id="submitBtn" class="btn-admin">
+              <i class="fa-solid fa-cloud-arrow-up"></i> Publicar Ahora
+            </button>
+
+            <button type="button" id="cancelEditBtn" class="btn-admin btn-cancel hidden" onclick="resetFormState()">
+              <i class="fa-solid fa-xmark"></i> Cancelar Edición
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2: GESTOR DE CONTENIDOS -->
+      <div id="tabManage" class="tab-content hidden">
+        <div class="admin-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+            <h3 style="margin:0; font-family: 'Comfortaa', cursive;"><i class="fa-solid fa-folder-open"></i> Contenido Registrado</h3>
+            <select id="manageTypeSelect" class="form-select" style="width: 180px;">
+              <option value="posts">Posts</option>
+              <option value="noticias">Noticias</option>
+              <option value="videos">Videos</option>
+              <option value="repos">Repositorios</option>
+            </select>
+          </div>
+
+          <div id="itemsContainer">
+            <!-- Los elementos se renderizan dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
+    <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
+    <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
+    <a href="admin.html" class="mobile-nav-item active"><i data-lucide="shield-check"></i><span>Admin</span></a>
+  </nav>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 El Tio Baza Blog. Panel de Administración Centralizado.</p>
+  </footer>
+
+  <script>
+    // Inicialización de iconos Lucide
+    if (window.lucide) lucide.createIcons();
+
+    // Gestor de Tema Oscuro/Claro con la bombilla
+    const themeBtn = document.getElementById('themeToggleBtn');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+      });
+
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+
+    let authToken = localStorage.getItem('adminToken');
+    let loadedItemsMap = {}; // Caché local para edición rápida
+
+    // Helper sanitizador contra XSS
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Mapeo automático de Autor -> Avatar por defecto
+    const DEFAULT_AVATARS = {
+      'RXx8': 'Avatar RXx8',
+      'El Tio Baza': 'Avatar Baza',
+      'Mannuee': 'Avatar Mannuee'
+    };
+
+    function updateDefaultAvatar(selectedAuthor) {
+      const avatarSelect = document.getElementById('itemAvatar');
+      if (avatarSelect && DEFAULT_AVATARS[selectedAuthor]) {
+        avatarSelect.value = DEFAULT_AVATARS[selectedAuthor];
+      }
+    }
+
+    // Referencias DOM
+    const loginSection = document.getElementById('loginSection');
+    const dashboardSection = document.getElementById('dashboardSection');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const contentType = document.getElementById('contentType');
+    const newsSubTagSelect = document.getElementById('newsSubTagSelect');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Comprobar estado de sesión
+    if (authToken) {
+      showDashboard();
+    }
+
+    // Manejador de Login
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginError.classList.add('hidden');
+      
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value;
+      const loginBtn = document.getElementById('loginBtn');
+
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
+
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          authToken = data.token;
+          localStorage.setItem('adminToken', authToken);
+          showDashboard();
+        } else {
+          loginError.textContent = data.error || 'Credenciales incorrectas';
+          loginError.classList.remove('hidden');
+        }
+      } catch (err) {
+        loginError.textContent = 'Error de conexión con el servidor backend';
+        loginError.classList.remove('hidden');
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
+      }
+    });
+
+    // Cerrar Sesión
+    logoutBtn.addEventListener('click', handleLogout);
+
+    function handleLogout() {
+      localStorage.removeItem('adminToken');
+      authToken = null;
+      dashboardSection.classList.add('hidden');
+      loginSection.classList.remove('hidden');
+      loginForm.reset();
+    }
+
+    function showDashboard() {
+      loginSection.classList.add('hidden');
+      dashboardSection.classList.remove('hidden');
+      loadManageItems(document.getElementById('manageTypeSelect').value || 'posts');
+    }
+
+    // Manejo de Tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const tab = btn.getAttribute('data-tab');
+        if (tab === 'create') {
+          document.getElementById('tabCreate').classList.remove('hidden');
+          document.getElementById('tabManage').classList.add('hidden');
+        } else {
+          document.getElementById('tabCreate').classList.add('hidden');
+          document.getElementById('tabManage').classList.remove('hidden');
+        }
+      });
+    });
+
+    // Control de campos condicionales según el tipo seleccionado
+    contentType.addEventListener('change', () => {
+      const type = contentType.value;
+      const categoryLabel = document.getElementById('categoryLabel');
+      const coverUrlBox = document.getElementById('coverUrlBox');
+      const contentBox = document.getElementById('contentBox');
+      const itemCategory = document.getElementById('itemCategory');
+
+      if (type === 'videos') {
+        document.getElementById('postFields').classList.add('hidden');
+        document.getElementById('videoFields').classList.remove('hidden');
+        document.getElementById('reposFields').classList.add('hidden');
+      } else if (type === 'repos') { 
+        document.getElementById('postFields').classList.add('hidden');
+        document.getElementById('videoFields').classList.add('hidden');
+        document.getElementById('reposFields').classList.remove('hidden');
+      } else if (type === 'noticias') {
+        document.getElementById('postFields').classList.remove('hidden');
+        document.getElementById('videoFields').classList.add('hidden');
+        document.getElementById('reposFields').classList.add('hidden');
+        
+        categoryLabel.textContent = 'Sub-Tag / Etiqueta de Noticia';
+        newsSubTagSelect.classList.remove('hidden');
+        coverUrlBox.classList.add('hidden');
+        contentBox.classList.add('hidden');
+
+        if (!itemCategory.value) {
+          itemCategory.value = newsSubTagSelect.value !== 'custom' ? newsSubTagSelect.value : '';
+        }
+      } else { // posts
+        document.getElementById('postFields').classList.remove('hidden');
+        document.getElementById('videoFields').classList.add('hidden');
+        document.getElementById('reposFields').classList.add('hidden');
+        
+        categoryLabel.textContent = 'Categoría';
+        newsSubTagSelect.classList.add('hidden');
+        coverUrlBox.classList.remove('hidden');
+        contentBox.classList.remove('hidden');
+      }
+    });
+
+    // Sincronización del desplegable de Sub-Tag
+    newsSubTagSelect.addEventListener('change', () => {
+      const itemCategory = document.getElementById('itemCategory');
+      if (newsSubTagSelect.value !== 'custom') {
+        itemCategory.value = newsSubTagSelect.value;
+      } else {
+        itemCategory.value = '';
+        itemCategory.focus();
+      }
+    });
+
+    // Crear o Editar Publicación
+    document.getElementById('createForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const type = contentType.value;
+      const editingId = document.getElementById('editingItemId').value;
+      const isEditing = Boolean(editingId);
+
+      const existingItem = isEditing ? loadedItemsMap[editingId] : null;
+      const createdDateISO = existingItem ? (existingItem.createdAt || existingItem.timestamp || new Date().toISOString()) : new Date().toISOString();
+
+      let payload = {
+        titulo: document.getElementById('itemTitle').value.trim(),
+        autor: document.getElementById('itemAuthor').value,
+        author: document.getElementById('itemAuthor').value,
+        avatar: document.getElementById('itemAvatar').value,
+        authorAvatar: document.getElementById('itemAvatar').value,
+        createdAt: createdDateISO,
+        timestamp: createdDateISO
+      };
+
+      if (type === 'posts') {
+        payload.subtitulo = document.getElementById('itemSubtitle').value.trim();
+        payload.categoria = document.getElementById('itemCategory').value.trim() || 'General';
+        payload.coverUrl = document.getElementById('itemCoverUrl').value.trim();
+        payload.content = document.getElementById('itemContent').value;
+      } else if (type === 'videos') {
+        payload.youtubeId = document.getElementById('youtubeId').value.trim();
+        payload.descripcion = document.getElementById('videoDesc').value.trim();
+        payload.badgeText = 'Video';
+      } else if (type === 'noticias') {
+        payload.subtitulo = document.getElementById('itemSubtitle').value.trim();
+        payload.categoria = document.getElementById('itemCategory').value.trim() || '📌 Aviso';
+        payload.badgeColor = 'green';
+      } else if (type === 'repos') {
+        payload.categoria = document.getElementById('repoCategory').value;
+        payload.category = document.getElementById('repoCategory').value;
+        payload.version = document.getElementById('repoVersion').value.trim();
+        payload.size = document.getElementById('repoSize').value.trim() || 'Open Source';
+        payload.downloadUrl = document.getElementById('repoDownloadUrl').value.trim();
+        payload.logoUrl = document.getElementById('repoLogoUrl').value.trim();
+        payload.bannerUrl = document.getElementById('repoBannerUrl').value.trim();
+        payload.webUrl = document.getElementById('repoWebUrl').value.trim();
+        payload.descripcion = document.getElementById('repoDesc').value.trim();
+        payload.extendedDesc = document.getElementById('repoExtendedDesc').value.trim();
+      }
+
+      const endpoint = isEditing ? `/api/admin/update/${type}/${editingId}` : '/api/admin/create';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${isEditing ? 'Guardando...' : 'Publicando...'}`;
+
+      try {
+        const res = await fetch(endpoint, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify(isEditing ? { payload } : { type, payload })
+        });
+
+        if (res.status === 401) {
+          alert('Sesión expirada. Por favor vuelve a iniciar sesión.');
+          handleLogout();
+          return;
+        }
+
+        if (res.ok) {
+          alert(isEditing ? '¡Publicación actualizada con éxito!' : '¡Publicación creada exitosamente!');
+          resetFormState();
+          loadManageItems(type);
+        } else {
+          const errData = await res.json();
+          alert(`Error: ${errData.error || 'No se pudo procesar la solicitud'}`);
+        }
+      } catch (err) {
+        alert('Error de red al conectar con el backend.');
+      } finally {
+        submitBtn.disabled = false;
+        if (!document.getElementById('editingItemId').value) {
+          submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Publicar Ahora`;
+        } else {
+          submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Cambios`;
+        }
+      }
+    });
+
+    // Gestor de Contenidos Registrados
+    const manageTypeSelect = document.getElementById('manageTypeSelect');
+    manageTypeSelect.addEventListener('change', () => loadManageItems(manageTypeSelect.value));
+
+    async function loadManageItems(type) {
+      const container = document.getElementById('itemsContainer');
+      container.innerHTML = '<p style="color: var(--text-muted)"><i class="fa-solid fa-spinner fa-spin"></i> Cargando elementos...</p>';
+
+      try {
+        const res = await fetch(`/api/${type}`);
+        if (!res.ok) throw new Error('Error al consultar servidor');
+        
+        const items = await res.json();
+        loadedItemsMap = {};
+
+        if (!items || items.length === 0) {
+          container.innerHTML = '<p style="color: var(--text-muted)">No hay contenido registrado en esta sección.</p>';
+          return;
+        }
+
+        container.innerHTML = items.map(item => {
+          loadedItemsMap[item.id] = item;
+          
+          const title = escapeHtml(item.titulo || item.title || 'Sin Título');
+          const author = escapeHtml(item.autor || item.author || 'N/A');
+          const category = escapeHtml(item.categoria || item.category || 'N/A');
+          const dateStr = item.createdAt || item.timestamp ? new Date(item.createdAt || item.timestamp).toLocaleDateString() : 'Sin fecha';
+
+          return `
+            <div class="item-list-row">
+              <div class="item-info">
+                <h4>${title}</h4>
+                <span>ID: <code>${escapeHtml(item.id)}</code> | Autor: <strong>${author}</strong> | Cat: <strong>${category}</strong> | Fecha: <strong>${dateStr}</strong></span>
+              </div>
+              <div class="item-actions">
+                ${type === 'posts' ? `
+                  <button class="btn-action star ${item.destacado ? 'active' : ''}" onclick="setFeatured('${item.id}')" title="Destacar en Inicio">
+                    <i class="fa-solid fa-star"></i> ${item.destacado ? 'Destacado' : 'Destacar'}
+                  </button>
+                ` : ''}
+                <button class="btn-action edit" onclick="startEditingItem('${type}', '${item.id}')" title="Editar contenido">
+                  <i class="fa-solid fa-pen"></i> Editar
+                </button>
+                <button class="btn-action delete" onclick="deleteItem('${type}', '${item.id}')" title="Eliminar contenido">
+                  <i class="fa-solid fa-trash"></i> Eliminar
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        container.innerHTML = '<p style="color: #ef4444"><i class="fa-solid fa-triangle-exclamation"></i> Error al cargar datos del servidor.</p>';
+      }
+    }
+
+    // Cargar datos en el formulario para iniciar edición
+    function startEditingItem(type, id) {
+      const item = loadedItemsMap[id];
+      if (!item) return;
+
+      document.getElementById('editingItemId').value = id;
+      contentType.value = type;
+      contentType.dispatchEvent(new Event('change'));
+
+      document.getElementById('itemTitle').value = item.titulo || item.title || '';
+      document.getElementById('itemAuthor').value = item.autor || item.author || 'El Tio Baza';
+      
+      let avatarVal = item.avatar || item.authorAvatar || 'Avatar Baza';
+      if (avatarVal === 'roxi' || avatarVal === 'rxx8' || avatarVal === 'Avatar Roxi') avatarVal = 'Avatar RXx8';
+      document.getElementById('itemAvatar').value = avatarVal;
+
+      if (type === 'posts') {
+        document.getElementById('itemSubtitle').value = item.subtitulo || '';
+        document.getElementById('itemCategory').value = item.categoria || 'General';
+        document.getElementById('itemCoverUrl').value = item.coverUrl || '';
+        document.getElementById('itemContent').value = item.content || '';
+      } else if (type === 'noticias') {
+        document.getElementById('itemSubtitle').value = item.subtitulo || '';
+        const cat = item.categoria || item.category || '📌 Aviso';
+        document.getElementById('itemCategory').value = cat;
+
+        const matchingOption = Array.from(newsSubTagSelect.options).find(opt => opt.value === cat);
+        if (matchingOption) {
+          newsSubTagSelect.value = matchingOption.value;
+        } else {
+          newsSubTagSelect.value = 'custom';
+        }
+      } else if (type === 'videos') {
+        document.getElementById('youtubeId').value = item.youtubeId || '';
+        document.getElementById('videoDesc').value = item.descripcion || '';
+      } else if (type === 'repos') { 
+        document.getElementById('repoCategory').value = item.categoria || item.category || 'xbox';
+        document.getElementById('repoVersion').value = item.version || '';
+        document.getElementById('repoSize').value = item.size || '';
+        document.getElementById('repoDownloadUrl').value = item.downloadUrl || '';
+        document.getElementById('repoLogoUrl').value = item.logoUrl || '';
+        document.getElementById('repoBannerUrl').value = item.bannerUrl || '';
+        document.getElementById('repoWebUrl').value = item.webUrl || '';
+        document.getElementById('repoDesc').value = item.descripcion || '';
+        document.getElementById('repoExtendedDesc').value = item.extendedDesc || '';
+      }
+
+      document.getElementById('formCardTitle').innerHTML = `<i class="fa-solid fa-pen"></i> Editando Publicación`;
+      submitBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Guardar Cambios`;
+      document.getElementById('tabCreateText').textContent = 'Editando Publicación';
+      document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+      document.getElementById('tabBtnCreate').click();
+    }
+
+    // Resetear formulario a modo creación
+    function resetFormState() {
+      document.getElementById('createForm').reset();
+      document.getElementById('editingItemId').value = '';
+      updateDefaultAvatar('El Tio Baza');
+
+      document.getElementById('formCardTitle').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Crear Nueva Publicación`;
+      submitBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Publicar Ahora`;
+      document.getElementById('tabCreateText').textContent = 'Publicar Nuevo';
+      document.getElementById('cancelEditBtn').classList.add('hidden');
+
+      contentType.value = 'posts';
+      contentType.dispatchEvent(new Event('change'));
+    }
+
+    // Eliminar Ítem
+    async function deleteItem(type, id) {
+      if (!confirm('¿Seguro que deseas eliminar este contenido permanentemente?')) return;
+
+      try {
+        const res = await fetch(`/api/admin/delete/${type}/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (res.status === 401) {
+          alert('Sesión expirada.');
+          handleLogout();
+          return;
+        }
+
+        if (res.ok) {
+          loadManageItems(type);
+        } else {
+          alert('No se pudo eliminar el elemento.');
+        }
+      } catch (err) {
+        alert('Error de red al intentar eliminar.');
+      }
+    }
+
+    // Cambiar estado destacado (Solo para Posts)
+    async function setFeatured(id) {
+      try {
+        const res = await fetch(`/api/admin/set-featured/${id}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (res.status === 401) {
+          alert('Sesión expirada.');
+          handleLogout();
+          return;
+        }
+
+        if (res.ok) {
+          loadManageItems('posts');
+        } else {
+          alert('No se pudo actualizar el estado de destacado.');
+        }
+      } catch (err) {
+        alert('Error al conectar con el servidor.');
+      }
+    }
+  </script>
+</body>
+</html>
+

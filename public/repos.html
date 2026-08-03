@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Tio Baza Blog — Repositorio y Herramientas</title>
+  
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Estilos para el Modal de Detalle de Repositorios */
+    .repo-modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .repo-modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .repo-modal-content {
+      background: var(--bg-card, #1e1e2f);
+      border: 1px solid var(--border-color, #2a2a3c);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+    .repo-modal-backdrop.active .repo-modal-content {
+      transform: translateY(0);
+    }
+    .repo-modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color, #333);
+      color: var(--text-muted, #aaa);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    .repo-modal-close:hover {
+      background: rgba(255,255,255,0.15);
+      color: var(--text-main, #fff);
+      border-color: var(--primary-green, #107c10);
+    }
+    .repo-modal-banner {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+    .repo-modal-header-flex {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .repo-modal-logo {
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid var(--border-color, #333);
+    }
+    .clickable-card {
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .clickable-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      border-color: var(--primary-green, #107c10);
+    }
+
+    /* Toolbar de Selector de Estilos (Apps / Compacto Moderno) */
+    .view-styles-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      background: var(--bg-surface, #161622);
+      border: 1px solid var(--border-color, #2a2a3c);
+      padding: 6px;
+      border-radius: 14px;
+      width: fit-content;
+    }
+    .view-style-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary, #aaa);
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .view-style-btn:hover {
+      color: var(--text-primary, #fff);
+    }
+    .view-style-btn.active {
+      background: var(--primary-green, #107c10);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(16, 124, 16, 0.4);
+    }
+
+    /* Estilo 1: Cuadrícula de Apps */
+    .repos-grid-apps {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .repos-grid-apps .post-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px;
+      background: var(--bg-card, #1e1e2f);
+      border-radius: 16px;
+      border: 1px solid var(--border-color, #2a2a3c);
+    }
+    .repos-grid-apps .post-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color, #2a2a3c);
+      padding-top: 14px;
+      margin-top: 16px;
+    }
+
+    /* Estilo 2: Compacto Moderno */
+    .repos-grid-compact {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .repos-grid-compact .post-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 22px;
+      gap: 20px;
+      border-radius: 12px;
+      background: var(--bg-card, #1e1e2f);
+      border: 1px solid var(--border-color, #2a2a3c);
+    }
+    .repos-grid-compact .post-card > div:first-child {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+      min-width: 0;
+    }
+    .repos-grid-compact .post-title {
+      font-size: 1rem;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 700;
+    }
+    .repos-grid-compact .post-excerpt {
+      display: none;
+    }
+    .repos-grid-compact .post-footer {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* Botones de Acción Globales Estilizados */
+    .repo-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .btn-download {
+      background: var(--primary-green, #107c10);
+      color: #fff;
+      border: 1px solid var(--primary-green, #107c10);
+    }
+    .btn-download:hover {
+      background: #0e6b0e;
+      box-shadow: 0 4px 12px rgba(16, 124, 16, 0.3);
+    }
+    .btn-official {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main, #fff);
+      border: 1px solid var(--border-color, #333);
+    }
+    .btn-official:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--text-secondary, #aaa);
+    }
+
+    /* MEDIA QUERY RESPONSIVE PARA MÓVILES EN MODO COMPACTO */
+    @media (max-width: 768px) {
+      .view-styles-toolbar {
+        width: 100%;
+        justify-content: center;
+      }
+      .view-style-btn {
+        flex: 1;
+        justify-content: center;
+      }
+      .repos-grid-compact .post-card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px;
+        gap: 14px;
+      }
+      .repos-grid-compact .post-card > div:first-child {
+        width: 100%;
+      }
+      .repos-grid-compact .post-title {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        font-size: 1.05rem;
+      }
+      .repos-grid-compact .post-footer {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        border-top: 1px solid var(--border-color, #2a2a3c);
+        padding-top: 12px;
+        margin-top: 4px;
+      }
+      .repos-grid-compact .repo-action-btn {
+        flex: 1;
+        padding: 9px 12px;
+        text-align: center;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+  <header class="navbar">
+    <div class="nav-container">
+      
+      <!-- Logo / Brand -->
+      <a href="index.html" class="nav-logo">
+        <div class="avatar-badge">
+          <i data-lucide="gamepad-2"></i>
+        </div>
+        <span>El Tio Baza <span class="logo-accent">Blog</span></span>
+      </a>
+
+      <!-- Menú Multipartes (Escritorio) -->
+      <nav class="nav-sections desktop-only">
+        <a href="index.html" class="nav-link">Inicio</a>
+        <a href="noticias.html" class="nav-link">Noticias</a>
+        <a href="posts.html" class="nav-link">Posts</a>
+        <a href="videos.html" class="nav-link">Videos</a>
+        <a href="repos.html" class="nav-link active">Repositorio</a>
+      </nav>
+
+      <!-- Acciones de Usuario -->
+      <div class="nav-actions">
+        
+        <!-- Botón de Tema con Foco (💡) y Animación -->
+        <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
+          <i data-lucide="lightbulb" class="icon-bulb"></i>
+        </button>
+
+        <!-- Menú Kebab de Accesos Rápidos -->
+        <div class="dropdown-wrapper">
+          <button id="kebabBtn" class="icon-btn" aria-label="Más opciones">
+            <i data-lucide="more-vertical"></i>
+          </button>
+
+          <div id="kebabDropdown" class="dropdown-menu kebab-menu hidden">
+            <ul>
+              <li><a href="index.html"><i data-lucide="home"></i> Ir a Inicio</a></li>
+              <li><a href="posts.html"><i data-lucide="file-text"></i> Ver Posts</a></li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- CABECERA DE LA PÁGINA -->
+  <header class="page-header">
+    <div class="header-container">
+      <div class="header-action-wrapper">
+        <div>
+          <h1 class="page-title"><i data-lucide="database"></i> Repositorio de Central</h1>
+          <p class="page-description">Utilidades, Emuladores Retro, BIOS y software abierto para Consolas XBOX Series S/X.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="content-section">
+
+    <!-- SELECTORES DE ESTILO DE VISTA (Apps / Compacto Moderno) -->
+    <div class="view-styles-toolbar" id="viewStylesToolbar">
+      <button class="view-style-btn active" data-view="apps">
+        <i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i> Apps
+      </button>
+      <button class="view-style-btn" data-view="compact">
+        <i data-lucide="rows" style="width: 16px; height: 16px;"></i> Compacto Moderno
+      </button>
+    </div>
+
+    <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+    <div class="posts-toolbar">
+      <div class="search-box">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Buscar fuente por nombre...">
+        <button id="clearSearchBtn" class="clear-search-btn hidden" title="Limpiar búsqueda">
+          <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+        </button>
+      </div>
+
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="all">
+          <i data-lucide="grid"></i> Todos <span class="filter-count" id="countAll">0</span>
+        </button>
+        <button class="filter-btn" data-filter="xbox">
+          <i data-lucide="cpu"></i> Emu / Consolas <span class="filter-count" id="countXbox">0</span>
+        </button>
+        <button class="filter-btn" data-filter="scripts">
+          <i data-lucide="terminal"></i> BIOS & DEP <span class="filter-count" id="countScripts">0</span>
+        </button>
+        <button class="filter-btn" data-filter="utilidades">
+          <i data-lucide="tool"></i> Utilidades PC <span class="filter-count" id="countUtils">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- INFORMACIÓN DE RESULTADOS -->
+    <div class="results-info-bar">
+      <span id="resultsCount">Mostrando repositorios disponibles</span>
+    </div>
+
+    <!-- CONTENEDOR DE TARJETAS DE REPOSITORIO -->
+    <div id="reposContainer" class="repos-grid-apps">
+      <!-- Las tarjetas se cargarán automáticamente desde el panel administrador -->
+    </div>
+
+  </main>
+
+  <!-- VENTANA MODAL PARA DETALLES COMPLETOS -->
+  <div id="repoModal" class="repo-modal-backdrop">
+    <div class="repo-modal-content">
+      <button id="closeRepoModal" class="repo-modal-close" aria-label="Cerrar ventana">
+        <i data-lucide="x"></i>
+      </button>
+      <div id="modalBodyContent">
+        <!-- Contenido inyectado dinámicamente al hacer clic en una tarjeta -->
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y herramientas de preservación.</p>
+  </footer>
+
+  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <nav class="mobile-bottom-nav mobile-only">
+    <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
+    <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
+    <a href="videos.html" class="mobile-nav-item"><i data-lucide="film"></i><span>Videos</span></a>
+    <a href="repos.html" class="mobile-nav-item active"><i data-lucide="database"></i><span>Repos</span></a>
+<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+
+  </nav>
+
+  <!-- SCRIPT DE LÓGICA DE TEMA, LUCIDE Y API DE REPOS CON MODAL -->
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (window.lucide) lucide.createIcons();
+
+      const container = document.getElementById('reposContainer');
+      const searchInput = document.getElementById('searchInput');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const viewStyleBtns = document.querySelectorAll('.view-style-btn');
+      const clearBtn = document.getElementById('clearSearchBtn');
+      const modal = document.getElementById('repoModal');
+      const closeModalBtn = document.getElementById('closeRepoModal');
+      const modalBody = document.getElementById('modalBodyContent');
+
+      let allRepos = [];
+      let currentFilter = 'all';
+      let currentViewStyle = 'apps'; // 'apps' o 'compact'
+
+      // 1. CARGAR DATOS DESDE LA API DEL BACKEND
+      async function fetchRepos() {
+        try {
+          const response = await fetch('/api/repos'); 
+          if (!response.ok) throw new Error('Error al obtener los repositorios');
+          allRepos = await response.json();
+          renderRepos();
+          updateCounters();
+        } catch (error) {
+          console.error('Error:', error);
+          container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Error al cargar los repositorios desde el servidor.</p>`;
+        }
+      }
+
+      // 2. RENDERIZAR TARJETAS EN PANTALLA SEGÚN EL ESTILO DE VISTA ACTIVO Y CONDICIONANDO LOS ENLACES
+      function renderRepos() {
+        const query = searchInput.value.toLowerCase().trim();
+        
+        container.className = currentViewStyle === 'compact' ? 'repos-grid-compact' : 'repos-grid-apps';
+
+        const filtered = allRepos.filter(item => {
+          const category = (item.categoria || item.category || 'xbox').toLowerCase();
+          const title = (item.titulo || item.title || '').toLowerCase();
+          const excerpt = (item.descripcion || item.excerpt || '').toLowerCase();
+
+          const matchesCategory = (currentFilter === 'all' || category === currentFilter);
+          const matchesQuery = (title.includes(query) || excerpt.includes(query));
+
+          return matchesCategory && matchesQuery;
+        });
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No se encontraron repositorios disponibles.</p>`;
+          document.getElementById('resultsCount').textContent = `Se encontraron 0 herramientas`;
+          clearBtn.classList.toggle('hidden', query === '');
+          return;
+        }
+
+        container.innerHTML = filtered.map((item, index) => {
+          const cat = item.categoria || item.category || 'XBOX';
+          const version = item.version ? `v${item.version}` : '';
+          const title = item.titulo || item.title || 'Sin título';
+          const desc = item.descripcion || item.excerpt || '';
+          const sizeOrBadge = item.size || item.badge || 'Open Source';
+          
+          // Verificación estricta de enlaces disponibles
+          const rawDownloadUrl = item.downloadUrl ? item.downloadUrl.trim() : '';
+          const hasDownload = rawDownloadUrl !== '' && rawDownloadUrl !== '#' && rawDownloadUrl !== 'undefined';
+          
+          const rawWebUrl = item.webUrl || item.website || '';
+          const rawWebUrlTrim = rawWebUrl ? rawWebUrl.trim() : '';
+          const hasWeb = rawWebUrlTrim !== '' && rawWebUrlTrim !== '#' && rawWebUrlTrim !== 'undefined';
+
+          const logoUrl = item.logoUrl || item.avatar || '';
+
+          if (currentViewStyle === 'compact') {
+            return `
+              <article class="post-card clickable-card" data-index="${index}" data-category="${cat}">
+                <div>
+                  ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="width: 32px; height: 32px; object-fit: cover; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border-color, #333);">` : ''}
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                      <span class="post-category" style="font-size: 0.68rem; padding: 2px 6px;">${cat.toUpperCase()}</span>
+                      ${version ? `<span class="post-date" style="font-size: 0.7rem;">${version}</span>` : ''}
+                    </div>
+                    <h3 class="post-title">${title}</h3>
+                  </div>
+                </div>
+                <div class="post-footer" onclick="event.stopPropagation()">
+                  ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" title="Sitio Oficial"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Sitio</a>` : ''}
+                  ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener">Descargar <i data-lucide="download" style="width: 14px; height: 14px;"></i></a>` : ''}
+                </div>
+              </article>
+            `;
+          } else {
+            return `
+              <article class="post-card clickable-card" data-index="${index}" data-category="${cat}">
+                <div>
+                  <div class="post-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="width: 28px; height: 28px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color, #333);">` : ''}
+                      <span class="post-category">${cat.toUpperCase()}</span>
+                    </div>
+                    ${version ? `<span class="post-date">${version}</span>` : ''}
+                  </div>
+                  <h3 class="post-title" style="margin-bottom: 8px; font-size: 1.1rem;">${title}</h3>
+                  <p class="post-excerpt" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">${desc}</p>
+                </div>
+                <div class="post-footer" onclick="event.stopPropagation()">
+                  <span class="read-time" style="font-size: 0.8rem; color: var(--text-muted);"><i data-lucide="hard-drive" style="width: 14px; height: 14px; vertical-align: middle;"></i> ${sizeOrBadge}</span>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" title="Sitio Oficial"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Sitio</a>` : ''}
+                    ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener">Descargar <i data-lucide="download" style="width: 14px; height: 14px;"></i></a>` : ''}
+                  </div>
+                </div>
+              </article>
+            `;
+          }
+        }).join('');
+
+        if (window.lucide) lucide.createIcons();
+        clearBtn.classList.toggle('hidden', query === '');
+        document.getElementById('resultsCount').textContent = `Se encontraron ${filtered.length} herramientas`;
+
+        document.querySelectorAll('.clickable-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const idx = card.getAttribute('data-index');
+            const data = filtered[idx];
+            openModal(data);
+          });
+        });
+      }
+
+      // 3. ABRIR VENTANA MODAL CON INFORMACIÓN EXTENDIDA Y ENLACES CONDICIONADOS
+      function openModal(item) {
+        const title = item.titulo || item.title || 'Sin título';
+        const desc = item.descripcion || item.excerpt || 'Sin descripción detallada.';
+        const extendedDesc = item.extendedDesc || item.content || desc;
+        const banner = item.bannerUrl || item.coverUrl || '';
+        const logo = item.logoUrl || item.avatar || '';
+        const author = item.autor || item.author || 'El Tio Baza';
+        
+        const rawWebUrl = item.webUrl || item.website || '';
+        const rawWebUrlTrim = rawWebUrl ? rawWebUrl.trim() : '';
+        const hasWeb = rawWebUrlTrim !== '' && rawWebUrlTrim !== '#' && rawWebUrlTrim !== 'undefined';
+
+        const rawDownloadUrl = item.downloadUrl ? item.downloadUrl.trim() : '';
+        const hasDownload = rawDownloadUrl !== '' && rawDownloadUrl !== '#' && rawDownloadUrl !== 'undefined';
+
+        const version = item.version ? `v${item.version}` : '';
+
+        modalBody.innerHTML = `
+          ${banner ? `<img src="${banner}" alt="Banner" class="repo-modal-banner">` : ''}
+          <div class="repo-modal-header-flex">
+            ${logo ? `<img src="${logo}" alt="Logo" class="repo-modal-logo">` : ''}
+            <div>
+              <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-main);">${title} ${version ? `<span style="font-size: 0.9rem; color: var(--primary-green); font-weight: 600;">(${version})</span>` : ''}</h2>
+              <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Creador / Autor: <strong>${author}</strong></p>
+            </div>
+          </div>
+          <div style="margin-bottom: 24px; color: var(--text-main); line-height: 1.6; font-size: 0.95rem;">
+            <p>${extendedDesc.replace(/\n/g, '<br>')}</p>
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--border-color, #333); padding-top: 18px;">
+            ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener" style="flex: 1; padding: 12px; text-align: center; justify-content: center;">Descargar Archivo <i data-lucide="download" style="width: 16px; height: 16px;"></i></a>` : ''}
+            ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" style="flex: 1; padding: 12px; text-align: center; justify-content: center;">Visitar Sitio Oficial <i data-lucide="external-link" style="width: 16px; height: 16px;"></i></a>` : ''}
+          </div>
+        `;
+
+        if (window.lucide) lucide.createIcons();
+        modal.classList.add('active');
+      }
+
+      function closeModal() {
+        modal.classList.remove('active');
+      }
+
+      closeModalBtn.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      // 4. ACTUALIZAR CONTADORES DE LOS BOTONES DE FILTRO DINÁMICAMENTE
+      function updateCounters() {
+        document.getElementById('countAll').textContent = allRepos.length;
+        document.getElementById('countXbox').textContent = allRepos.filter(i => (i.categoria || i.category) === 'xbox').length;
+        document.getElementById('countScripts').textContent = allRepos.filter(i => (i.categoria || i.category) === 'scripts').length;
+        document.getElementById('countUtils').textContent = allRepos.filter(i => (i.categoria || i.category) === 'utilidades').length;
+      }
+
+      // EVENTOS DE BÚSQUEDA, FILTROS Y CAMBIO DE ESTILOS DE VISTA
+      searchInput.addEventListener('input', renderRepos);
+      
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        renderRepos();
+        searchInput.focus();
+      });
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.getAttribute('data-filter');
+          renderRepos();
+        });
+      });
+
+      viewStyleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          viewStyleBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentViewStyle = btn.getAttribute('data-view');
+          renderRepos();
+        });
+      });
+
+      // Ejecutar carga inicial
+      fetchRepos();
+    });
+  </script>
+</body>
+</html>
+
