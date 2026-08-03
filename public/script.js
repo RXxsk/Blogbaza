@@ -3,6 +3,9 @@
  * Conexión e integración con API REST (Express + Node.js)
  */
 
+// 🌐 URL Base de tu backend en Render
+const API_URL = 'https://tiobaza-backend.onrender.com';
+
 document.addEventListener('DOMContentLoaded', () => {
   // Inicialización de la UI base
   initThemeToggle();
@@ -79,7 +82,7 @@ function formatRelativeTime(dateInput) {
 // 🏠 INDEX / PORTADA (Hero Destacado + Noticias, Posts Destacados y Videos Destacados)
 async function loadHomeData() {
   try {
-    const response = await fetch('/api/destacado');
+    const response = await fetch(`${API_URL}/api/destacado`);
     if (!response.ok) throw new Error('No se pudo obtener el contenido destacado');
     
     const data = await response.json();
@@ -228,7 +231,7 @@ async function loadPostsPage() {
   if (!container) return;
 
   try {
-    const res = await fetch('/api/posts');
+    const res = await fetch(`${API_URL}/api/posts`);
     const posts = await res.json();
 
     if (!Array.isArray(posts) || posts.length === 0) {
@@ -282,7 +285,7 @@ async function loadNoticiasPage(categoryFilter = 'all') {
   if (!container) return;
 
   try {
-    const res = await fetch('/api/noticias');
+    const res = await fetch(`${API_URL}/api/noticias`);
     let noticias = await res.json();
 
     if (!Array.isArray(noticias) || noticias.length === 0) {
@@ -342,7 +345,7 @@ async function loadVideosPage() {
   if (!container) return;
 
   try {
-    const res = await fetch('/api/videos');
+    const res = await fetch(`${API_URL}/api/videos`);
     const videos = await res.json();
 
     if (!Array.isArray(videos) || videos.length === 0) {
