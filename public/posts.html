@@ -624,12 +624,15 @@
     <a href="posts.html" class="mobile-nav-item active"><i data-lucide="file-text"></i><span>Posts</span></a>
     <a href="videos.html" class="mobile-nav-item"><i data-lucide="film"></i><span>Videos</span></a>
     <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
-<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+    <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
 
   <!-- Scripts -->
   <script src="script.js"></script>
   <script>
+    // 🌐 URL Base del backend en Render
+    const API_URL = 'https://tiobaza-backend.onrender.com';
+
     let allPostsData = [];
     let activePostCategory = 'all';
     let activeViewStyle = 'compact'; // 'compact', 'list', 'detailed'
@@ -684,7 +687,7 @@
       const container = document.getElementById('postsListContainer');
 
       try {
-        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/posts` : '/api/posts';
+        const apiEndpoint = `${API_URL}/api/posts`;
         
         let response;
         try {
@@ -835,7 +838,6 @@
           const category = post.category || post.categoria || 'General';
           const author = post.author || post.autor || 'El Tío Baza';
           const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-          // Corrección clave para leer correctamente la imagen propia del post desde la API (coverUrl, image, imagen, cover)
           const image = post.coverUrl || post.image || post.imagen || post.cover || 'blogpre.jpg';
           const summary = post.summary || post.excerpt || post.content || 'Sin descripción disponible.';
 
@@ -861,7 +863,6 @@
           const category = post.category || post.categoria || 'General';
           const author = post.author || post.autor || 'El Tío Baza';
           const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-          // Corrección clave para leer correctamente la imagen propia del post desde la API (coverUrl, image, imagen, cover)
           const image = post.coverUrl || post.image || post.imagen || post.cover || 'blogpre.jpg';
           const summary = post.summary || post.excerpt || post.content || 'Sin descripción disponible.';
 
@@ -908,7 +909,7 @@
       `;
 
       try {
-        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/posts/${postId}` : `/api/posts/${postId}`;
+        const apiEndpoint = `${API_URL}/api/posts/${postId}`;
         
         let postData;
         try {
@@ -951,7 +952,6 @@
       const author = post.author || post.autor || 'El Tío Baza';
       const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
       const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-      // Corrección en el modal para extraer la imagen propia de la API de forma segura
       const image = post.coverUrl || post.image || post.imagen || post.cover || '';
       const content = post.content || post.contenido || post.body || post.summary || '<p>No hay detalles adicionales disponibles para esta publicación.</p>';
 
@@ -1008,4 +1008,4 @@
     }
   </script>
 </body>
-</html>
+  </html>
