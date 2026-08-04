@@ -1,0 +1,364 @@
+<main id="main-content">
+    <section class="error-page-section">
+        <div class="container-fluid">
+            <div class="error-section">
+                <!-- Efecto -->
+                <h1 class="glitch-text" data-text="404">404</h1>
+                <h2 class="error-message">Página No Encontrada</h2>
+                <p class="error-description">
+                    ¡Vaya! La página que buscas se ha perdido en el éter digital. Es posible que haya sido movida, eliminada o que nunca haya existido en esta dimensión.
+                </p>
+
+                <!-- Buscador Global Conectado-->
+                <div class="global-search-container">
+                    <div class="search-input-wrapper">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" id="globalPageSearchInput" placeholder="Busca posts, herramientas, videos o noticias..." autocomplete="off">
+                        <button id="clearGlobalSearchBtn" class="clear-search-btn hidden">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <!-- Contenedor donde se despliegan dinámicamente -->
+                    <div id="globalSearchResults" class="global-search-results hidden"></div>
+                </div>
+
+                <div class="error-actions">
+                    <a href="/index.html" class="btn btn-primary">
+                        <i data-lucide="home" style="width: 18px; height: 18px; margin-right: 6px;"></i> Volver al Inicio
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Estilos 404 y el Buscador -->
+<style>
+  .error-page-section {
+    padding: 60px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 75vh;
+  }
+
+  .error-section {
+    text-align: center;
+    max-width: 650px;
+    margin: 0 auto;
+  }
+
+  /* Estilos */
+  .glitch-text {
+    font-size: 7rem;
+    font-weight: 900;
+    color: var(--primary-green, #107c10);
+    position: relative;
+    margin: 0;
+    letter-spacing: 4px;
+    text-shadow: 0 0 20px rgba(16, 124, 16, 0.4);
+    animation: pulseGlitch 3s infinite alternate;
+  }
+
+  .error-message {
+    font-size: 1.8rem;
+    color: #fff;
+    margin: 15px 0 10px 0;
+    font-weight: 700;
+  }
+
+  .error-description {
+    color: var(--text-secondary, #94a3b8);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+  }
+
+  /* Contenedor del Buscador Global */
+  .global-search-container {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto 30px auto;
+    text-align: left;
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    border-radius: 12px;
+    padding: 4px 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .search-input-wrapper:focus-within {
+    border-color: var(--primary-green, #107c10);
+    box-shadow: 0 0 15px rgba(16, 124, 16, 0.3);
+  }
+
+  .search-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--text-secondary, #94a3b8);
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+
+  #globalPageSearchInput {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 0.95rem;
+    padding: 10px 0;
+  }
+
+  #globalPageSearchInput::placeholder {
+    color: var(--text-secondary, #94a3b8);
+  }
+
+  .clear-search-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #94a3b8);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+
+  .clear-search-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  .clear-search-btn.hidden, .global-search-results.hidden {
+    display: none;
+  }
+
+  /* Resultados Desplegables de la Búsqueda */
+  .global-search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+    border-radius: 12px;
+    max-height: 380px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    padding: 8px;
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #fff;
+    transition: background 0.2s, transform 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .search-result-item:last-child {
+    border-bottom: none;
+  }
+
+  .search-result-item:hover {
+    background: rgba(16, 124, 16, 0.25);
+    transform: translateX(4px);
+  }
+
+  .search-result-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--primary-green, #107c10);
+  }
+
+  .search-result-info {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .search-result-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0 0 2px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .search-result-type {
+    font-size: 0.72rem;
+    color: var(--primary-green, #107c10);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+
+  .search-no-results {
+    padding: 15px;
+    text-align: center;
+    color: var(--text-secondary, #94a3b8);
+    font-size: 0.9rem;
+  }
+
+  @keyframes pulseGlitch {
+    0% { text-shadow: 2px 2px 0px rgba(239, 68, 68, 0.4), -2px -2px 0px rgba(16, 124, 16, 0.4); }
+    100% { text-shadow: -2px 2px 0px rgba(239, 68, 68, 0.4), 2px -2px 0px rgba(16, 124, 16, 0.4); }
+  }
+</style>
+
+<!-- Script de Conectividad para el Buscador Global -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const globalInput = document.getElementById('globalPageSearchInput');
+    const clearBtn = document.getElementById('clearGlobalSearchBtn');
+    const resultsBox = document.getElementById('globalSearchResults');
+
+    let cachedGlobalData = { posts: [], repos: [], videos: [], noticias: [] };
+    let isDataLoaded = false;
+
+    // Precargar todos los JSONs de la web en segundo plano para búsqueda instantánea
+    async function preloadSiteData() {
+      if (isDataLoaded) return;
+      const API_BASE = 'https://rxtiobaza-data.onrender.com';
+      const FALLBACK = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
+
+      try {
+        const fetchJSON = async (endpoint, file) => {
+          try {
+            let res = await fetch(`${API_BASE}${endpoint}`);
+            if (!res.ok) throw new Error();
+            return await res.json();
+          } catch {
+            let res = await fetch(`${FALLBACK}/${file}`);
+            return await res.json();
+          }
+        };
+
+        const [postsRes, reposRes, videosRes, noticiasRes] = await Promise.all([
+          fetchJSON('/api/posts', 'posts.json'),
+          fetchJSON('/api/repos', 'repos.json'),
+          fetchJSON('/api/videos', 'videos.json'),
+          fetchJSON('/api/noticias', 'noticias.json')
+        ]);
+
+        cachedGlobalData.posts = Array.isArray(postsRes) ? postsRes : (postsRes.posts || postsRes.data || []);
+        cachedGlobalData.repos = Array.isArray(reposRes) ? reposRes : (reposRes.repos || reposRes.data || []);
+        cachedGlobalData.videos = Array.isArray(videosRes) ? videosRes : (videosRes.videos || videosRes.data || []);
+        cachedGlobalData.noticias = Array.isArray(noticiasRes) ? noticiasRes : (noticiasRes.noticias || noticiasRes.data || []);
+        
+        isDataLoaded = true;
+      } catch (e) {
+        console.error('Error precargando datos para el buscador global:', e);
+      }
+    }
+
+    if (globalInput) {
+      globalInput.addEventListener('focus', preloadSiteData);
+      globalInput.addEventListener('input', async (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (clearBtn) clearBtn.classList.toggle('hidden', query === '');
+
+        if (!query) {
+          resultsBox.classList.add('hidden');
+          resultsBox.innerHTML = '';
+          return;
+        }
+
+        if (!isDataLoaded) {
+          resultsBox.innerHTML = '<div class="search-no-results">Cargando base de datos...</div>';
+          resultsBox.classList.remove('hidden');
+          await preloadSiteData();
+        }
+
+        // Filtrar en Posts, Repositorios, Videos y Noticias simultáneamente
+        const matchedPosts = cachedGlobalData.posts.filter(p => (p.titulo || p.title || '').toLowerCase().includes(query)).map(p => ({
+          title: p.titulo || p.title,
+          type: 'Post',
+          url: `/post.html`, 
+          img: p.coverUrl || p.cover || 'blogpre.jpg'
+        }));
+
+        const matchedRepos = cachedGlobalData.repos.filter(r => (r.titulo || r.title || '').toLowerCase().includes(query)).map(r => ({
+          title: r.titulo || r.title,
+          type: 'Herramienta / Repo',
+          url: r.downloadUrl || '#',
+          img: r.logoUrl || r.avatar || 'blogpre.jpg'
+        }));
+
+        const matchedVideos = cachedGlobalData.videos.filter(v => (v.titulo || v.title || '').toLowerCase().includes(query)).map(v => ({
+          title: v.titulo || v.title,
+          type: 'Video de YouTube',
+          url: v.youtubeUrl || v.url || `https://www.youtube.com/watch?v=${v.youtubeId || ''}`,
+          img: v.thumbnail || `https://img.youtube.com/vi/${v.youtubeId || ''}/hqdefault.jpg`
+        }));
+
+        const matchedNoticias = cachedGlobalData.noticias.filter(n => (n.titulo || n.title || '').toLowerCase().includes(query)).map(n => ({
+          title: n.titulo || n.title,
+          type: 'Noticia',
+          url: `/index.html`,
+          img: 'blogpre.jpg'
+        }));
+
+        const allResults = [...matchedPosts, ...matchedRepos, ...matchedVideos, ...matchedNoticias].slice(0, 6);
+
+        if (allResults.length === 0) {
+          resultsBox.innerHTML = '<div class="search-no-results">No se encontró nada relacionado con tu búsqueda.</div>';
+        } else {
+          resultsBox.innerHTML = allResults.map(item => `
+            <a href="${item.url}" class="search-result-item">
+              <img src="${item.img}" alt="" class="search-result-icon">
+              <div class="search-result-info">
+                <p class="search-result-title">${item.title}</p>
+                <span class="search-result-type">${item.type}</span>
+              </div>
+              <i data-lucide="chevron-right" style="width: 16px; height: 16px; color: var(--text-secondary);"></i>
+            </a>
+          `).join('');
+          if (window.lucide) lucide.createIcons();
+        }
+
+        resultsBox.classList.remove('hidden');
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        globalInput.value = '';
+        clearBtn.classList.add('hidden');
+        resultsBox.classList.add('hidden');
+        resultsBox.innerHTML = '';
+      });
+    }
+
+    // Ocultar resultados
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.global-search-container')) {
+        if (resultsBox) resultsBox.classList.add('hidden');
+      }
+    });
+  </script>
+  
