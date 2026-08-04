@@ -570,8 +570,9 @@
 
   <script src="script.js"></script>
   <script>
-    // URL base de la API externa (Render)
-    const API_URL = 'https://rxtiobaza-data.onrender.com';
+    // Constante oficial de la API de Render
+    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+
     let allVideosData = [];
 
     // MAPA OFICIAL DE AVATARES REGISTRADOS (Fallback local)
@@ -632,21 +633,26 @@
     });
 
     /**
-     * Consume la API usando la const API_URL o usa data/videos.json como respaldo
+     * Consume la API oficial de Render o usa data/videos.json como respaldo
      */
     async function fetchVideos() {
       const container = document.getElementById('videosGridContainer');
 
       try {
-        const apiEndpoint = `${API_URL}/api/videos`;
         let response;
-
         try {
-          response = await fetch(apiEndpoint);
+          // Usamos la API tal cual se hace en el index con el endpoint completo
+          response = await fetch(`${API_BASE_URL}/api/videos`);
           if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
         } catch (err) {
-          // Fallback a archivo local si falla Render
-          response = await fetch('data/videos.json');
+          // Respaldo secundario si la API falla de forma local o externa
+          try {
+            const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/videos` : '/api/videos';
+            response = await fetch(localApi);
+            if (!response.ok) throw new Error();
+          } catch (e2) {
+            response = await fetch('data/videos.json');
+          }
         }
 
         const data = await response.json();
@@ -690,14 +696,14 @@
       }
 
       container.innerHTML = videos.map(video => {
-        const title = video.title || video.titulo || 'Sin título';
-        const author = video.author || video.autor || 'El Tío Baza';
+        const title = video.titulo || video.title || 'Sin título';
+        const author = video.autor || video.author || 'El Tío Baza';
         const rawAvatar = video.authorAvatar || video.avatar || video.avatarUrl || video.author_avatar;
         const avatar = resolveAuthorAvatar(author, rawAvatar);
-        const date = video.date || video.fecha || 'Reciente';
-        const duration = video.duration || video.duracion || '10:00';
+        const date = video.fecha || video.date || 'Reciente';
+        const duration = video.duracion || video.duration || '10:00';
         const youtubeUrl = video.youtubeUrl || video.url || video.videoUrl || '';
-        const videoId = extractYouTubeId(youtubeUrl) || video.youtubeId || '';
+        const videoId = video.youtubeId || video.id || extractYouTubeId(youtubeUrl) || '';
         
         // Miniatura oficial de YouTube o fallback
         const thumbnail = video.thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');
