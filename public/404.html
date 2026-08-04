@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Página no encontrada | Blogbaza</title>
+    <!-- Librería de iconos Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
       :root {
@@ -48,6 +49,7 @@
         padding: 40px 20px;
       }
 
+      /* Animación Estilo Consola Xbox Fuera de Servicio */
       .xbox-error-ring {
         width: 110px;
         height: 110px;
@@ -69,7 +71,6 @@
         border-radius: 50%;
       }
 
-      /* rojos de error */
       .q1 { top: 6px; left: 6px; background-color: var(--xbox-red); animation: blinkRed 1s infinite alternate; }
       .q2 { top: 6px; right: 6px; background-color: var(--xbox-red); animation: blinkRed 1s infinite alternate 0.3s; }
       .q3 { bottom: 6px; left: 6px; background-color: var(--xbox-red); animation: blinkRed 1s infinite alternate 0.6s; }
@@ -85,7 +86,7 @@
         50% { transform: scale(1.04); }
       }
 
-      /* Animación */
+      /* Animación del Avatar con Herramienta */
       .avatar-container {
         display: flex;
         justify-content: center;
@@ -220,10 +221,9 @@
         display: none;
       }
 
-      /* Resultados Desplegables */
       .global-search-results {
         position: absolute;
-        top: calc(100 + 8px);
+        top: calc(100% + 8px);
         left: 0;
         right: 0;
         background: #0d0d0d;
@@ -234,7 +234,6 @@
         z-index: 100;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
         padding: 6px;
-        margin-top: 6px;
       }
 
       .search-result-item {
@@ -299,7 +298,6 @@
         font-size: 0.88rem;
       }
 
-      /* Botón de Retorno */
       .error-actions {
         display: flex;
         justify-content: center;
@@ -318,6 +316,8 @@
         font-size: 0.95rem;
         transition: all 0.2s ease;
         box-shadow: 0 4px 15px rgba(16, 124, 16, 0.3);
+        cursor: pointer;
+        border: none;
       }
 
       .btn-primary:hover {
@@ -326,7 +326,6 @@
         box-shadow: 0 6px 20px rgba(16, 124, 16, 0.5);
       }
 
-      /* Móviles */
       @media (max-width: 480px) {
         .error-page-section {
           padding: 20px 10px;
@@ -346,7 +345,7 @@
 
 <main id="main-content">
     <section class="error-page-section">
-        <!-- (luces de error) -->
+        <!-- Aro exterior con animación de consola fuera de servicio -->
         <div class="xbox-error-ring">
             <div class="xbox-quadrant q1"></div>
             <div class="xbox-quadrant q2"></div>
@@ -354,16 +353,12 @@
             <div class="xbox-quadrant q4"></div>
         </div>
 
-        <!-- Avatar  -->
+        <!-- Muñeco de Avatar animado con herramienta en mano -->
         <div class="avatar-container">
             <svg class="xbox-avatar-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- Cabeza del Avatar -->
                 <circle cx="50" cy="30" r="16" fill="#22c55e" stroke="#000" stroke-width="2"/>
-                <!-- Cuerpo / Sudadera -->
                 <path d="M30 75C30 58 38 52 50 52C62 52 70 58 70 75V85H30V75Z" fill="#15803d" stroke="#000" stroke-width="2"/>
-                <!-- herramienta -->
                 <path d="M32 58L20 70L28 78" stroke="#22c55e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-                <!-- Herramienta (Llave inglesa animada) -->
                 <g class="wrench-tool" transform="translate(45, 45)">
                     <rect x="-3" y="-18" width="6" height="22" rx="2" fill="#94a3b8" stroke="#000" stroke-width="1.5"/>
                     <circle cx="0" cy="-18" r="6" fill="#94a3b8" stroke="#000" stroke-width="1.5"/>
@@ -378,7 +373,7 @@
             La ruta solicitada no se encuentra disponible o el sistema ha colapsado en esta dimensión. Utiliza el buscador para localizar contenido o regresa al menú principal.
         </p>
 
-        <!-- Buscador Global Conectado Automáticamente -->
+        <!-- Buscador Global -->
         <div class="global-search-container">
             <div class="search-input-wrapper">
                 <i data-lucide="search" class="search-icon"></i>
@@ -391,9 +386,10 @@
         </div>
 
         <div class="error-actions">
-            <a href="/index.html" class="btn-primary">
+            <!-- Botón blindado para romper cualquier bucle de redirección -->
+            <button id="returnHomeBtn" class="btn-primary">
                 <i data-lucide="home" style="width: 18px; height: 18px; margin-right: 8px;"></i> Volver al Inicio
-            </a>
+            </button>
         </div>
     </section>
 </main>
@@ -401,6 +397,15 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     if (window.lucide) lucide.createIcons();
+
+    // Blindaje de redirección: si intentan regresar, limpiamos la historia y forzamos la carga limpia de la raíz
+    const homeBtn = document.getElementById('returnHomeBtn');
+    if (homeBtn) {
+      homeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = window.location.origin + '/';
+      });
+    }
 
     const globalInput = document.getElementById('globalPageSearchInput');
     const clearBtn = document.getElementById('clearGlobalSearchBtn');
@@ -521,7 +526,7 @@
         if (resultsBox) resultsBox.classList.add('hidden');
       }
     });
-  </script>
+  });
 </script>
 </body>
 </html>
