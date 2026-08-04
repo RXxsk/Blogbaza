@@ -36,5 +36,10 @@
 /repos/     /repos.html     301
 /repos      /repos.html     301
 
+/Rxrelogit/    /rxrelogit.html  301
+/rxrelogit     /rxrelogit.html  301
+/rxrelogit/    /rxrelogit.html  301
+/Rxrelogit     /rxrelogit.html  301
+
 
 /api/* https://rxtiobaza-data.onrender.com/api/:splat 200
