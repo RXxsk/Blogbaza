@@ -538,23 +538,63 @@
 
   <script src="script.js"></script>
   <script>
-      // Cargar Últimas Noticias para el Inicio
+    // Constante oficial de la API de Render
+    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+
+    // Inicialización de íconos de Lucide
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) lucide.createIcons();
+      loadHomeDynamicSections();
+    });
+
+    function openUniversalModal(htmlContent) {
+      document.getElementById('universalModalContent').innerHTML = htmlContent;
+      document.getElementById('universalPreviewModal').classList.add('show');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeUniversalModal() {
+      document.getElementById('universalPreviewModal').classList.remove('show');
+    }
+
+    // Cerrar modal haciendo clic fuera de la caja
+    document.getElementById('universalPreviewModal').addEventListener('click', (e) => {
+      if (e.target.id === 'universalPreviewModal') closeUniversalModal();
+    });
+
+    /**
+     * Función auxiliar para limpiar texto HTML y prevenir inyecciones
+     */
+    function escapeHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Cargar dinámicamente Noticias, Destacados, Fuentes (Repositorios) y Carrusel de Videos
+    async function loadHomeDynamicSections() {
+      try {
+        // 0. Cargar Últimas Noticias para el Inicio
         try {
           let resNoticias;
           try {
             resNoticias = await fetch(`${API_BASE_URL}/api/noticias`);
             if (!resNoticias.ok) throw new Error();
           } catch (e) {
-            resNoticias = await fetch('/api/noticias');
+            const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
+            resNoticias = await fetch(localApi);
           }
 
-          if (resNoticias.ok) {
+          if (resNoticias && resNoticias.ok) {
             const noticiasData = await resNoticias.json();
             const noticiasList = Array.isArray(noticiasData) ? noticiasData : (noticiasData.noticias || []);
             const homeNoticiasContainer = document.getElementById('homeNoticiasContainer');
 
             if (homeNoticiasContainer && noticiasList.length > 0) {
-              // Tomamos por ejemplo las últimas 3 o 4 noticias para el inicio
+              // Tomamos las últimas 3 noticias para la vista previa del inicio
               const ultimasNoticias = noticiasList.slice(0, 3);
 
               homeNoticiasContainer.innerHTML = ultimasNoticias.map(item => {
@@ -593,38 +633,20 @@
           console.error('Error al cargar las últimas noticias en el home:', err);
         }
 
-    
-    // Inicialización de íconos de Lucide
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) lucide.createIcons();
-      loadHomeDynamicSections();
-    });
-
-    function openUniversalModal(htmlContent) {
-      document.getElementById('universalModalContent').innerHTML = htmlContent;
-      document.getElementById('universalPreviewModal').classList.add('show');
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function closeUniversalModal() {
-      document.getElementById('universalPreviewModal').classList.remove('show');
-    }
-
-    // Cerrar modal haciendo clic fuera de la caja
-    document.getElementById('universalPreviewModal').addEventListener('click', (e) => {
-      if (e.target.id === 'universalPreviewModal') closeUniversalModal();
-    });
-
-    // Cargar dinámicamente Destacados, Fuentes (Repositorios) y Carrusel de Videos
-    async function loadHomeDynamicSections() {
-      try {
         // 1. Cargar Posts para la sección "Destacado"
-        const resPosts = await fetch('/api/posts');
+        let resPosts;
+        try {
+          resPosts = await fetch(`${API_BASE_URL}/api/posts`);
+          if (!resPosts.ok) throw new Error();
+        } catch (e) {
+          resPosts = await fetch('/api/posts');
+        }
+
         if (resPosts.ok) {
           const posts = await resPosts.json();
           const destContainer = document.getElementById('homeDestacadoContainer');
-          // Buscar el primer post marcado como destacado o tomar el primero de la lista
-          const featured = posts.find(p => p.destacado) || posts[0];
+          const postsList = Array.isArray(posts) ? posts : (posts.posts || []);
+          const featured = postsList.find(p => p.destacado) || postsList[0];
 
           if (featured) {
             const title = featured.titulo || featured.title || 'Sin título';
@@ -650,9 +672,17 @@
         }
 
         // 2. Cargar Repositorios para "Fuentes Recomendadas"
-        const resRepos = await fetch('/api/repos');
+        let resRepos;
+        try {
+          resRepos = await fetch(`${API_BASE_URL}/api/repos`);
+          if (!resRepos.ok) throw new Error();
+        } catch (e) {
+          resRepos = await fetch('/api/repos');
+        }
+
         if (resRepos.ok) {
-          const repos = await resRepos.json();
+          const reposData = await resRepos.json();
+          const repos = Array.isArray(reposData) ? reposData : (reposData.repos || []);
           const reposContainer = document.getElementById('homeReposContainer');
 
           if (repos && repos.length > 0) {
@@ -678,9 +708,17 @@
         }
 
         // 3. Cargar Videos para el Carrusel
-        const resVideos = await fetch('/api/videos');
+        let resVideos;
+        try {
+          resVideos = await fetch(`${API_BASE_URL}/api/videos`);
+          if (!resVideos.ok) throw new Error();
+        } catch (e) {
+          resVideos = await fetch('/api/videos');
+        }
+
         if (resVideos.ok) {
-          const videos = await resVideos.json();
+          const videosData = await resVideos.json();
+          const videos = Array.isArray(videosData) ? videosData : (videosData.videos || []);
           const videoContainer = document.getElementById('homeVideoCarousel');
 
           if (videos && videos.length > 0) {
@@ -744,7 +782,7 @@
           ${extDesc}
         </div>
         ${downloadUrl && downloadUrl !== '#' ? `
-          <a href="${downloadUrl}" target="_blank" style="display:block; text-align:center; background: var(--primary-green); color:#fff; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;">
+          <a href="${downloadUrl}" target="_blank" style="block; display:block; text-align:center; background: var(--primary-green); color:#fff; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;">
             <i data-lucide="download"></i> Descargar / Ver Enlace
           </a>
         ` : ''}
@@ -768,4 +806,3 @@
   </script>
 </body>
 </html>
-
