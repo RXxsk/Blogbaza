@@ -413,10 +413,13 @@
   </nav>
 
   <!-- SCRIPT DE LÓGICA DE TEMA, LUCIDE Y API DE REPOS CON MODAL -->
-  <script src="script.js"></script>
+    <script src="script.js"></script>
   <script>
     // Constante oficial de la API de Render
     const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+    
+    // URL de respaldo apuntando directamente carpeta data en GitHub
+    const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
     document.addEventListener('DOMContentLoaded', async () => {
       if (window.lucide) lucide.createIcons();
@@ -434,27 +437,31 @@
       let currentFilter = 'all';
       let currentViewStyle = 'apps'; // 'apps' o 'compact'
 
-      // 1. CARGAR DATOS DESDE LA API DEL BACKEND (Con respaldo doble Render / Local)
+      // 1. CARGAR DATOS DESDE LA API DE RENDER O RESPALDO DE GITHUB
       async function fetchRepos() {
+        let reposData = [];
+
         try {
-          let response;
           try {
-            response = await fetch(`${API_BASE_URL}/api/repos`);
-            if (!response.ok) throw new Error();
-          } catch (e) {
-            response = await fetch('/api/repos');
+            // Intento 1: Servidor principal en Render
+            const response = await fetch(`${API_BASE_URL}/api/repos`);
+            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+            reposData = await response.json();
+          } catch (err) {
+            console.warn('Render no disponible para repos, cargando respaldo desde GitHub...');
+            // Intento 2 (Respaldo): Archivo JSON estático alojado en GitHub
+            const fallbackResponse = await fetch(`${FALLBACK_JSON_URL}/repos.json`);
+            if (!fallbackResponse.ok) throw new Error('Error al cargar respaldo de GitHub');
+            reposData = await fallbackResponse.json();
           }
 
-          if (!response.ok) throw new Error('Error al obtener los repositorios');
-          
-          const reposData = await response.json();
           allRepos = Array.isArray(reposData) ? reposData : (reposData.repos || []);
           
           renderRepos();
           updateCounters();
         } catch (error) {
-          console.error('Error:', error);
-          container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Error al cargar los repositorios desde el servidor.</p>`;
+          console.error('Error al cargar repositorios (Render y GitHub fallaron):', error);
+          container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Error al cargar los repositorios desde el servidor o el respaldo.</p>`;
         }
       }
 
