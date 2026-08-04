@@ -1,5 +1,27 @@
 [
   {
+    "id": "1785871389479",
+    "titulo": "XB Cloud Gaming",
+    "autor": "RXx8",
+    "author": "RXx8",
+    "avatar": "https://avatars.githubusercontent.com/u/60585034?v=4",
+    "authorAvatar": "https://avatars.githubusercontent.com/u/60585034?v=4",
+    "createdAt": "2026-08-04T19:23:08.440Z",
+    "timestamp": "2026-08-04T19:23:08.440Z",
+    "categoria": "utilidades",
+    "category": "utilidades",
+    "version": "",
+    "size": "Cloud Gaming Xbox",
+    "downloadUrl": "",
+    "logoUrl": "https://emulationrevival.github.io/xbox-dev-mode/images/apps/xbcloudgaming.webp",
+    "bannerUrl": "https://emulationrevival.github.io/xbox-dev-mode/images/apps/xbcloudgaming.webp",
+    "webUrl": "",
+    "descripcion": "",
+    "extendedDesc": "",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
+    "fecha": "04 ago 2026"
+  },
+  {
     "id": "1785750841926",
     "titulo": "N64 Standalone",
     "autor": "Mannuee",
