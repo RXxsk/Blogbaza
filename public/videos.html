@@ -552,7 +552,7 @@
     <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
     <a href="videos.html" class="mobile-nav-item active"><i data-lucide="film"></i><span>Videos</span></a>
     <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
-<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+    <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
 
   <!-- MODAL DE REPRODUCTOR DE VIDEO -->
@@ -630,20 +630,27 @@
     });
 
     /**
-     * Consume la API /api/videos o usa data/videos.json como fallback
+     * Consume la API de videos de forma dinámica con fallbacks inteligentes
      */
     async function fetchVideos() {
       const container = document.getElementById('videosGridContainer');
 
       try {
-        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/videos` : '/api/videos';
         let response;
 
+        // 1. Intentar la ruta relativa del servidor / API
         try {
-          response = await fetch(apiEndpoint);
+          response = await fetch('/api/videos');
           if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
         } catch (err) {
-          response = await fetch('data/videos.json');
+          // 2. Si falla la ruta relativa, llamar directamente a Render
+          try {
+            response = await fetch('https://tiobaza-backend.onrender.com/api/videos');
+            if (!response.ok) throw new Error(`Render HTTP Error: ${response.status}`);
+          } catch (renderErr) {
+            // 3. Si ambos fallan, usar el JSON local como respaldo
+            response = await fetch('data/videos.json');
+          }
         }
 
         const data = await response.json();
