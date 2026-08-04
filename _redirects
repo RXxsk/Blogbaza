@@ -1,39 +1,40 @@
-# --- PÁGINA PRINCIPAL / HOME ---
-/Home/      /index.html    200
-/Home       /index.html    200
-/home/      /index.html    200
-/home       /index.html    200
+# --- REDIRECCIONES DE HOME ---
+/Home/      /               301
+/Home       /               301
+/home/      /               301
+/home       /               301
 
-# --- SECCIÓN POSTS ---
-/Post/      /posts.html    200
-/Post       /posts.html    200
-/post/      /posts.html    200
-/post       /posts.html    200
-/posts/     /posts.html    200
-/posts      /posts.html    200
+# --- REDIRECCIONES DE POSTS ---
+/Post/      /posts.html     301
+/Post       /posts.html     301
+/post/      /posts.html     301
+/post       /posts.html     301
+/posts/     /posts.html     301
+/posts      /posts.html     301
 
-# --- SECCIÓN VIDEOS ---
-/Videos/    /videos.html   200
-/Videos     /videos.html   200
-/videos/    /videos.html   200
-/videos     /videos.html   200
+# --- REDIRECCIONES DE VIDEOS ---
+/Videos/    /videos.html    301
+/Videos     /videos.html    301
+/videos/    /videos.html    301
+/videos     /videos.html    301
 
-# --- SECCIÓN NOTICIAS ---
-/Noticias/  /noticias.html 200
-/Noticias   /noticias.html 200
-/noticias/  /noticias.html 200
-/noticias   /noticias.html 200
+# --- REDIRECCIONES DE NOTICIAS ---
+/Noticias/  /noticias.html  301
+/Noticias   /noticias.html  301
+/noticias/  /noticias.html  301
+/noticias   /noticias.html  301
 
-# --- SECCIÓN ABOUT ---
-/About/     /about.html    200
-/About      /about.html    200
-/about/     /about.html    200
-/about      /about.html    200
+# --- REDIRECCIONES DE ABOUT ---
+/About/     /about.html     301
+/About      /about.html     301
+/about/     /about.html     301
+/about      /about.html     301
 
-# --- SECCIÓN REPOS ---
-/Repos/     /repos.html    200
-/Repos      /repos.html    200
-/repos/     /repos.html    200
-/repos      /repos.html    200
+# --- REDIRECCIONES DE REPOS ---
+/Repos/     /repos.html     301
+/Repos      /repos.html     301
+/repos/     /repos.html     301
+/repos      /repos.html     301
+
 
 /api/* https://rxtiobaza-data.onrender.com/api/:splat 200
