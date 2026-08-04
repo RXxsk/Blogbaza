@@ -570,8 +570,11 @@
 
   <script src="script.js"></script>
   <script>
-    // Constante oficial de la API de Render
+    // URL del servidor principal en Render
     const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+    
+    // URL de respaldo apuntando directamente a tu carpeta data en GitHub
+    const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
     let allVideosData = [];
 
@@ -633,35 +636,31 @@
     });
 
     /**
-     * Consume la API oficial de Render o usa data/videos.json como respaldo
+     * Consume la API oficial de Render o usa el respaldo JSON de GitHub si falla
      */
     async function fetchVideos() {
       const container = document.getElementById('videosGridContainer');
+      let data = [];
 
       try {
-        let response;
         try {
-          // Usamos la API tal cual se hace en el index con el endpoint completo
-          response = await fetch(`${API_BASE_URL}/api/videos`);
+          // Intento 1: Servidor principal en Render
+          const response = await fetch(`${API_BASE_URL}/api/videos`);
           if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+          data = await response.json();
         } catch (err) {
-          // Respaldo secundario si la API falla de forma local o externa
-          try {
-            const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/videos` : '/api/videos';
-            response = await fetch(localApi);
-            if (!response.ok) throw new Error();
-          } catch (e2) {
-            response = await fetch('data/videos.json');
-          }
+          console.warn('Render no disponible para videos, cargando respaldo desde GitHub...');
+          // Intento 2 (Respaldo): Archivo JSON estático alojado en GitHub
+          const fallbackResponse = await fetch(`${FALLBACK_JSON_URL}/videos.json`);
+          if (!fallbackResponse.ok) throw new Error('Error al cargar respaldo de GitHub');
+          data = await fallbackResponse.json();
         }
 
-        const data = await response.json();
         allVideosData = Array.isArray(data) ? data : (data.videos || []);
-
         renderVideosGrid(allVideosData);
 
       } catch (error) {
-        console.error('Error al cargar videos:', error);
+        console.error('Error al cargar videos (Render y GitHub fallaron):', error);
         if (container) {
           container.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
