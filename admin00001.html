@@ -594,11 +594,11 @@
       loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
 
       try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
-        });
+        const res = await fetch(`${API_URL}/api/login`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ username, password })
+});
         const data = await res.json();
 
         if (res.ok && data.success) {
@@ -750,7 +750,7 @@
         payload.extendedDesc = document.getElementById('repoExtendedDesc').value.trim();
       }
 
-      const endpoint = isEditing ? `/api/admin/update/${type}/${editingId}` : '/api/admin/create';
+      const endpoint = isEditing ? `${API_URL}/api/admin/update/${type}/${editingId}` : `${API_URL}/api/admin/create`;
       const method = isEditing ? 'PUT' : 'POST';
 
       submitBtn.disabled = true;
@@ -801,7 +801,7 @@
       container.innerHTML = '<p style="color: var(--text-muted)"><i class="fa-solid fa-spinner fa-spin"></i> Cargando elementos...</p>';
 
       try {
-        const res = await fetch(`/api/${type}`);
+        const res = await fetch(`${API_URL}/api/${type}`);
         if (!res.ok) throw new Error('Error al consultar servidor');
         
         const items = await res.json();
@@ -923,7 +923,7 @@
       if (!confirm('¿Seguro que deseas eliminar este contenido permanentemente?')) return;
 
       try {
-        const res = await fetch(`/api/admin/delete/${type}/${id}`, {
+        const res = await fetch(`${API_URL}/api/admin/delete/${type}/${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
@@ -947,7 +947,7 @@
     // Cambiar estado destacado (Solo para Posts)
     async function setFeatured(id) {
       try {
-        const res = await fetch(`/api/admin/set-featured/${id}`, {
+        const res = await fetch(`${API_URL}/api/admin/set-featured/${id}`, {
           method: 'PUT',
           headers: { 'Authorization': `Bearer ${authToken}` }
         });
