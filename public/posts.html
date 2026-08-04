@@ -629,6 +629,9 @@
   <!-- Scripts -->
   <script src="script.js"></script>
   <script>
+    // Constante actualizada con tu URL correcta de Render y respaldo integrado
+    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+
     let allPostsData = [];
     let activePostCategory = 'all';
     let activeViewStyle = 'compact'; // 'compact', 'list', 'detailed'
@@ -684,12 +687,12 @@
 
       try {
         let response;
-        // Intenta la ruta relativa como en index.html, con fallback al backend en Render
+        // Doble respaldo: ruta relativa local o directo a la URL de Render corregida
         try {
           response = await fetch('/api/posts');
           if (!response.ok) throw new Error();
         } catch (e) {
-          response = await fetch('https://tiobaza-backend.onrender.com/api/posts');
+          response = await fetch(`${API_BASE_URL}/api/posts`);
         }
 
         const data = await response.json();
@@ -909,7 +912,7 @@
             response = await fetch(`/api/posts/${postId}`);
             if (!response.ok) throw new Error();
           } catch (e) {
-            response = await fetch(`https://tiobaza-backend.onrender.com/api/posts/${postId}`);
+            response = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
           }
           postData = await response.json();
         } catch (e) {
