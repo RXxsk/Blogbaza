@@ -621,8 +621,12 @@
 
   <!-- Scripts -->
   <script src="script.js"></script>
-  <script>
+    <script>
+    // Constante oficial de la API de Render
     const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+    
+    // URL de respaldo apuntando directamente a tu carpeta data en GitHub
+    const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
     let allPostsData = [];
     let activePostCategory = 'all';
@@ -683,11 +687,16 @@
           response = await fetch(`${API_BASE_URL}/api/posts`);
           if (!response.ok) throw new Error();
         } catch (e) {
-          response = await fetch('/api/posts');
+          try {
+            response = await fetch('/api/posts');
+            if (!response.ok) throw new Error();
+          } catch (errLocal) {
+            response = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
+          }
         }
 
         const data = await response.json();
-        allPostsData = Array.isArray(data) ? data : (data.posts || []);
+        allPostsData = Array.isArray(data) ? data : (data.posts || data.data || []);
 
         updatePostCategoryCounts(allPostsData);
         applyPostFilters();
@@ -902,9 +911,20 @@
             response = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
             if (!response.ok) throw new Error();
           } catch (e) {
-            response = await fetch(`/api/posts/${postId}`);
+            try {
+              response = await fetch(`/api/posts/${postId}`);
+              if (!response.ok) throw new Error();
+            } catch (errLocal) {
+              // Si falla individual, buscamos de nuevo en el JSON general de GitHub como respaldo
+              const fallbackRes = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
+              const fallbackData = await fallbackRes.json();
+              const list = Array.isArray(fallbackData) ? fallbackData : (fallbackData.posts || fallbackData.data || []);
+              postData = list.find(p => String(p._id || p.id) === String(postId));
+            }
           }
-          postData = await response.json();
+          if (response && response.ok && !postData) {
+            postData = await response.json();
+          }
         } catch (e) {
           console.error(e);
         }
