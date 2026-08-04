@@ -409,13 +409,15 @@
     <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
     <a href="videos.html" class="mobile-nav-item"><i data-lucide="film"></i><span>Videos</span></a>
     <a href="repos.html" class="mobile-nav-item active"><i data-lucide="database"></i><span>Repos</span></a>
-<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
-
+    <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
 
   <!-- SCRIPT DE LÓGICA DE TEMA, LUCIDE Y API DE REPOS CON MODAL -->
   <script src="script.js"></script>
   <script>
+    // Constante oficial de la API de Render
+    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+
     document.addEventListener('DOMContentLoaded', async () => {
       if (window.lucide) lucide.createIcons();
 
@@ -432,12 +434,22 @@
       let currentFilter = 'all';
       let currentViewStyle = 'apps'; // 'apps' o 'compact'
 
-      // 1. CARGAR DATOS DESDE LA API DEL BACKEND
+      // 1. CARGAR DATOS DESDE LA API DEL BACKEND (Con respaldo doble Render / Local)
       async function fetchRepos() {
         try {
-          const response = await fetch('/api/repos'); 
+          let response;
+          try {
+            response = await fetch(`${API_BASE_URL}/api/repos`);
+            if (!response.ok) throw new Error();
+          } catch (e) {
+            response = await fetch('/api/repos');
+          }
+
           if (!response.ok) throw new Error('Error al obtener los repositorios');
-          allRepos = await response.json();
+          
+          const reposData = await response.json();
+          allRepos = Array.isArray(reposData) ? reposData : (reposData.repos || []);
+          
           renderRepos();
           updateCounters();
         } catch (error) {
@@ -635,4 +647,3 @@
   </script>
 </body>
 </html>
-
