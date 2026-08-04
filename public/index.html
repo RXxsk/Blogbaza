@@ -538,6 +538,62 @@
 
   <script src="script.js"></script>
   <script>
+      // Cargar Últimas Noticias para el Inicio
+        try {
+          let resNoticias;
+          try {
+            resNoticias = await fetch(`${API_BASE_URL}/api/noticias`);
+            if (!resNoticias.ok) throw new Error();
+          } catch (e) {
+            resNoticias = await fetch('/api/noticias');
+          }
+
+          if (resNoticias.ok) {
+            const noticiasData = await resNoticias.json();
+            const noticiasList = Array.isArray(noticiasData) ? noticiasData : (noticiasData.noticias || []);
+            const homeNoticiasContainer = document.getElementById('homeNoticiasContainer');
+
+            if (homeNoticiasContainer && noticiasList.length > 0) {
+              // Tomamos por ejemplo las últimas 3 o 4 noticias para el inicio
+              const ultimasNoticias = noticiasList.slice(0, 3);
+
+              homeNoticiasContainer.innerHTML = ultimasNoticias.map(item => {
+                const category = item.categoria || item.category || 'General';
+                const title = item.titulo || item.title || 'Noticia sin título';
+                const content = item.contenido || item.description || '';
+                const date = item.fecha || item.date || 'Reciente';
+
+                let badgeClass = '';
+                if (category.toLowerCase() === 'mantenimiento') badgeClass = 'warning';
+                if (category.toLowerCase() === 'lanzamientos') badgeClass = 'info';
+
+                return `
+                  <article class="news-item">
+                    <span class="news-badge ${badgeClass}">${escapeHTML(category)}</span>
+                    <div class="news-content" style="flex: 1;">
+                      <h4>${escapeHTML(title)}</h4>
+                      <p>${escapeHTML(content)}</p>
+                      <div class="news-date">
+                        <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+                        <span>${escapeHTML(date)}</span>
+                      </div>
+                    </div>
+                  </article>
+                `;
+              }).join('');
+
+              if (window.lucide) {
+                lucide.createIcons();
+              }
+            } else if (homeNoticiasContainer) {
+              homeNoticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay noticias recientes registradas.</p>';
+            }
+          }
+        } catch (err) {
+          console.error('Error al cargar las últimas noticias en el home:', err);
+        }
+
+    
     // Inicialización de íconos de Lucide
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
