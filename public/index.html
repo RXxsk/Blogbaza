@@ -543,7 +543,7 @@
   </nav>
 
   <script src="script.js"></script>
-    <script>
+      <script>
     // Constante oficial de la API de Render
     const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
     
@@ -593,13 +593,7 @@
             resNoticias = await fetch(`${API_BASE_URL}/api/noticias`);
             if (!resNoticias.ok) throw new Error();
           } catch (e) {
-            try {
-              const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
-              resNoticias = await fetch(localApi);
-              if (!resNoticias.ok) throw new Error();
-            } catch (errLocal) {
-              resNoticias = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
-            }
+            resNoticias = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
           }
 
           if (resNoticias && resNoticias.ok) {
@@ -608,7 +602,6 @@
             const homeNoticiasContainer = document.getElementById('homeNoticiasContainer');
 
             if (homeNoticiasContainer && noticiasList.length > 0) {
-              // Tomamos las últimas 3 noticias para la vista previa del inicio
               const ultimasNoticias = noticiasList.slice(0, 3);
 
               homeNoticiasContainer.innerHTML = ultimasNoticias.map(item => {
@@ -648,140 +641,137 @@
         }
 
         // 1. Cargar Posts para la sección "Destacado"
-        let resPosts;
         try {
-          resPosts = await fetch(`${API_BASE_URL}/api/posts`);
-          if (!resPosts.ok) throw new Error();
-        } catch (e) {
+          let resPosts;
           try {
-            resPosts = await fetch('/api/posts');
+            resPosts = await fetch(`${API_BASE_URL}/api/posts`);
             if (!resPosts.ok) throw new Error();
-          } catch (errLocal) {
+          } catch (e) {
             resPosts = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
           }
-        }
 
-        if (resPosts && resPosts.ok) {
-          const posts = await resPosts.json();
-          const destContainer = document.getElementById('homeDestacadoContainer');
-          const postsList = Array.isArray(posts) ? posts : (posts.posts || []);
-          const featured = postsList.find(p => p.destacado) || postsList[0];
+          if (resPosts && resPosts.ok) {
+            const postsData = await resPosts.json();
+            const destContainer = document.getElementById('homeDestacadoContainer');
+            const postsList = Array.isArray(postsData) ? postsData : (postsData.posts || postsData.data || []);
+            const featured = postsList.find(p => p.destacado) || postsList[0];
 
-          if (featured) {
-            const title = featured.titulo || featured.title || 'Sin título';
-            const subtitle = featured.subtitulo || featured.descripcion || 'Sin descripción disponible...';
-            const cover = featured.coverUrl || 'blogpre.jpg';
-            const fullContent = featured.content || subtitle;
+            if (featured && destContainer) {
+              const title = featured.titulo || featured.title || 'Sin título';
+              const subtitle = featured.subtitulo || featured.descripcion || featured.excerpt || 'Sin descripción disponible...';
+              const cover = featured.coverUrl || featured.banner || 'blogpre.jpg';
+              const fullContent = featured.content || featured.contenido || subtitle;
 
-            destContainer.innerHTML = `
-              <div class="featured-diagonal-card" onclick='showPostModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)})'>
-                <div class="diagonal-media-wrapper">
-                  <img src="${cover}" alt="${title}">
-                </div>
-                <div class="diagonal-content">
-                  <span class="tag" style="background: rgba(16,124,16,0.2); color: var(--primary-green); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${featured.categoria || 'Destacado'}</span>
-                  <h3 style="margin: 10px 0 6px 0; font-size: 1.15rem; color: #fff;">${title}</h3>
-                  <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">${subtitle}</p>
-                </div>
-              </div>
-            `;
-          } else {
-            destContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay publicaciones destacadas.</p>';
-          }
-        }
-
-        // 2. Cargar Repositorios para "Fuentes Recomendadas"
-        let resRepos;
-        try {
-          resRepos = await fetch(`${API_BASE_URL}/api/repos`);
-          if (!resRepos.ok) throw new Error();
-        } catch (e) {
-          try {
-            resRepos = await fetch('/api/repos');
-            if (!resRepos.ok) throw new Error();
-          } catch (errLocal) {
-            resRepos = await fetch(`${FALLBACK_JSON_URL}/repos.json`);
-          }
-        }
-
-        if (resRepos && resRepos.ok) {
-          const reposData = await resRepos.json();
-          const repos = Array.isArray(reposData) ? reposData : (reposData.repos || []);
-          const reposContainer = document.getElementById('homeReposContainer');
-
-          if (repos && repos.length > 0) {
-            reposContainer.innerHTML = repos.map(repo => {
-              const name = repo.titulo || repo.title || 'Herramienta';
-              const logo = repo.logoUrl || repo.coverUrl || 'blogpre.jpg';
-              const desc = repo.descripcion || 'Sin descripción.';
-              const extDesc = repo.extendedDesc || desc;
-              const download = repo.downloadUrl || '#';
-              const version = repo.version || 'v1.0';
-
-              return `
-                <div class="source-app-card" onclick='showRepoModal(${JSON.stringify(name)}, ${JSON.stringify(logo)}, ${JSON.stringify(desc)}, ${JSON.stringify(extDesc)}, ${JSON.stringify(download)}, ${JSON.stringify(version)})'>
-                  <img src="${logo}" alt="${name}" class="source-app-logo">
-                  <span class="source-app-name">${name}</span>
-                  <span style="font-size: 0.7rem; color: var(--text-secondary);">${version}</span>
-                </div>
-              `;
-            }).join('');
-          } else {
-            reposContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay fuentes registradas.</p>';
-          }
-        }
-
-        // 3. Cargar Videos para el Carrusel
-        let resVideos;
-        try {
-          resVideos = await fetch(`${API_BASE_URL}/api/videos`);
-          if (!resVideos.ok) throw new Error();
-        } catch (e) {
-          try {
-            resVideos = await fetch('/api/videos');
-            if (!resVideos.ok) throw new Error();
-          } catch (errLocal) {
-            resVideos = await fetch(`${FALLBACK_JSON_URL}/videos.json`);
-          }
-        }
-
-        if (resVideos && resVideos.ok) {
-          const videosData = await resVideos.json();
-          const videos = Array.isArray(videosData) ? videosData : (videosData.videos || []);
-          const videoContainer = document.getElementById('homeVideoCarousel');
-
-          if (videos && videos.length > 0) {
-            videoContainer.innerHTML = videos.map((vid, idx) => {
-              const ytId = vid.youtubeId || vid.id || '';
-              const title = vid.titulo || vid.title || 'Video de YouTube';
-              const desc = vid.descripcion || vid.desc || 'Video exclusivo del canal.';
-              const thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
-              const ytLink = `https://www.youtube.com/watch?v=${ytId}`;
-
-              return `
-                <div class="video-carousel-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
-                  <img src="${thumbUrl}" alt="${title}" class="video-carousel-thumb">
-                  <div style="flex: 1;">
-                    <span style="font-size: 0.75rem; color: var(--primary-green); font-weight: 700;"><i data-lucide="youtube"></i> YouTube Video</span>
-                    <h3 style="margin: 6px 0; font-size: 1.1rem; color: #fff;">${title}</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">${desc}</p>
-                    <a href="${ytLink}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #ef4444; color: #fff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold;">
-                      <i data-lucide="play"></i> Ver en YouTube
-                    </a>
+              destContainer.innerHTML = `
+                <div class="featured-diagonal-card" onclick='showPostModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)})'>
+                  <div class="diagonal-media-wrapper">
+                    <img src="${cover}" alt="${title}">
+                  </div>
+                  <div class="diagonal-content">
+                    <span class="tag" style="background: rgba(16,124,16,0.2); color: var(--primary-green); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${featured.categoria || featured.category || 'Destacado'}</span>
+                    <h3 style="margin: 10px 0 6px 0; font-size: 1.15rem; color: #fff;">${title}</h3>
+                    <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">${subtitle}</p>
                   </div>
                 </div>
               `;
-            }).join('');
-
-            // Iniciar intervalo del carrusel cada 5 segundos
-            initVideoCarousel();
-          } else {
-            videoContainer.innerHTML = '<p style="color: var(--text-secondary); padding: 20px; text-align: center;">No hay videos disponibles.</p>';
+            } else if (destContainer) {
+              destContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay publicaciones destacadas.</p>';
+            }
           }
+        } catch (err) {
+          console.error('Error al cargar posts destacados:', err);
+        }
+
+        // 2. Cargar Repositorios para "Fuentes Recomendadas"
+        try {
+          let resRepos;
+          try {
+            resRepos = await fetch(`${API_BASE_URL}/api/repos`);
+            if (!resRepos.ok) throw new Error();
+          } catch (e) {
+            resRepos = await fetch(`${FALLBACK_JSON_URL}/repos.json`);
+          }
+
+          if (resRepos && resRepos.ok) {
+            const reposData = await resRepos.json();
+            const repos = Array.isArray(reposData) ? reposData : (reposData.repos || reposData.data || []);
+            const reposContainer = document.getElementById('homeReposContainer');
+
+            if (repos && repos.length > 0 && reposContainer) {
+              reposContainer.innerHTML = repos.map(repo => {
+                const name = repo.titulo || repo.title || 'Herramienta';
+                const logo = repo.logoUrl || repo.avatar || repo.coverUrl || 'blogpre.jpg';
+                const desc = repo.descripcion || repo.excerpt || 'Sin descripción.';
+                const extDesc = repo.extendedDesc || repo.content || desc;
+                const download = repo.downloadUrl || '#';
+                const version = repo.version ? `v${repo.version}` : 'v1.0';
+
+                return `
+                  <div class="source-app-card" onclick='showRepoModal(${JSON.stringify(name)}, ${JSON.stringify(logo)}, ${JSON.stringify(desc)}, ${JSON.stringify(extDesc)}, ${JSON.stringify(download)}, ${JSON.stringify(version)})'>
+                    <img src="${logo}" alt="${name}" class="source-app-logo">
+                    <span class="source-app-name">${name}</span>
+                    <span style="font-size: 0.7rem; color: var(--text-secondary);">${version}</span>
+                  </div>
+                `;
+              }).join('');
+            } else if (reposContainer) {
+              reposContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay fuentes registradas.</p>';
+            }
+          }
+        } catch (err) {
+          console.error('Error al cargar repositorios:', err);
+        }
+
+        // 3. Cargar Videos para el Carrusel
+        try {
+          let resVideos;
+          try {
+            resVideos = await fetch(`${API_BASE_URL}/api/videos`);
+            if (!resVideos.ok) throw new Error();
+          } catch (e) {
+            resVideos = await fetch(`${FALLBACK_JSON_URL}/videos.json`);
+          }
+
+          if (resVideos && resVideos.ok) {
+            const videosData = await resVideos.json();
+            const videos = Array.isArray(videosData) ? videosData : (videosData.videos || videosData.data || []);
+            const videoContainer = document.getElementById('homeVideoCarousel');
+
+            if (videos && videos.length > 0 && videoContainer) {
+              videoContainer.innerHTML = videos.map((vid, idx) => {
+                const ytId = vid.youtubeId || vid.id || '';
+                const title = vid.titulo || vid.title || 'Video de YouTube';
+                const desc = vid.descripcion || vid.desc || vid.excerpt || 'Video exclusivo del canal.';
+                const thumbUrl = vid.thumbnail || (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : 'blogpre.jpg');
+                const ytLink = vid.youtubeUrl || vid.url || (ytId ? `https://www.youtube.com/watch?v=${ytId}` : '#');
+
+                return `
+                  <div class="video-carousel-slide ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                    <img src="${thumbUrl}" alt="${title}" class="video-carousel-thumb">
+                    <div style="flex: 1;">
+                      <span style="font-size: 0.75rem; color: var(--primary-green); font-weight: 700;"><i data-lucide="youtube"></i> YouTube Video</span>
+                      <h3 style="margin: 6px 0; font-size: 1.1rem; color: #fff;">${title}</h3>
+                      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">${desc}</p>
+                      <a href="${ytLink}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: #ef4444; color: #fff; padding: 6px 14px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: bold;">
+                        <i data-lucide="play"></i> Ver en YouTube
+                      </a>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+
+              // Iniciar intervalo del carrusel cada 5 segundos
+              initVideoCarousel();
+            } else if (videoContainer) {
+              videoContainer.innerHTML = '<p style="color: var(--text-secondary); padding: 20px; text-align: center;">No hay videos disponibles.</p>';
+            }
+          }
+        } catch (err) {
+          console.error('Error al cargar videos para el carrusel:', err);
         }
 
       } catch (err) {
-        console.error('Error cargando elementos dinámicos en el Index:', err);
+        console.error('Error general cargando elementos dinámicos en el Index:', err);
       }
     }
 
@@ -811,7 +801,7 @@
           ${extDesc}
         </div>
         ${downloadUrl && downloadUrl !== '#' ? `
-          <a href="${downloadUrl}" target="_blank" style="block; display:block; text-align:center; background: var(--primary-green); color:#fff; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;">
+          <a href="${downloadUrl}" target="_blank" style="display:block; text-align:center; background: var(--primary-green); color:#fff; padding:10px; border-radius:8px; text-decoration:none; font-weight:bold;">
             <i data-lucide="download"></i> Descargar / Ver Enlace
           </a>
         ` : ''}
