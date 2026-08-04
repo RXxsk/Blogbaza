@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 
-
   <style>
     /* ESTILOS DE LAYOUTS DE VIDEOS */
     .videos-layout-grid {
@@ -358,8 +357,8 @@
     </div>
   </header>
 
-
-<div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
+  <!-- NOTIFICACIÓN DE LOGRO XBOX -->
+  <div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
     <div class="achievement-icon-wrapper">
       <i data-lucide="award" class="achievement-icon"></i>
     </div>
@@ -375,7 +374,6 @@
   </div>
 
   <style>
-    /* Estilos de la notificación de Logro Xbox */
     .xbox-achievement {
       position: fixed;
       bottom: 25px;
@@ -497,7 +495,6 @@
     });
   </script>
 
-
   <!-- CABECERA DE LA SECCIÓN VIDEOS CON CONTROLES DE DISEÑO -->
   <section class="page-header">
     <div class="header-container">
@@ -615,6 +612,11 @@
           } else if (mode === 'immersive') {
             container.classList.add('videos-layout-immersive');
           }
+
+          // Re-renderizar tarjetas para actualizar layout y estilos sin perder info
+          if (allVideosData && allVideosData.length > 0) {
+            renderVideosGrid(allVideosData);
+          }
         });
       });
 
@@ -625,47 +627,55 @@
     });
 
     /**
-     * Consume la API de videos de forma dinámica con fallbacks inteligentes
+     * Consume la API de videos de forma silenciosa e ininterrumpida
      */
     async function fetchVideos() {
-      const container = document.getElementById('videosGridContainer');
+      let dataLoaded = false;
+      let rawData = null;
 
-      try {
-        let response;
+      // Intentos de conexión ordenados sin mostrar textos de error intermedios
+      const endpoints = [
+        '/api/videos',
+        'https://tiobaza-backend.onrender.com/api/videos',
+        'data/videos.json'
+      ];
 
-        // 1. Intentar la ruta relativa del servidor / API
+      for (const url of endpoints) {
         try {
-          response = await fetch('/api/videos');
-          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        } catch (err) {
-          // 2. Si falla la ruta relativa, llamar directamente a Render
-          try {
-            response = await fetch('https://tiobaza-backend.onrender.com/api/videos');
-            if (!response.ok) throw new Error(`Render HTTP Error: ${response.status}`);
-          } catch (renderErr) {
-            // 3. Si ambos fallan, usar el JSON local como respaldo
-            response = await fetch('data/videos.json');
+          const res = await fetch(url);
+          if (res.ok) {
+            rawData = await res.json();
+            dataLoaded = true;
+            break; // Si responde bien, salir del bucle
           }
-        }
-
-        const data = await response.json();
-        allVideosData = Array.isArray(data) ? data : (data.videos || []);
-
-        renderVideosGrid(allVideosData);
-
-      } catch (error) {
-        console.error('Error al cargar videos:', error);
-        if (container) {
-          container.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
-              <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-secondary);"></i>
-              <h3>Aún no hay videos disponibles</h3>
-              <p style="color: var(--text-secondary); margin-top: 6px;">Regresa más tarde para ver nuevo contenido en video.</p>
-            </div>
-          `;
-          if (window.lucide) lucide.createIcons();
+        } catch (e) {
+          // Fallo silencioso, pasa al siguiente endpoint
         }
       }
+
+      if (dataLoaded && rawData) {
+        allVideosData = Array.isArray(rawData) ? rawData : (rawData.videos || []);
+        renderVideosGrid(allVideosData);
+      } else {
+        renderEmptyState();
+      }
+    }
+
+    /**
+     * Muestra estado vacío limpia en caso de no encontrar ningún dato
+     */
+    function renderEmptyState() {
+      const container = document.getElementById('videosGridContainer');
+      if (!container) return;
+
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+          <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-secondary);"></i>
+          <h3>Aún no hay videos disponibles</h3>
+          <p style="color: var(--text-secondary); margin-top: 6px;">Regresa más tarde para ver nuevo contenido en video.</p>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
     }
 
     /**
@@ -676,14 +686,7 @@
       if (!container) return;
 
       if (!videos || videos.length === 0) {
-        container.innerHTML = `
-          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
-            <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px;"></i>
-            <h3>Aún no hay videos disponibles</h3>
-            <p style="color: var(--text-secondary);">Regresa más tarde para ver nuevo contenido en video.</p>
-          </div>
-        `;
-        if (window.lucide) lucide.createIcons();
+        renderEmptyState();
         return;
       }
 
