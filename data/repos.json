@@ -17,7 +17,7 @@
     "bannerUrl": "https://emulationrevival.github.io/xbox-dev-mode/images/apps/xbcloudgaming.webp",
     "webUrl": "https://github.com/danprice142",
     "descripcion": "",
-    "extendedDesc": "Project Information\n- *Title:* XB Cloud Gaming\n- *Release Date:* November 27, 2024\n- *Author / Developer:* DanP\n- *Platform:* Xbox Series S|X\n\n*System Requirements*\n- Active Xbox Game Pass Subscription (Core / Ultimate)\n- Installation of all 3 required dependencies\n- Compatible Xbox Series S|X Console (Dev Mode Recommended)\n\n*Key Features*\n- Full Frontend Integration & Support\n- Optimized for Xbox Series S|X Architecture\n- Dependency-based Installation System",
+    "extendedDesc": "Project Information\n- *Title:* XB Cloud Gaming\n- *Release Date:* November 27, 2024\n- *Author / Developer:* DanP\n- *Platform:* Xbox Series S|X\n\nSystem Requirements\n- Active Xbox Game Pass Subscription (Core / Ultimate)\n- Installation of all 3 required dependencies\n- Compatible Xbox Series S|X Console (Dev Mode Recommended)\n\nKey Features\n- Full Frontend Integration & Support\n- Optimized for Xbox Series S|X Architecture\n- Dependency-based Installation System",
     "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
     "fecha": "04 ago 2026"
   },
