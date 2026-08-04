@@ -103,6 +103,9 @@
 
   <script src="script.js"></script>
   <script>
+    // Constante oficial de la API de Render
+    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+
     let allNewsData = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -122,14 +125,19 @@
       const resultsText = document.getElementById('newsResultsText');
 
       try {
-        const apiEndpoint = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
-        
         let response;
         try {
-          response = await fetch(apiEndpoint);
+          // Usamos la API tal cual se hace en el index con el endpoint completo
+          response = await fetch(`${API_BASE_URL}/api/noticias`);
           if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         } catch (err) {
-          response = await fetch('data/noticias.json');
+          try {
+            const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
+            response = await fetch(localApi);
+            if (!response.ok) throw new Error();
+          } catch (e2) {
+            response = await fetch('data/noticias.json');
+          }
         }
 
         const data = await response.json();
@@ -208,4 +216,3 @@
   </script>
 </body>
 </html>
-
