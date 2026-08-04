@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 
-
   <style>
     /* ESTILOS DE LAYOUTS DE VIDEOS */
     .videos-layout-grid {
@@ -137,7 +136,7 @@
       overflow: hidden;
     }
 
-    /* ESTILOS DEL BLOQUE DEL AUTOR Y AVATAR */
+    /* BLOQUE DE AUTOR Y AVATAR */
     .video-author-box {
       display: flex;
       align-items: center;
@@ -172,7 +171,7 @@
       font-size: 0.75rem;
     }
 
-    /* DISEÑO COMPACTO (AUSTERO / LISTA) */
+    /* DISEÑO COMPACTO */
     .videos-layout-compact .video-card {
       flex-direction: row;
       align-items: stretch;
@@ -198,7 +197,7 @@
       font-size: 1rem;
     }
 
-    /* DISEÑO INMERSIVO (DESTACADO / GRANDE) */
+    /* DISEÑO INMERSIVO */
     .videos-layout-immersive .video-card {
       border-radius: 18px;
     }
@@ -216,7 +215,7 @@
       font-size: 0.95rem;
     }
 
-    /* ESTILOS DEL MODAL DE VIDEO Y BACKDROP */
+    /* MODAL DE VIDEO */
     .video-modal {
       position: fixed;
       top: 0;
@@ -284,7 +283,7 @@
 
     .video-responsive {
       position: relative;
-      padding-bottom: 56.25%; /* Ratio 16:9 */
+      padding-bottom: 56.25%;
       height: 0;
       overflow: hidden;
     }
@@ -313,7 +312,6 @@
   <header class="navbar">
     <div class="nav-container">
       
-      <!-- Logo / Brand -->
       <a href="index.html" class="nav-logo">
         <div class="avatar-badge">
           <i data-lucide="gamepad-2"></i>
@@ -321,7 +319,6 @@
         <span>El Tio Baza <span class="logo-accent">Blog</span></span>
       </a>
 
-      <!-- Menú Multipartes (Escritorio) -->
       <nav class="nav-sections desktop-only">
         <a href="index.html" class="nav-link">Inicio</a>
         <a href="noticias.html" class="nav-link">Noticias</a>
@@ -330,15 +327,11 @@
         <a href="repos.html" class="nav-link">Repositorio</a>
       </nav>
 
-      <!-- Acciones de Usuario -->
       <div class="nav-actions">
-        
-        <!-- Botón de Tema con Foco (💡) -->
         <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
           <i data-lucide="lightbulb" class="icon-bulb"></i>
         </button>
 
-        <!-- Menú Kebab -->
         <div class="dropdown-wrapper">
           <button id="kebabBtn" class="icon-btn" aria-label="Más opciones">
             <i data-lucide="more-vertical"></i>
@@ -358,8 +351,8 @@
     </div>
   </header>
 
-
-<div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
+  <!-- NOTIFICACIÓN DE LOGRO XBOX -->
+  <div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
     <div class="achievement-icon-wrapper">
       <i data-lucide="award" class="achievement-icon"></i>
     </div>
@@ -375,7 +368,6 @@
   </div>
 
   <style>
-    /* Estilos de la notificación de Logro Xbox */
     .xbox-achievement {
       position: fixed;
       bottom: 25px;
@@ -497,8 +489,7 @@
     });
   </script>
 
-
-  <!-- CABECERA DE LA SECCIÓN VIDEOS CON CONTROLES DE DISEÑO -->
+  <!-- CABECERA -->
   <section class="page-header">
     <div class="header-container">
       <div class="header-action-wrapper">
@@ -509,7 +500,6 @@
           </p>
         </div>
         
-        <!-- Controles dinámicos para cambiar la visualización -->
         <div class="view-mode-selector">
           <button class="view-mode-btn active" data-view="grid" aria-label="Vista de cuadrícula moderna">
             <i data-lucide="layout-grid"></i>
@@ -528,17 +518,14 @@
     </div>
   </section>
 
-  <!-- CONTENIDO PRINCIPAL DE VIDEOS -->
+  <!-- CONTENIDO PRINCIPAL -->
   <main class="content-section">
-    
-    <!-- Contenedor dinámico principal -->
     <div id="videosGridContainer" class="videos-layout-grid">
       <div class="loading-state-card" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
         <div class="loading-spinner-xbox" style="margin: 0 auto 16px;"></div>
-        <p>Sincronizando transmisiones y recuperando metadatos...</p>
+        <p>Cargando videos...</p>
       </div>
     </div>
-
   </main>
 
   <!-- FOOTER -->
@@ -546,13 +533,13 @@
     <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y videos.</p>
   </footer>
 
-  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <!-- NAVEGACIÓN MÓVIL -->
   <nav class="mobile-bottom-nav mobile-only">
     <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
     <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
     <a href="videos.html" class="mobile-nav-item active"><i data-lucide="film"></i><span>Videos</span></a>
     <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
-<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+    <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
 
   <!-- MODAL DE REPRODUCTOR DE VIDEO -->
@@ -572,7 +559,6 @@
   <script>
     let allVideosData = [];
 
-    // MAPA OFICIAL DE AVATARES REGISTRADOS (Fallback local)
     const DEFAULT_AVATAR = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10';
     const AVATAR_FRONTEND_MAP = {
       'el tio baza': DEFAULT_AVATAR,
@@ -593,10 +579,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
 
-      // Cargar lista de videos desde la API
       fetchVideos();
 
-      // Control del selector de layout / vistas
       const viewButtons = document.querySelectorAll('.view-mode-btn');
       const container = document.getElementById('videosGridContainer');
 
@@ -616,45 +600,49 @@
             container.classList.add('videos-layout-immersive');
           }
 
-          // Volvemos a renderizar los ítems para garantizar que se apliquen las imágenes del autor
           if (allVideosData && allVideosData.length > 0) {
             renderVideosGrid(allVideosData);
           }
         });
       });
 
-      // Tecla Escape para cerrar modal
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') closeVideoModal();
       });
     });
 
     /**
-     * Consume la API en silencio e intenta con data/videos.json como fallback directo
+     * Carga de videos compatible con la lógica del Index y con manejo silencioso de errores
      */
     async function fetchVideos() {
-      const endpoints = [
-        typeof API_URL !== 'undefined' ? `${API_URL}/videos` : '/api/videos',
-        'https://tiobaza-backend.onrender.com/api/videos',
-        'data/videos.json'
-      ];
+      let videosFound = null;
 
-      let loadedData = null;
+      const endpoints = [
+        typeof API_URL !== 'undefined' ? `${API_URL}/videos` : null,
+        '/api/videos',
+        'https://tiobaza-backend.onrender.com/api/videos',
+        'data/videos.json',
+        './data/videos.json'
+      ].filter(Boolean);
 
       for (const url of endpoints) {
         try {
           const res = await fetch(url);
           if (res.ok) {
-            loadedData = await res.json();
-            break; // Si responde bien, interrumpe el bucle silenciosamente
+            const data = await res.json();
+            const list = Array.isArray(data) ? data : (data.videos || data.data || data.items || []);
+            if (list && list.length > 0) {
+              videosFound = list;
+              break;
+            }
           }
-        } catch (err) {
-          // Fallo silencioso, continúa intentando con la siguiente opción
+        } catch (e) {
+          // Ignora silenciosamente para evitar alertas flotantes o errores en consola
         }
       }
 
-      if (loadedData) {
-        allVideosData = Array.isArray(loadedData) ? loadedData : (loadedData.videos || []);
+      if (videosFound) {
+        allVideosData = videosFound;
         renderVideosGrid(allVideosData);
       } else {
         const container = document.getElementById('videosGridContainer');
@@ -672,7 +660,7 @@
     }
 
     /**
-     * Renderiza la lista de videos en la cuadrícula asegurando la carga de los avatares
+     * Mapeo de campos flexible idéntico al index
      */
     function renderVideosGrid(videos) {
       const container = document.getElementById('videosGridContainer');
@@ -697,11 +685,15 @@
         const avatar = resolveAuthorAvatar(author, rawAvatar);
         const date = video.date || video.fecha || 'Reciente';
         const duration = video.duration || video.duracion || '10:00';
-        const youtubeUrl = video.youtubeUrl || video.url || video.videoUrl || '';
-        const videoId = extractYouTubeId(youtubeUrl) || video.youtubeId || '';
         
-        // Miniatura oficial de YouTube o fallback
-        const thumbnail = video.thumbnail || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');
+        // Detección flexible de URL y Video ID
+        const youtubeUrl = video.youtubeUrl || video.url || video.videoUrl || video.link || '';
+        const rawId = video.youtubeId || video.videoId || video.id || '';
+        const videoId = extractYouTubeId(rawId) || extractYouTubeId(youtubeUrl) || '';
+        
+        // Miniatura con fallbacks
+        const thumbnail = video.thumbnail || video.thumb || video.miniatura || video.imagen || 
+          (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');
 
         return `
           <article class="video-card" onclick="openVideoModal('${escapeHTML(youtubeUrl)}', '${escapeHTML(videoId)}')">
@@ -733,25 +725,20 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    /**
-     * Extrae el ID de un enlace de YouTube (soporta shorts, watch, embed y youtu.be)
-     */
     function extractYouTubeId(url) {
       if (!url) return '';
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[2].length === 11) ? match[2] : url;
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = String(url).match(regExp);
+      if (match && match[2].length === 11) return match[2];
+      if (typeof url === 'string' && url.length === 11 && !url.includes('/') && !url.includes('.')) return url;
+      return '';
     }
 
-    /**
-     * Abre el modal e inyecta el iframe de YouTube con autoplay
-     */
     function openVideoModal(url, rawId) {
       const modal = document.getElementById('videoModal');
       const iframe = document.getElementById('youtubeIframe');
 
       const videoId = rawId || extractYouTubeId(url);
-
       if (!modal || !iframe || !videoId) return;
 
       iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
@@ -759,9 +746,6 @@
       document.body.style.overflow = 'hidden';
     }
 
-    /**
-     * Cierra el modal de reproductor y detiene el audio del video
-     */
     function closeVideoModal() {
       const modal = document.getElementById('videoModal');
       const iframe = document.getElementById('youtubeIframe');
