@@ -155,7 +155,7 @@
       color: var(--text-primary);
     }
 
-    /* ESTILOS DE VISTA: LISTA (Con miniatura lateral) */
+    /* ESTILOS DE VISTA: LISTA */
     .posts-list-view {
       display: flex;
       flex-direction: column;
@@ -220,7 +220,7 @@
       overflow: hidden;
     }
 
-    /* ESTILOS DE VISTA: DETALLADO (Tarjetas grandes tipo cuadrícula) */
+    /* ESTILOS DE VISTA: DETALLADO */
     .posts-detailed-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -300,7 +300,7 @@
       color: var(--text-secondary);
     }
 
-    /* ESTILOS DEL MODAL VISUALIZADOR DE POST COMPLETO */
+    /* MODAL */
     .post-modal-overlay {
       position: fixed;
       top: 0;
@@ -439,7 +439,6 @@
       margin-bottom: 18px;
     }
 
-    /* RESPONSIVO PARA MÓVILES */
     @media (max-width: 600px) {
       .view-style-toolbar {
         max-width: 100%;
@@ -520,7 +519,7 @@
     </div>
   </header>
 
-  <!-- CABECERA DE LA SECCIÓN POSTS -->
+  <!-- CABECERA -->
   <section class="page-header">
     <div class="header-container">
       <h1 class="page-title"><i data-lucide="file-text"></i> Publicaciones y Artículos</h1>
@@ -533,10 +532,9 @@
   <!-- CONTENIDO PRINCIPAL -->
   <main class="content-section">
     
-    <!-- Barra de Herramientas (Búsqueda + Filtros con Contador Dinámico) -->
+    <!-- Barra de Herramientas -->
     <div class="posts-toolbar">
       
-      <!-- Buscador en tiempo real por título -->
       <div class="search-box">
         <i data-lucide="search" class="search-icon"></i>
         <input 
@@ -550,7 +548,6 @@
         </button>
       </div>
 
-      <!-- Filtros de Categoría con Contadores Basados en la API -->
       <div class="filter-bar" id="postsFilterBar">
         <button class="filter-btn active" data-category="all" onclick="selectPostFilter('all', this)">
           Todos <span class="filter-count" id="count-all">0</span>
@@ -568,7 +565,7 @@
 
     </div>
 
-    <!-- Barra de Estilos de Vista Centrados (Compacto, Lista, Detallado) -->
+    <!-- Barra de Estilos de Vista -->
     <div class="view-style-toolbar">
       <button class="view-style-btn active" data-view="compact" onclick="changePostViewStyle('compact', this)">
         <i data-lucide="list" style="width: 16px; height: 16px;"></i> Compacto
@@ -581,14 +578,12 @@
       </button>
     </div>
 
-    <!-- Info de Resultados -->
     <div class="results-info-bar">
       <span id="postsResultsText">Mostrando publicaciones...</span>
     </div>
 
-    <!-- CONTENEDOR DINÁMICO DE POSTS -->
+    <!-- CONTENEDOR DINÁMICO -->
     <div id="postsListContainer" class="posts-compact-list">
-      <!-- Carga inicial con Skeleton Loader -->
       <div class="post-compact-card skeleton-card">
         <div class="skeleton-line skeleton-anim" style="width: 40px; height: 40px; border-radius: 50%;"></div>
         <div style="flex: 1;">
@@ -600,15 +595,13 @@
 
   </main>
 
-  <!-- VENTANA MODAL VISUALIZADORA DE PREVISUALIZACIÓN DE POST -->
+  <!-- MODAL -->
   <div id="postPreviewModal" class="post-modal-overlay" onclick="closePostPreviewModalOnOverlay(event)">
     <div class="post-modal-container">
       <button class="post-modal-close-btn" onclick="closePostPreviewModal()" aria-label="Cerrar vista previa">
         <i data-lucide="x"></i>
       </button>
-      <div id="postModalBody" class="post-modal-body">
-        <!-- Se inyectará dinámicamente el contenido traído desde la API -->
-      </div>
+      <div id="postModalBody" class="post-modal-body"></div>
     </div>
   </div>
 
@@ -617,7 +610,7 @@
     <p>© 2026 El Tio Baza Blog. Portal de noticias, artículos y videos.</p>
   </footer>
 
-  <!-- NAVEGACIÓN MÓVIL INFERIOR -->
+  <!-- NAVEGACIÓN MÓVIL -->
   <nav class="mobile-bottom-nav mobile-only">
     <a href="index.html" class="mobile-nav-item"><i data-lucide="home"></i><span>Inicio</span></a>
     <a href="posts.html" class="mobile-nav-item active"><i data-lucide="file-text"></i><span>Posts</span></a>
@@ -629,12 +622,11 @@
   <!-- Scripts -->
   <script src="script.js"></script>
   <script>
-    // Constante actualizada con tu URL correcta de Render y respaldo integrado
     const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
 
     let allPostsData = [];
     let activePostCategory = 'all';
-    let activeViewStyle = 'compact'; // 'compact', 'list', 'detailed'
+    let activeViewStyle = 'compact';
 
     const AVATAR_FRONTEND_MAP = {
       'el tio baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
@@ -687,12 +679,11 @@
 
       try {
         let response;
-        // Doble respaldo: ruta relativa local o directo a la URL de Render corregida
         try {
-          response = await fetch('/api/posts');
+          response = await fetch(`${API_BASE_URL}/api/posts`);
           if (!response.ok) throw new Error();
         } catch (e) {
-          response = await fetch(`${API_BASE_URL}/api/posts`);
+          response = await fetch('/api/posts');
         }
 
         const data = await response.json();
@@ -791,7 +782,6 @@
         return;
       }
 
-      // Renderizado basado en el estilo activo (Compacto, Lista o Detallado)
       if (activeViewStyle === 'compact') {
         container.innerHTML = filtered.map(post => {
           const id = post._id || post.id || '';
@@ -909,10 +899,10 @@
         try {
           let response;
           try {
-            response = await fetch(`/api/posts/${postId}`);
+            response = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
             if (!response.ok) throw new Error();
           } catch (e) {
-            response = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
+            response = await fetch(`/api/posts/${postId}`);
           }
           postData = await response.json();
         } catch (e) {
