@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 
+
   <style>
     /* ESTILOS DE LAYOUTS DE VIDEOS */
     .videos-layout-grid {
@@ -357,8 +358,8 @@
     </div>
   </header>
 
-  <!-- NOTIFICACIÓN DE LOGRO XBOX -->
-  <div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
+
+<div id="xboxAchievementBanner" class="xbox-achievement" style="display: none;">
     <div class="achievement-icon-wrapper">
       <i data-lucide="award" class="achievement-icon"></i>
     </div>
@@ -374,6 +375,7 @@
   </div>
 
   <style>
+    /* Estilos de la notificación de Logro Xbox */
     .xbox-achievement {
       position: fixed;
       bottom: 25px;
@@ -495,6 +497,7 @@
     });
   </script>
 
+
   <!-- CABECERA DE LA SECCIÓN VIDEOS CON CONTROLES DE DISEÑO -->
   <section class="page-header">
     <div class="header-container">
@@ -532,7 +535,7 @@
     <div id="videosGridContainer" class="videos-layout-grid">
       <div class="loading-state-card" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
         <div class="loading-spinner-xbox" style="margin: 0 auto 16px;"></div>
-        <p>Conectando al servidor...</p>
+        <p>Sincronizando transmisiones y recuperando metadatos...</p>
       </div>
     </div>
 
@@ -549,7 +552,7 @@
     <a href="posts.html" class="mobile-nav-item"><i data-lucide="file-text"></i><span>Posts</span></a>
     <a href="videos.html" class="mobile-nav-item active"><i data-lucide="film"></i><span>Videos</span></a>
     <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
-    <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
+<a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
 
   <!-- MODAL DE REPRODUCTOR DE VIDEO -->
@@ -613,7 +616,7 @@
             container.classList.add('videos-layout-immersive');
           }
 
-          // Re-renderizar tarjetas para actualizar layout y estilos sin perder info
+          // Volvemos a renderizar los ítems para garantizar que se apliquen las imágenes del autor
           if (allVideosData && allVideosData.length > 0) {
             renderVideosGrid(allVideosData);
           }
@@ -627,55 +630,45 @@
     });
 
     /**
-     * Consume la API de videos de forma silenciosa e ininterrumpida
+     * Consume la API en silencio e intenta con data/videos.json como fallback directo
      */
     async function fetchVideos() {
-      let dataLoaded = false;
-      let rawData = null;
-
-      // Intentos de conexión ordenados sin mostrar textos de error intermedios
       const endpoints = [
-        '/api/videos',
+        typeof API_URL !== 'undefined' ? `${API_URL}/videos` : '/api/videos',
         'https://tiobaza-backend.onrender.com/api/videos',
         'data/videos.json'
       ];
+
+      let loadedData = null;
 
       for (const url of endpoints) {
         try {
           const res = await fetch(url);
           if (res.ok) {
-            rawData = await res.json();
-            dataLoaded = true;
-            break; // Si responde bien, salir del bucle
+            loadedData = await res.json();
+            break; // Si responde bien, interrumpe el bucle silenciosamente
           }
-        } catch (e) {
-          // Fallo silencioso, pasa al siguiente endpoint
+        } catch (err) {
+          // Fallo silencioso, continúa intentando con la siguiente opción
         }
       }
 
-      if (dataLoaded && rawData) {
-        allVideosData = Array.isArray(rawData) ? rawData : (rawData.videos || []);
+      if (loadedData) {
+        allVideosData = Array.isArray(loadedData) ? loadedData : (loadedData.videos || []);
         renderVideosGrid(allVideosData);
       } else {
-        renderEmptyState();
+        const container = document.getElementById('videosGridContainer');
+        if (container) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+              <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-secondary);"></i>
+              <h3>Aún no hay videos disponibles</h3>
+              <p style="color: var(--text-secondary); margin-top: 6px;">Regresa más tarde para ver nuevo contenido en video.</p>
+            </div>
+          `;
+          if (window.lucide) lucide.createIcons();
+        }
       }
-    }
-
-    /**
-     * Muestra estado vacío limpia en caso de no encontrar ningún dato
-     */
-    function renderEmptyState() {
-      const container = document.getElementById('videosGridContainer');
-      if (!container) return;
-
-      container.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
-          <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-secondary);"></i>
-          <h3>Aún no hay videos disponibles</h3>
-          <p style="color: var(--text-secondary); margin-top: 6px;">Regresa más tarde para ver nuevo contenido en video.</p>
-        </div>
-      `;
-      if (window.lucide) lucide.createIcons();
     }
 
     /**
@@ -686,7 +679,14 @@
       if (!container) return;
 
       if (!videos || videos.length === 0) {
-        renderEmptyState();
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
+            <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px;"></i>
+            <h3>Aún no hay videos disponibles</h3>
+            <p style="color: var(--text-secondary);">Regresa más tarde para ver nuevo contenido en video.</p>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
         return;
       }
 
