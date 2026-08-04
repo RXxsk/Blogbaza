@@ -1,1 +1,39 @@
+# --- PÁGINA PRINCIPAL / HOME ---
+/Home/      /index.html    200
+/Home       /index.html    200
+/home/      /index.html    200
+/home       /index.html    200
+
+# --- SECCIÓN POSTS ---
+/Post/      /posts.html    200
+/Post       /posts.html    200
+/post/      /posts.html    200
+/post       /posts.html    200
+/posts/     /posts.html    200
+/posts      /posts.html    200
+
+# --- SECCIÓN VIDEOS ---
+/Videos/    /videos.html   200
+/Videos     /videos.html   200
+/videos/    /videos.html   200
+/videos     /videos.html   200
+
+# --- SECCIÓN NOTICIAS ---
+/Noticias/  /noticias.html 200
+/Noticias   /noticias.html 200
+/noticias/  /noticias.html 200
+/noticias   /noticias.html 200
+
+# --- SECCIÓN ABOUT ---
+/About/     /about.html    200
+/About      /about.html    200
+/about/     /about.html    200
+/about      /about.html    200
+
+# --- SECCIÓN REPOS ---
+/Repos/     /repos.html    200
+/Repos      /repos.html    200
+/repos/     /repos.html    200
+/repos      /repos.html    200
+
 /api/* https://rxtiobaza-data.onrender.com/api/:splat 200
