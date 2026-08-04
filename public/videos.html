@@ -535,7 +535,7 @@
     <div id="videosGridContainer" class="videos-layout-grid">
       <div class="loading-state-card" style="text-align: center; grid-column: 1 / -1; padding: 40px;">
         <div class="loading-spinner-xbox" style="margin: 0 auto 16px;"></div>
-        <p>Sincronizando transmisiones y recuperando metadatos...</p>
+        <p>Conectando al servidor...</p>
       </div>
     </div>
 
@@ -615,11 +615,6 @@
           } else if (mode === 'immersive') {
             container.classList.add('videos-layout-immersive');
           }
-
-          // Volvemos a renderizar los ítems para garantizar que se apliquen las imágenes del autor
-          if (allVideosData && allVideosData.length > 0) {
-            renderVideosGrid(allVideosData);
-          }
         });
       });
 
@@ -663,10 +658,9 @@
         if (container) {
           container.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px;">
-              <i data-lucide="alert-triangle" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
-              <h3>No se pudieron recuperar los videos</h3>
-              <p style="color: var(--text-secondary); margin-top: 6px;">Verifica la conexión con el servidor o inténtalo nuevamente.</p>
-              <button class="btn-secondary" onclick="fetchVideos()" style="margin-top: 14px;">Reintentar</button>
+              <i data-lucide="film" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-secondary);"></i>
+              <h3>Aún no hay videos disponibles</h3>
+              <p style="color: var(--text-secondary); margin-top: 6px;">Regresa más tarde para ver nuevo contenido en video.</p>
             </div>
           `;
           if (window.lucide) lucide.createIcons();
