@@ -375,7 +375,6 @@
       padding: 32px;
     }
 
-    /* ENCABEZADO MODAL: FECHA CENTRADA, TAMAÑO MEDIANO Y SEPARADA DE LA X */
     .modal-post-header-meta {
       display: flex;
       align-items: center;
@@ -630,8 +629,6 @@
   <!-- Scripts -->
   <script src="script.js"></script>
   <script>
-    const API_URL = 'https://tiobaza-backend.onrender.com';
-
     let allPostsData = [];
     let activePostCategory = 'all';
     let activeViewStyle = 'compact'; // 'compact', 'list', 'detailed'
@@ -686,14 +683,13 @@
       const container = document.getElementById('postsListContainer');
 
       try {
-        const apiEndpoint = `${API_URL}/api/posts`;
-        
         let response;
+        // Intenta la ruta relativa como en index.html, con fallback al backend en Render
         try {
-          response = await fetch(apiEndpoint);
-          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-        } catch (err) {
-          response = await fetch('data/posts.json');
+          response = await fetch('/api/posts');
+          if (!response.ok) throw new Error();
+        } catch (e) {
+          response = await fetch('https://tiobaza-backend.onrender.com/api/posts');
         }
 
         const data = await response.json();
@@ -722,7 +718,7 @@
       const counts = { all: postsList.length, Tutoriales: 0, Guías: 0, Desarrollo: 0 };
 
       postsList.forEach(post => {
-        const cat = post.category || post.categoria;
+        const cat = post.categoria || post.category;
         if (cat && counts.hasOwnProperty(cat)) counts[cat]++;
       });
 
@@ -767,8 +763,8 @@
       const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
       const filtered = allPostsData.filter(post => {
-        const category = post.category || post.categoria || '';
-        const title = (post.title || post.titulo || '').toLowerCase();
+        const category = post.categoria || post.category || '';
+        const title = (post.titulo || post.title || '').toLowerCase();
         
         const matchesCat = (activePostCategory === 'all') || (category.toLowerCase() === activePostCategory.toLowerCase());
         const matchesSearch = !searchTerm || title.includes(searchTerm);
@@ -795,12 +791,12 @@
       // Renderizado basado en el estilo activo (Compacto, Lista o Detallado)
       if (activeViewStyle === 'compact') {
         container.innerHTML = filtered.map(post => {
-          const id = post.id || post._id || '';
-          const title = post.title || post.titulo || 'Sin título';
-          const category = post.category || post.categoria || 'General';
-          const author = post.author || post.autor || 'El Tío Baza';
+          const id = post._id || post.id || '';
+          const title = post.titulo || post.title || 'Sin título';
+          const category = post.categoria || post.category || 'General';
+          const author = post.autor || post.author || 'El Tío Baza';
           const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
-          const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+          const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
 
           return `
             <div class="post-compact-card" onclick="openPostPreviewModal('${id}')">
@@ -832,14 +828,12 @@
 
       } else if (activeViewStyle === 'list') {
         container.innerHTML = filtered.map(post => {
-          const id = post.id || post._id || '';
-          const title = post.title || post.titulo || 'Sin título';
-          const category = post.category || post.categoria || 'General';
-          const author = post.author || post.autor || 'El Tío Baza';
-          const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-          // Corrección clave para leer correctamente la imagen propia del post desde la API (coverUrl, image, imagen, cover)
-          const image = post.coverUrl || post.image || post.imagen || post.cover || 'blogpre.jpg';
-          const summary = post.summary || post.excerpt || post.content || 'Sin descripción disponible.';
+          const id = post._id || post.id || '';
+          const title = post.titulo || post.title || 'Sin título';
+          const category = post.categoria || post.category || 'General';
+          const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+          const image = post.coverUrl || post.cover || post.imagen || post.image || 'blogpre.jpg';
+          const summary = post.subtitulo || post.descripcion || post.excerpt || post.summary || post.content || 'Sin descripción disponible.';
 
           return `
             <div class="post-list-card" onclick="openPostPreviewModal('${id}')">
@@ -858,14 +852,13 @@
 
       } else if (activeViewStyle === 'detailed') {
         container.innerHTML = filtered.map(post => {
-          const id = post.id || post._id || '';
-          const title = post.title || post.titulo || 'Sin título';
-          const category = post.category || post.categoria || 'General';
-          const author = post.author || post.autor || 'El Tío Baza';
-          const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-          // Corrección clave para leer correctamente la imagen propia del post desde la API (coverUrl, image, imagen, cover)
-          const image = post.coverUrl || post.image || post.imagen || post.cover || 'blogpre.jpg';
-          const summary = post.summary || post.excerpt || post.content || 'Sin descripción disponible.';
+          const id = post._id || post.id || '';
+          const title = post.titulo || post.title || 'Sin título';
+          const category = post.categoria || post.category || 'General';
+          const author = post.autor || post.author || 'El Tío Baza';
+          const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+          const image = post.coverUrl || post.cover || post.imagen || post.image || 'blogpre.jpg';
+          const summary = post.subtitulo || post.descripcion || post.excerpt || post.summary || post.content || 'Sin descripción disponible.';
 
           return `
             <div class="post-detailed-card" onclick="openPostPreviewModal('${id}')">
@@ -900,44 +893,38 @@
       modal.classList.add('active');
       document.body.style.overflow = 'hidden';
 
-      modalBody.innerHTML = `
-        <div style="padding: 10px;">
-          <div class="skeleton-line short skeleton-anim" style="margin: 0 auto 16px auto; width: 120px;"></div>
-          <div class="skeleton-line long skeleton-anim" style="height: 32px; margin-bottom: 20px;"></div>
-          <div class="skeleton-line skeleton-anim" style="height: 220px; border-radius: 12px; margin-bottom: 24px;"></div>
-          <div class="skeleton-line skeleton-anim" style="height: 80px;"></div>
-        </div>
-      `;
+      let postData = allPostsData.find(p => String(p._id || p.id) === String(postId));
 
-      try {
-        const apiEndpoint = `${API_URL}/api/posts/${postId}`;
-        
-        let postData;
+      if (!postData) {
+        modalBody.innerHTML = `
+          <div style="padding: 10px;">
+            <div class="skeleton-line short skeleton-anim" style="margin: 0 auto 16px auto; width: 120px;"></div>
+            <div class="skeleton-line long skeleton-anim" style="height: 32px; margin-bottom: 20px;"></div>
+            <div class="skeleton-line skeleton-anim" style="height: 220px; border-radius: 12px; margin-bottom: 24px;"></div>
+          </div>
+        `;
         try {
-          const response = await fetch(apiEndpoint);
-          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-          postData = await response.json();
-        } catch (err) {
-          postData = allPostsData.find(p => String(p.id || p._id) === String(postId));
-          if (!postData) {
-            const fallbackRes = await fetch('data/posts.json');
-            const fallbackData = await fallbackRes.json();
-            const list = Array.isArray(fallbackData) ? fallbackData : (fallbackData.posts || []);
-            postData = list.find(p => String(p.id || p._id) === String(postId));
+          let response;
+          try {
+            response = await fetch(`/api/posts/${postId}`);
+            if (!response.ok) throw new Error();
+          } catch (e) {
+            response = await fetch(`https://tiobaza-backend.onrender.com/api/posts/${postId}`);
           }
+          postData = await response.json();
+        } catch (e) {
+          console.error(e);
         }
+      }
 
-        if (!postData) throw new Error('No se encontró la información del post.');
-
+      if (postData) {
         renderModalContent(postData);
-
-      } catch (error) {
-        console.error('Error al obtener detalle del post:', error);
+      } else {
         modalBody.innerHTML = `
           <div style="text-align: center; padding: 30px 10px;">
             <i data-lucide="alert-triangle" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
             <h3>Error al cargar el post</h3>
-            <p style="color: var(--text-secondary); margin-top: 6px;">No se pudo recuperar la información completa desde la API.</p>
+            <p style="color: var(--text-secondary); margin-top: 6px;">No se pudo recuperar la información del post.</p>
           </div>
         `;
         if (window.lucide) lucide.createIcons();
@@ -948,14 +935,13 @@
       const modalBody = document.getElementById('postModalBody');
       if (!modalBody) return;
 
-      const title = post.title || post.titulo || 'Sin título';
-      const category = post.category || post.categoria || 'General';
-      const author = post.author || post.autor || 'El Tío Baza';
+      const title = post.titulo || post.title || 'Sin título';
+      const category = post.categoria || post.category || 'General';
+      const author = post.autor || post.author || 'El Tío Baza';
       const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
-      const date = post.date || post.fecha || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-      // Corrección en el modal para extraer la imagen propia de la API de forma segura
-      const image = post.coverUrl || post.image || post.imagen || post.cover || '';
-      const content = post.content || post.contenido || post.body || post.summary || '<p>No hay detalles adicionales disponibles para esta publicación.</p>';
+      const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+      const image = post.coverUrl || post.cover || post.imagen || post.image || '';
+      const content = post.content || post.contenido || post.descripcion || post.subtitulo || '<p>No hay detalles adicionales disponibles para esta publicación.</p>';
 
       modalBody.innerHTML = `
         <div class="modal-post-header-meta">
