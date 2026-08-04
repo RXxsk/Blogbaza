@@ -543,9 +543,12 @@
   </nav>
 
   <script src="script.js"></script>
-  <script>
+    <script>
     // Constante oficial de la API de Render
     const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+    
+    // URL de respaldo apuntando directamente a tu carpeta data en GitHub
+    const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
     // Inicialización de íconos de Lucide
     document.addEventListener('DOMContentLoaded', () => {
@@ -590,8 +593,13 @@
             resNoticias = await fetch(`${API_BASE_URL}/api/noticias`);
             if (!resNoticias.ok) throw new Error();
           } catch (e) {
-            const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
-            resNoticias = await fetch(localApi);
+            try {
+              const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
+              resNoticias = await fetch(localApi);
+              if (!resNoticias.ok) throw new Error();
+            } catch (errLocal) {
+              resNoticias = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
+            }
           }
 
           if (resNoticias && resNoticias.ok) {
@@ -645,10 +653,15 @@
           resPosts = await fetch(`${API_BASE_URL}/api/posts`);
           if (!resPosts.ok) throw new Error();
         } catch (e) {
-          resPosts = await fetch('/api/posts');
+          try {
+            resPosts = await fetch('/api/posts');
+            if (!resPosts.ok) throw new Error();
+          } catch (errLocal) {
+            resPosts = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
+          }
         }
 
-        if (resPosts.ok) {
+        if (resPosts && resPosts.ok) {
           const posts = await resPosts.json();
           const destContainer = document.getElementById('homeDestacadoContainer');
           const postsList = Array.isArray(posts) ? posts : (posts.posts || []);
@@ -683,10 +696,15 @@
           resRepos = await fetch(`${API_BASE_URL}/api/repos`);
           if (!resRepos.ok) throw new Error();
         } catch (e) {
-          resRepos = await fetch('/api/repos');
+          try {
+            resRepos = await fetch('/api/repos');
+            if (!resRepos.ok) throw new Error();
+          } catch (errLocal) {
+            resRepos = await fetch(`${FALLBACK_JSON_URL}/repos.json`);
+          }
         }
 
-        if (resRepos.ok) {
+        if (resRepos && resRepos.ok) {
           const reposData = await resRepos.json();
           const repos = Array.isArray(reposData) ? reposData : (reposData.repos || []);
           const reposContainer = document.getElementById('homeReposContainer');
@@ -719,10 +737,15 @@
           resVideos = await fetch(`${API_BASE_URL}/api/videos`);
           if (!resVideos.ok) throw new Error();
         } catch (e) {
-          resVideos = await fetch('/api/videos');
+          try {
+            resVideos = await fetch('/api/videos');
+            if (!resVideos.ok) throw new Error();
+          } catch (errLocal) {
+            resVideos = await fetch(`${FALLBACK_JSON_URL}/videos.json`);
+          }
         }
 
-        if (resVideos.ok) {
+        if (resVideos && resVideos.ok) {
           const videosData = await resVideos.json();
           const videos = Array.isArray(videosData) ? videosData : (videosData.videos || []);
           const videoContainer = document.getElementById('homeVideoCarousel');
