@@ -558,13 +558,13 @@
 
     <!-- Barra de Estilos de Vista -->
     <div class="view-style-toolbar">
-      <button class="view-style-btn active" data-view="compact" onclick="changePostViewStyle('compact', this)">
+      <button class="view-style-btn" data-view="compact" onclick="changePostViewStyle('compact', this)">
         <i data-lucide="list" style="width: 16px; height: 16px;"></i> Compacto
       </button>
       <button class="view-style-btn" data-view="list" onclick="changePostViewStyle('list', this)">
         <i data-lucide="rows" style="width: 16px; height: 16px;"></i> Lista
       </button>
-      <button class="view-style-btn" data-view="detailed" onclick="changePostViewStyle('detailed', this)">
+      <button class="view-style-btn active" data-view="detailed" onclick="changePostViewStyle('detailed', this)">
         <i data-lucide="layout-grid" style="width: 16px; height: 16px;"></i> Detallado
       </button>
     </div>
@@ -621,7 +621,7 @@
 
     let allPostsData = [];
     let activePostCategory = 'all';
-    let activeViewStyle = 'compact';
+    let activeViewStyle = 'detailed';
 
     const AVATAR_FRONTEND_MAP = {
       'el tio baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
