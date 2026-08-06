@@ -236,8 +236,8 @@
     "logoUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTEyirPYd7bW30VkPlBX2vo7EAO_aWXEJhFo_ghQiCBIg&s=10",
     "bannerUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKea6Fq9AxYe_helgzATtroY_-S31HajX7Y3Tghplw7g&s=10",
     "webUrl": "https://www.retroarch.com/",
-    "descripcion": "RetroArch UWP es la versión adaptada para consolas Xbox Series X/S. Funciona como un centro multisistemas, permitiendo ejecutar desde consolas clásicas de 8/16 bits hasta sistemas más complejos (como PS1, PSP) en modo desarrollador.",
-    "extendedDesc": "",
+    "descripcion": "RetroArch UWP",
+    "extendedDesc": "RetroArch UWP es la versión adaptada para consolas Xbox Series X/S. Funciona como un centro multisistemas, permitiendo ejecutar desde consolas clásicas de 8/16 bits hasta sistemas más complejos en modo desarrollador.\n\nNES / Famicom\nSuper Nintendo / Super Famicom\nSega Master System / Game Gear / SG-1000\nSega Genesis / Mega Drive / CD / 32X\nPC Engine (TurboGrafx-16)\nGame Boy / Game Boy Color\nGame Boy Advance (GBA)\nAtari Lynx / Wonderswan\nArcade / MAME / NeoGeo\nAtari 2600 / 5200 / 7800\nPlayStation 1 (PSX)\nNintendo 64 (N64)\nSega Saturn",
     "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
     "fecha": "03 ago 2026"
   }
