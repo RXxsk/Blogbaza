@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad | El Tio Baza Blog</title>
+    
+    <style>
+       
+        :root {
+            --xbox-green: #107c10;
+            --xbox-green-bright: #1afc1a;
+            --xbox-green-light: #139813;
+            --xbox-green-glow: rgba(16, 124, 16, 0.45);
+            --bg-dark: #08090a;
+            --card-bg: rgba(18, 20, 24, 0.85);
+            --card-border: rgba(16, 124, 16, 0.35);
+            --text-main: #ffffff;
+            --text-muted: #9ba1a6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% -20%, rgba(16, 124, 16, 0.25) 0%, transparent 60%),
+                radial-gradient(circle at 0% 100%, rgba(16, 124, 16, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(16, 124, 16, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 100px 20px 30px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .goog-te-banner-frame, .skiptranslate, .goog-te-balloon-frame {
+            display: none !important;
+        }
+        body { top: 0px !important; }
+        #google_translate_element {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            visibility: hidden;
+        }
+
+       
+        .lang-picker-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+        }
+
+        .lang-picker-btn {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px) saturate(190%);
+            -webkit-backdrop-filter: blur(25px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 30px;
+            padding: 8px 16px;
+            color: var(--text-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.6),
+                0 0 15px rgba(16, 124, 16, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .lang-picker-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            border-color: rgba(26, 252, 26, 0.6);
+            background: rgba(255, 255, 255, 0.14);
+            box-shadow: 
+                0 14px 35px rgba(0, 0, 0, 0.8),
+                0 0 25px rgba(26, 252, 26, 0.4),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .translate-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+            pointer-events: none; /* No interfiere con el clic */
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+        }
+
+        .lang-picker-btn select {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            padding-right: 5px;
+            appearance: none;
+            -webkit-appearance: none;
+            /* Permite hacer clic directo desde el primer toque */
+            z-index: 2;
+        }
+
+        .lang-picker-btn select:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .lang-picker-btn select option {
+            background: #121417;
+            color: #ffffff;
+            padding: 10px;
+        }
+
+        .select-arrow {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            margin-left: -4px;
+        }
+
+       
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header-card {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .typewriter-box {
+            display: inline-block;
+            max-width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .header-card h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 
+                0 0 15px rgba(16, 124, 16, 0.6),
+                0 4px 20px rgba(0, 0, 0, 0.9);
+            
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid var(--xbox-green-bright);
+            animation: 
+                typing 2.5s steps(22, end) forwards,
+                blinkCursor 0.75s step-end 4 forwards;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blinkCursor {
+            from, to { border-color: transparent; }
+            50% { border-color: var(--xbox-green-bright); }
+        }
+
+        .xbox-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, var(--xbox-green) 0%, #0b520b 100%);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            box-shadow: 0 0 15px var(--xbox-green-glow);
+            margin-bottom: 15px;
+            border: 1px solid rgba(26, 252, 26, 0.3);
+        }
+
+        .xbox-badge::before {
+            content: '•';
+            color: var(--xbox-green-bright);
+            font-size: 1.2rem;
+            animation: pulseDot 1.5s infinite;
+        }
+
+       
+        .policy-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            animation: fadeInUp 0.8s ease-out both;
+        }
+
+        .policy-section:nth-child(2) { animation-delay: 0.1s; }
+        .policy-section:nth-child(3) { animation-delay: 0.2s; }
+        .policy-section:nth-child(4) { animation-delay: 0.3s; }
+        .policy-section:nth-child(5) { animation-delay: 0.4s; }
+        .policy-section:nth-child(6) { animation-delay: 0.5s; }
+
+        .policy-section:hover {
+            transform: translateY(-4px);
+            border-color: var(--xbox-green);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.7), 0 0 20px rgba(16, 124, 16, 0.2);
+        }
+
+        .policy-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--xbox-green-bright), var(--xbox-green));
+            box-shadow: 0 0 12px var(--xbox-green-bright);
+        }
+
+        .policy-section h2 {
+            font-size: 1.35rem;
+            color: #fff;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        .sec-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(16, 124, 16, 0.2);
+            color: var(--xbox-green-bright);
+            border: 1px solid rgba(26, 252, 26, 0.4);
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            box-shadow: 0 0 8px rgba(16, 124, 16, 0.3);
+            flex-shrink: 0;
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 1.02rem;
+        }
+
+       
+        footer {
+            margin-top: 50px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+
+        .footer-text {
+            font-size: 0.78rem;
+            color: #666c72;
+            line-height: 1.6;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .footer-text a {
+            color: var(--xbox-green-light);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-text a:hover {
+            color: var(--xbox-green-bright);
+        }
+
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.8); }
+        }
+
+
+        @media (max-width: 768px) {
+            body {
+                padding: 85px 12px 20px 12px;
+            }
+
+            .header-card h1 {
+                font-size: 1.45rem;
+                letter-spacing: 1px;
+            }
+
+            .policy-section {
+                padding: 20px 16px;
+                border-radius: 14px;
+            }
+
+            .policy-section h2 {
+                font-size: 1.15rem;
+            }
+
+            p {
+                font-size: 0.95rem;
+            }
+
+            .lang-picker-wrapper {
+                top: 12px;
+                right: 12px;
+            }
+
+            .lang-picker-btn {
+                padding: 6px 12px;
+            }
+
+            .lang-picker-btn select {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BOTÓN TRADUCTOR FLOTANTE 3D iPHONE -->
+    <div class="lang-picker-wrapper">
+        <div class="lang-picker-btn">
+            <svg class="translate-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" fill="#FFFFFF"/>
+            </svg>
+            <select id="languageSelector" onchange="changeLanguage(this.value)">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="pt">Português</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="it">Italiano</option>
+                <option value="ja">日本語</option>
+                <option value="zh-CN">简体中文</option>
+                <option value="ru">Русский</option>
+            </select>
+            <span class="select-arrow">▼</span>
+        </div>
+    </div>
+
+    <!-- Div invisible de Google Translate -->
+    <div id="google_translate_element"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="container">
+        
+        <div class="header-card">
+            <span class="xbox-badge">Secure Protocol</span>
+            <div class="typewriter-box">
+                <h1>Política de Privacidad</h1>
+            </div>
+            <p>Actualización: 3 Agosto 2026</p>
+        </div>
+
+        <div class="policy-section">
+            <h2><span class="sec-num">01</span> Compromiso de Privacidad</h2>
+            <p>Nos tomamos la protección de tus datos muy en serio. Esta política describe detalladamente cómo recopilamos, usamos y resguardamos tu información personal dentro de nuestro ecosistema y servicios conectados.</p>
+        </div>
+
+        <div class="policy-section">
+            <h2><span class="sec-num">02</span> Información Recopilada</h2>
+            <p>Podemos recopilar datos de identificación técnica, información sobre el estado de la red, y preferencias de hardware para garantizar la máxima velocidad de respuesta.</p>
+        </div>
+
+        <div class="policy-section">
+            <h2><span class="sec-num">03</span> Uso de los Datos</h2>
+            <p>Tus datos se procesan exclusivamente para mantener la seguridad de tu perfil, enviar parches de actualización del sistema y personalizar la interfaz visual según tus gustos.</p>
+        </div>
+
+        <div class="policy-section">
+            <h2><span class="sec-num">04</span> Seguridad y Encriptación</h2>
+            <p>Implementamos protocolos de cifrado de extremo a extremo y barreras de seguridad perimetral de grado militar para prevenir accesos no autorizados, modificaciones o filtraciones de información.</p>
+        </div>
+
+        <div class="policy-section">
+            <h2><span class="sec-num">05</span> Soporte y Privacidad</h2>
+            <p>Si tienes preguntas acerca del manejo de tus datos personales o deseas solicitar la purga completa de tu cuenta, puedes contactarnos a través de los canales de asistencia técnica autorizados.</p>
+        </div>
+
+    </div>
+
+    <footer>
+        <p class="footer-text">
+            © 2026 El Tio Baza Blog - Ecosistema de Servicios. Todos los derechos reservados. Todas las fuentes registradas pertenecen a sus respectivos propietarios.<br>
+          <a href="#">Términos de Servicio</a>
+        </p>
+    </footer>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'es',
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        function syncDropdownWithCookie() {
+            var match = document.cookie.match(/(?:^|;) *googtrans=([^;]*)/);
+            if (match && match[1]) {
+                var lang = match[1].split('/').pop();
+                var selector = document.getElementById('languageSelector');
+                if (selector && lang) {
+                    selector.value = lang;
+                }
+            }
+        }
+
+        function changeLanguage(langCode) {
+            var domain = window.location.hostname;
+            document.cookie = "googtrans=/es/" + langCode + "; path=/;";
+            if (domain) {
+                document.cookie = "googtrans=/es/" + langCode + "; path=/; domain=" + domain + ";";
+            }
+
+            var selectElem = document.querySelector('.goog-te-combo');
+            if (selectElem) {
+                selectElem.value = langCode;
+                selectElem.dispatchEvent(new Event('change'));
+            } else {
+                window.location.reload();
+            }
+        }
+
+        (function() {
+            var gt = document.createElement('script');
+            gt.type = 'text/javascript';
+            gt.async = true;
+            gt.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+            document.body.appendChild(gt);
+            
+            window.addEventListener('DOMContentLoaded', syncDropdownWithCookie);
+        })();
+    </script>
+</body>
+</html>
+
