@@ -866,7 +866,7 @@
     <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
 <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
-
+  
 <script src="script.js"></script>
 <script>
     // Constante oficial de la API de Render
@@ -1040,7 +1040,7 @@
               if (shareBtn) {
                 shareBtn.addEventListener('click', (e) => {
                   e.stopPropagation();
-                  sharePostFromHome(postId, title, cover);
+                  sharePostFromHome(postId, title);
                 });
               }
 
@@ -1147,6 +1147,7 @@
 
     // Funciones de previsualización para el Modal
     function showPostModal(title, content, cover, postId) {
+      const shareUrl = window.location.origin + '/posts.html?id=' + (postId || '');
       const html = `
         ${cover ? `<img src="${cover}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : ''}
         <h2 style="margin-top:0; color:#fff; font-size:1.3rem;">${title}</h2>
@@ -1193,36 +1194,13 @@
       }, 5000); // Cambia cada 5 segundos
     }
 
-    // Función dedicada para compartir consultando la API y generando el link con la imagen del post
-    async function sharePostFromHome(postId, fallbackTitle, fallbackCover) {
-      let shareTitle = fallbackTitle || 'Publicación';
-      let shareImage = fallbackCover || '';
-
-      // Consulta a la API para verificar la información más actualizada del post
-      if (postId) {
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
-          if (res.ok) {
-            const data = await res.json();
-            const post = data.post || data;
-            shareTitle = post.titulo || post.title || shareTitle;
-            shareImage = post.coverUrl || post.banner || post.imagen || shareImage;
-          }
-        } catch (e) {
-          // Si falla la API individual se mantiene el respaldo local
-        }
-      }
-
-      // Construcción del enlace del post incluyendo el parámetro de la imagen para la vista previa
-      let shareUrl = window.location.origin + '/posts.html?id=' + encodeURIComponent(postId || '');
-      if (shareImage) {
-        shareUrl += '&img=' + encodeURIComponent(shareImage);
-      }
-
+    // Función dedicada para compartir desde la sección de inicio
+    function sharePostFromHome(postId, title) {
+      const shareUrl = window.location.origin + '/posts.html?id=' + (postId || '');
       if (navigator.share) {
         navigator.share({
-          title: shareTitle,
-          text: 'Echa un vistazo a este post: ' + shareTitle,
+          title: title,
+          text: 'Echa un vistazo a este post: ' + title,
           url: shareUrl
         }).catch(() => {});
       } else {
