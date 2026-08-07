@@ -489,7 +489,7 @@
         renderRepos();
         updateCounters();
 
-        // Verificar si la URL trae un ID para abrir la previsualización del repo automáticamente
+        // Verificar si la URL trae un ID para abrir la previsualización automáticamente
         const urlParams = new URLSearchParams(window.location.search);
         const repoIdFromUrl = urlParams.get('id');
         if (repoIdFromUrl) {
@@ -505,7 +505,7 @@
       }
     }
 
-    // 2. RENDERIZAR TARJETAS EN PANTALLA SEGÚN EL ESTILO DE VISTA ACTIVO Y CONDICIONANDO LOS ENLACES
+    // 2. RENDERIZAR TARJETAS EN PANTALLA SEGÚN EL ESTILO DE VISTA ACTIVO
     function renderRepos() {
       const query = searchInput.value.toLowerCase().trim();
       
@@ -604,11 +604,10 @@
       });
     }
 
-    // 3. ABRIR VENTANA MODAL CON INFORMACIÓN EXTENDIDA Y ENLACES CONDICIONADOS
+    // 3. ABRIR VENTANA MODAL CON INFORMACIÓN EXTENDIDA
     function openModal(item) {
-      window.currentActiveRepo = item; // Referencia global del repo abierto
+      window.currentActiveRepo = item; // Guardar referencia global del repo activo
 
-      const repoId = item._id || item.id || '';
       const title = item.titulo || item.title || 'Sin título';
       const desc = item.descripcion || item.excerpt || 'Sin descripción detallada.';
       const extendedDesc = item.extendedDesc || item.content || desc;
@@ -636,7 +635,7 @@
             </div>
           </div>
 
-          <!-- Botón Compartir Integrado en la Modal -->
+          <!-- Botón Compartir Integrado con URL Corta -->
           <button onclick="shareActiveRepoModal()" style="
             color: #107C10;
             font-size: 13px;
@@ -684,7 +683,7 @@
       if (e.target === modal) closeModal();
     });
 
-    // 4. ACTUALIZAR CONTADORES DE LOS BOTONES DE FILTRO DINÁMICAMENTE
+    // 4. ACTUALIZAR CONTADORES DE LOS BOTONES DE FILTRO
     function updateCounters() {
       document.getElementById('countAll').textContent = allRepos.length;
       document.getElementById('countXbox').textContent = allRepos.filter(i => (i.categoria || i.category) === 'xbox').length;
@@ -692,7 +691,7 @@
       document.getElementById('countUtils').textContent = allRepos.filter(i => (i.categoria || i.category) === 'utilidades').length;
     }
 
-    // EVENTOS DE BÚSQUEDA, FILTROS Y CAMBIO DE ESTILOS DE VISTA
+    // EVENTOS DE BÚSQUEDA Y FILTROS
     searchInput.addEventListener('input', renderRepos);
     
     clearBtn.addEventListener('click', () => {
@@ -719,42 +718,23 @@
       });
     });
 
-    // Ejecutar carga inicial
+    // Carga inicial
     fetchRepos();
   });
 
-  // FUNCIÓN DEDICADA PARA COMPARTIR EL REPOSITORIO ACTIVO CONSULTANDO SU API E IMAGEN
-  async function shareActiveRepoModal() {
+  // FUNCIÓN PARA COMPARTIR EL REPOSITORIO CON URL CORTA CLEAN (?id=123)
+  function shareActiveRepoModal() {
     const item = window.currentActiveRepo || {};
     const repoId = item._id || item.id || '';
-    let shareTitle = item.titulo || item.title || document.title;
-    let shareImage = item.bannerUrl || item.coverUrl || item.logoUrl || item.avatar || '';
+    const shareTitle = item.titulo || item.title || document.title;
 
-    // Consultar API de Render para garantizar que traiga el banner o imagen actualizada
-    if (repoId) {
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/repos/${repoId}`);
-        if (res.ok) {
-          const data = await res.json();
-          const fetchedRepo = data.repo || data;
-          shareTitle = fetchedRepo.titulo || fetchedRepo.title || shareTitle;
-          shareImage = fetchedRepo.bannerUrl || fetchedRepo.coverUrl || fetchedRepo.logoUrl || shareImage;
-        }
-      } catch (e) {
-        // En caso de fallo de red se utilizan los datos del objeto cargado
-      }
-    }
-
-    // Construir enlace directo que redirige a la modal del repo incluyendo la imagen encoded
-    let shareUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(repoId);
-    if (shareImage) {
-      shareUrl += '&img=' + encodeURIComponent(shareImage);
-    }
+    // Enlace corto y limpio
+    const shareUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(repoId);
 
     if (navigator.share) {
       navigator.share({
         title: shareTitle,
-        text: 'Mira esta herramienta/repositorio: ' + shareTitle,
+        text: 'Mira esta herramienta: ' + shareTitle,
         url: shareUrl
       }).catch(() => {});
     } else {
@@ -764,6 +744,7 @@
     }
   }
 </script>
+
 
 </body>
 </html>
