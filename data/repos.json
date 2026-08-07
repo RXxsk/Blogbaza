@@ -1,5 +1,27 @@
 [
   {
+    "id": "1786061901640",
+    "titulo": "Xex2Zar",
+    "autor": "Mannuee",
+    "author": "Mannuee",
+    "avatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "authorAvatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "createdAt": "2026-08-07T00:18:20.491Z",
+    "timestamp": "2026-08-07T00:18:20.491Z",
+    "categoria": "utilidades",
+    "category": "utilidades",
+    "version": "Release Final",
+    "size": "2.2MB",
+    "downloadUrl": "https://shrinkme.click/xex2zar",
+    "logoUrl": "https://raw.githubusercontent.com/mannuuplds-hub/iconos/refs/heads/main/xexicon.png",
+    "bannerUrl": "https://raw.githubusercontent.com/mannuuplds-hub/iconos/refs/heads/main/xexbanner.png",
+    "webUrl": "",
+    "descripcion": "Conversor de formato XEX a ZAR para mejor rendimiento en BACKUPS de XBOX360",
+    "extendedDesc": "Pasos para la conversion:\n\n1-Ubicacion de archivos: Ten listo tu respaldo de Xbox 360 en formato XEX (asegurate de tener la carpeta raiz del juego que contiene el archivo ejecutable default.xex).\n\n2-Ejecucion: Abre o ten a la mano la herramienta de conversion Xex2Zar.\n\n3-Conversion: Arrastra la carpeta raiz del juego directamente sobre la herramienta para que comience el proceso de empaquetado al formato .zar.\n\n4-Ubicacion final: Una vez que termine, toma el archivo .zar resultante y guardalo en tu directorio de juegos destinado para Xenia.\n\nAdvertencias importantes:\n\nCuidado con como arrastras las carpetas: No arrastres carpetas anidadas que contengan subcarpetas extrañas ni selecciones contenido interno incorrecto. Debes arrastrar unicamente la carpeta raiz del juego (la que contiene directamente el default.xex y los assets). Si la estructura interna esta mal armada, el script fallara o el archivo ZAR resultante no funcionara.",
+    "avatarUrl": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "fecha": "07 ago 2026"
+  },
+  {
     "id": "1786060280502",
     "titulo": "ADDONS Kodi",
     "autor": "Mannuee",
