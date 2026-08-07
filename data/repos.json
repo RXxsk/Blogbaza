@@ -1,5 +1,27 @@
 [
   {
+    "id": "1786081148800",
+    "titulo": "ES-DE",
+    "autor": "Mannuee",
+    "author": "Mannuee",
+    "avatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "authorAvatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "createdAt": "2026-08-07T05:39:07.496Z",
+    "timestamp": "2026-08-07T05:39:07.496Z",
+    "categoria": "xbox",
+    "category": "xbox",
+    "version": "3.5.0.1",
+    "size": "84MB",
+    "downloadUrl": "https://www.mediafire.com/file/mcrheaqgv5mlg43/ES-DE_3.5.0.10_x64.msix/file",
+    "logoUrl": "https://raw.githubusercontent.com/mannuuplds-hub/iconos/refs/heads/main/ES-ICON.jpg",
+    "bannerUrl": "https://raw.githubusercontent.com/mannuuplds-hub/iconos/refs/heads/main/ES-DE%20Banner.png",
+    "webUrl": "",
+    "descripcion": "Emulation Station UWP Xbox Series X|S FrontEnd",
+    "extendedDesc": "EmulationStation UWP Version (ES-DE) es una interfaz gráfica (frontend) modular, multiplataforma y de código abierto diseñada para organizar y lanzar colecciones de videojuegos retro y emuladores desde un único lugar.",
+    "avatarUrl": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "fecha": "07 ago 2026"
+  },
+  {
     "id": "1786061901640",
     "titulo": "Xex2Zar",
     "autor": "Mannuee",
