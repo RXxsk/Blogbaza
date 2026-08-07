@@ -110,12 +110,24 @@
   let allNewsData = [];
   let currentNewsMode = 'news'; // 'news' o 'xbox'
 
-  document.addEventListener('DOMContentLoaded', () => {
-    if (window.lucide) {
-      lucide.createIcons();
-    }
+  const AVATAR_FRONTEND_MAP = {
+    'el tio baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+    'el tío baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+    'baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+    'rxx8': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKPhcbxJpIBqKRVJ7R_FNOHclLLV2s_eA4caJBzDpm2Q&s=10',
+    'mannuee': 'https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj'
+  };
 
-    // Configurar buscador en tiempo real
+  function resolveAuthorAvatar(authorName, avatarFromApi) {
+    if (avatarFromApi && avatarFromApi.startsWith('http')) return avatarFromApi;
+    const key = (authorName || '').toLowerCase().trim();
+    return AVATAR_FRONTEND_MAP[key] || AVATAR_FRONTEND_MAP['el tío baza'];
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) lucide.createIcons();
+
+    // Configurar buscador y eventos de texto
     const searchInput = document.getElementById('newsSearchInput');
     const clearBtn = document.getElementById('clearNewsSearchBtn');
     
@@ -134,25 +146,19 @@
       });
     }
 
-    // Cargar noticias desde la API con soporte para auto-abrir por ID (?id=...)
+    // Cargar noticias y permitir auto-apertura si la URL trae un ?id=...
     fetchAndRenderNoticias().then(() => {
       const urlParams = new URLSearchParams(window.location.search);
       const newsIdFromUrl = urlParams.get('id');
       if (newsIdFromUrl && allNewsData.length > 0) {
-        const targetNews = allNewsData.find(n => String(n._id || n.id) === String(newsIdFromUrl));
-        if (targetNews) {
-          const title = targetNews.titulo || targetNews.title || 'Noticia';
-          const content = targetNews.contenido || targetNews.description || '';
-          const image = targetNews.coverUrl || targetNews.imagen || targetNews.image || '';
-          openNewsPreview(newsIdFromUrl, title, content, image);
+        const target = allNewsData.find(n => String(n._id || n.id) === String(newsIdFromUrl));
+        if (target) {
+          openNewsModal(target);
         }
       }
     });
   });
 
-  /**
-   * Petición de noticias conectada a la API del admin backend (con fallback local)
-   */
   async function fetchAndRenderNoticias() {
     const container = document.getElementById('noticiasGridContainer');
 
@@ -160,30 +166,28 @@
       let response;
       try {
         response = await fetch(`${API_BASE_URL}/api/noticias`);
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+        if (!response.ok) throw new Error();
       } catch (err) {
         try {
-          const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
-          response = await fetch(localApi);
+          response = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
           if (!response.ok) throw new Error();
         } catch (e2) {
-          response = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
+          response = await fetch('data/noticias.json');
         }
       }
 
       const data = await response.json();
       allNewsData = Array.isArray(data) ? data : (data.noticias || []);
-
       renderFilteredNews();
 
     } catch (error) {
-      console.error('Error al cargar noticias de la API:', error);
+      console.error('Error al cargar noticias:', error);
       if (container) {
         container.innerHTML = `
           <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 40px;">
             <i data-lucide="alert-triangle" class="empty-state-icon" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
             <h3>No se pudieron cargar las noticias</h3>
-            <p>Verifica la conexión con el servidor o la API del admin.</p>
+            <p>Verifica la conexión con el servidor.</p>
             <button class="btn-secondary" onclick="fetchAndRenderNoticias()" style="margin-top: 15px; padding: 8px 16px; cursor: pointer;">Reintentar</button>
           </div>
         `;
@@ -192,7 +196,7 @@
     }
   }
 
-  // Cambiar entre modo "News" y "Xbox Portal"
+  // Cambio de modo superior ("News" o "Xbox Portal")
   function switchNewsMode(mode, btnElement) {
     currentNewsMode = mode;
     const modeButtons = document.querySelectorAll('.news-mode-btn');
@@ -201,7 +205,7 @@
     renderFilteredNews();
   }
 
-  // Renderizar y filtrar noticias manteniendo el diseño 3D original
+  // Renderizar tarjetas estilo Post/Noticia principal de la Home
   function renderFilteredNews() {
     const container = document.getElementById('noticiasGridContainer');
     const resultsText = document.getElementById('newsResultsText');
@@ -215,7 +219,7 @@
       const title = (item.titulo || item.title || '').toLowerCase();
       const content = (item.contenido || item.description || '').toLowerCase();
 
-      const matchesMode = (currentNewsMode === 'news') ? true : (category.includes('xbox') || title.includes('xbox'));
+      const matchesMode = (currentNewsMode === 'news') ? true : (category.includes('xbox') || title.includes('xbox') || content.includes('xbox'));
       const matchesSearch = !query || title.includes(query) || content.includes(query);
 
       return matchesMode && matchesSearch;
@@ -230,99 +234,125 @@
         <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 40px;">
           <i data-lucide="newspaper" class="empty-state-icon" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-secondary);"></i>
           <h3>No se encontraron noticias</h3>
-          <p style="color: var(--text-secondary);">Intenta con otros términos o cambia de modo.</p>
+          <p style="color: var(--text-secondary);">Intenta con otros términos en la búsqueda.</p>
         </div>
       `;
       if (window.lucide) lucide.createIcons();
       return;
     }
 
-    // Asegurar estructura de grid 3D transparente idéntica a la home
-    container.className = 'news-3d-grid mb-4';
-
+    // Usar la estructura de cuadrícula limpia para las tarjetas grandes tipo Index
     container.innerHTML = filtered.map(item => {
       const newsId = item._id || item.id || '';
-      const category = item.categoria || item.category || 'General';
+      const category = item.categoria || item.category || 'XBOX Wire Español';
       const title = item.titulo || item.title || 'Noticia sin título';
-      const content = item.contenido || item.description || '';
+      const rawContent = item.contenido || item.description || '';
       const date = item.fecha || item.date || 'Reciente';
-      const image = item.coverUrl || item.imagen || item.image || '';
+      const author = item.autor || item.author || 'RXx8';
+      const image = item.coverUrl || item.imagen || item.image || 'blogpre.jpg';
 
-      let badgeClass = '';
-      if (category.toLowerCase() === 'mantenimiento') badgeClass = 'warning';
-      if (category.toLowerCase() === 'lanzamientos') badgeClass = 'info';
+      // Limpiar texto para resumen de tarjeta
+      const parser = new DOMParser();
+      const parsedDoc = parser.parseFromString(rawContent, 'text/html');
+      let cleanExcerpt = parsedDoc.body.textContent || parsedDoc.body.innerText || '';
+      cleanExcerpt = cleanExcerpt.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim();
 
       return `
-        <article class="news-item" style="cursor: pointer;" onclick="openNewsPreview('${newsId}', ${JSON.stringify(title)}, ${JSON.stringify(content)}, ${JSON.stringify(image)})">
-          
-          ${image ? `<div style="width: 100%; height: 140px; border-radius: 8px; overflow: hidden; margin-bottom: 10px;"><img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" style="width: 100%; height: 100%; object-fit: cover;"></div>` : ''}
-
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span class="news-badge ${badgeClass}">${escapeHTML(category)}</span>
-            
-            <!-- Botón de compartir aislado por ID -->
-            <button onclick="
-              event.stopPropagation();
-              shareNewsItem('${newsId}', ${JSON.stringify(title)});
-            " style="
-              color: #107C10;
-              padding: 4px 8px;
-              border-radius: 6px;
-              background: rgba(16, 124, 16, 0.15);
-              border: 1px solid rgba(16, 124, 16, 0.3);
-              cursor: pointer;
-              display: inline-flex;
-              align-items: center;
-              gap: 4px;
-              font-size: 0.7rem;
-              font-weight: 600;
-              z-index: 10;
-            " title="Compartir noticia">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="18" cy="5" r="3"></circle>
-                <circle cx="6" cy="12" r="3"></circle>
-                <circle cx="18" cy="19" r="3"></circle>
-                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-              </svg>
-            </button>
+        <article class="featured-diagonal-card" style="cursor: pointer; margin-bottom: 20px; background: var(--bg-card, #161b22); border-radius: 14px; overflow: hidden; border: 1px solid var(--border-color, #30363d);" onclick='openNewsModal(${JSON.stringify(item)})'>
+          <div class="diagonal-media-wrapper" style="width: 100%; height: 210px; overflow: hidden; position: relative;">
+            <img src="${image}" alt="${title}" style="width: 100%; height: 100%; object-fit: cover;">
+            <div style="position: absolute; top: 12px; left: 12px;">
+              <span class="tag" style="background: rgba(16,124,16,0.85); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${escapeHTML(category)}</span>
+            </div>
           </div>
+          
+          <div class="diagonal-content" style="padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 8px;">
+              <h3 style="margin: 0; font-size: 1.2rem; color: #fff; line-height: 1.4;">${escapeHTML(title)}</h3>
+              
+              <!-- Botón Compartir independiente con URL Corta -->
+              <button type="button" onclick="
+                event.stopPropagation();
+                shareNewsById('${newsId}', ${JSON.stringify(title)});
+              " style="
+                color: #107C10;
+                padding: 6px 10px;
+                border-radius: 8px;
+                background: rgba(16, 124, 16, 0.15);
+                border: 1px solid rgba(16, 124, 16, 0.3);
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                flex-shrink: 0;
+              " title="Compartir noticia">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="18" cy="5" r="3"></circle>
+                  <circle cx="6" cy="12" r="3"></circle>
+                  <circle cx="18" cy="19" r="3"></circle>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+              </button>
+            </div>
 
-          <div class="news-content" style="flex: 1;">
-            <h4 style="margin: 6px 0; color: #fff;">${escapeHTML(title)}</h4>
-            <p style="margin: 0 0 10px 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">${escapeHTML(content.replace(/<[^>]*>?/gm, ''))}</p>
-            <div class="news-date">
-              <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
-              <span>${escapeHTML(date)}</span>
+            <p style="margin: 0 0 14px 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">${escapeHTML(cleanExcerpt)}</p>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-color, #30363d); padding-top: 10px;">
+              <span><i data-lucide="user" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${escapeHTML(author)}</span>
+              <span><i data-lucide="calendar" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${escapeHTML(date)}</span>
             </div>
           </div>
         </article>
       `;
     }).join('');
 
-    if (window.lucide) {
-      lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
   }
 
-  // Previsualización de la noticia en modal universal
-  function openNewsPreview(newsId, title, content, image) {
+  // Abrir la previsualización modal idéntica a la segunda captura que mandaste
+  function openNewsModal(item) {
+    window.currentActiveNews = item;
+    const title = item.titulo || item.title || 'Noticia';
+    const rawContent = item.contenido || item.description || '<p>Sin contenido detallado.</p>';
+    const date = item.fecha || item.date || 'Reciente';
+    const author = item.autor || item.author || 'RXx8';
+    const image = item.coverUrl || item.imagen || item.image || '';
+    const category = item.categoria || item.category || 'XBOX Wire Español';
+    const newsId = item._id || item.id || '';
+
     if (typeof openUniversalModal === 'function') {
       const html = `
-        ${image ? `<img src="${image}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : ''}
-        <h2 style="margin-top:0; color:#fff; font-size:1.3rem;">${title}</h2>
-        <div style="color: var(--text-secondary); font-size:0.95rem; line-height:1.6; max-height: 350px; overflow-y: auto;">
-          ${content}
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="background: rgba(16,124,16,0.2); color: #107C10; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${escapeHTML(category)}</span>
+          <div style="display: flex; align-items: center; gap: 12px; font-size: 0.85rem; color: var(--text-secondary);">
+            <span><i data-lucide="calendar" style="width: 14px; height: 14px; vertical-align: middle;"></i> ${escapeHTML(date)}</span>
+            
+            <!-- Botón de compartir dentro del modal -->
+            <button onclick="shareNewsById('${newsId}', ${JSON.stringify(title)})" style="color: #107C10; padding: 4px 8px; border-radius: 6px; background: rgba(16, 124, 16, 0.15); border: 1px solid rgba(16, 124, 16, 0.3); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; font-weight: bold;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.5"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              Compartir
+            </button>
+          </div>
+        </div>
+
+        <h2 style="margin-top:0; color:#fff; font-size:1.4rem; line-height: 1.3;">${escapeHTML(title)}</h2>
+        <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--text-secondary);">Escrito por ${escapeHTML(author)}</p>
+
+        ${image ? `<img src="${image}" style="width:100%; height:220px; object-fit:cover; border-radius:10px; margin-bottom:15px;">` : ''}
+        
+        <div style="color: var(--text-secondary); font-size:0.95rem; line-height:1.6; max-height: 380px; overflow-y: auto;">
+          ${rawContent}
         </div>
       `;
       openUniversalModal(html);
-    } else {
-      alert(title + '\n\n' + content);
     }
   }
 
-  // Compartir mediante URL limpia con ID
-  function shareNewsItem(newsId, title) {
+  // Compartir mediante enlace corto y limpio con ID (?id=...)
+  function shareNewsById(newsId, title) {
     const shareUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(newsId);
 
     if (navigator.share) {
