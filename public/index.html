@@ -908,72 +908,64 @@
         .replace(/"/g, '&quot;');
     }
 
-    // Cargar dinámicamente Noticias, Destacados, Fuentes (Repositorios) y Carrusel de Videos
-async function loadHomeDynamicSections() {
-  try {
-    // 0. Cargar Últimas Noticias para el Inicio
-    try {
-      let resNoticias;
+  // Cargar dinámicamente Noticias, Destacados, Fuentes (Repositorios) y Carrusel de Videos
+    async function loadHomeDynamicSections() {
       try {
-        resNoticias = await fetch(`${API_BASE_URL}/api/noticias`);
-        if (!resNoticias.ok) throw new Error();
-      } catch (e) {
-        resNoticias = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
-      }
-
-      if (resNoticias && resNoticias.ok) {
-        const noticiasData = await resNoticias.json();
-        const noticiasList = Array.isArray(noticiasData) ? noticiasData : (noticiasData.noticias || []);
-        const homeNoticiasContainer = document.getElementById('homeNoticiasContainer');
-
-        if (homeNoticiasContainer && noticiasList.length > 0) {
-          const ultimasNoticias = noticiasList.slice(0, 3);
-
-          homeNoticiasContainer.innerHTML = ultimasNoticias.map(item => {
-            const title = item.titulo || item.title || 'Sin título';
-            const subtitle = item.subtitulo || item.descripcion || item.summary || 'Sin descripción disponible...';
-            const fullContent = item.content || item.contenido || subtitle;
-            const cover = item.coverUrl || item.image || item.imagen || 'blogpre.jpg';
-            const category = item.categoria || item.category || 'Noticia';
-            const author = item.autor || item.author || 'El Tío Baza';
-            const date = item.fecha || item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Reciente');
-
-            return `
-              <div class="news-3d-card" onclick='showDetailedNewsModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)}, ${JSON.stringify(author)}, ${JSON.stringify(date)}, ${JSON.stringify(category)})'>
-                <div class="news-3d-media">
-                  <img src="${cover}" alt="${escapeHTML(title)}">
-                  <div style="position: absolute; top: 10px; left: 10px;">
-                    <span style="background: rgba(16,124,16,0.85); backdrop-filter: blur(4px); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">${escapeHTML(category)}</span>
-                  </div>
-                </div>
-                <div class="news-3d-content">
-                  <h3 style="margin: 0; font-size: 1.05rem; color: #fff; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHTML(title)}</h3>
-                  <p style="margin: 0; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHTML(subtitle.replace(/<[^>]*>?/gm, ''))}</p>
-                  <div class="news-3d-meta">
-                    <span><i data-lucide="user" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${escapeHTML(author)}</span>
-                    <span><i data-lucide="calendar" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${escapeHTML(date)}</span>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('');
-
-          if (window.lucide) {
-            lucide.createIcons();
+        // 1. Cargar Noticias para la sección "Últimas Noticias" (Efecto 3D Transparente)
+        try {
+          let resNoticias;
+          try {
+            resNoticias = await fetch(`${API_BASE_URL}/api/noticias`);
+            if (!resNoticias.ok) throw new Error();
+          } catch (e) {
+            resNoticias = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
           }
-        } else if (homeNoticiasContainer) {
-          homeNoticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay noticias disponibles.</p>';
+
+          if (resNoticias && resNoticias.ok) {
+            const noticias = await resNoticias.json();
+            const noticiasContainer = document.getElementById('homeNoticiasContainer');
+            const latestNoticias = Array.isArray(noticias) ? noticias.slice(0, 3) : [];
+
+            if (latestNoticias.length > 0) {
+              noticiasContainer.innerHTML = latestNoticias.map(item => {
+                const title = item.titulo || item.title || 'Sin título';
+                const subtitle = item.subtitulo || item.descripcion || item.summary || 'Sin descripción disponible...';
+                const fullContent = item.content || item.contenido || subtitle;
+                const cover = item.coverUrl || item.image || item.imagen || 'blogpre.jpg';
+                const category = item.categoria || item.category || 'Noticia';
+                const author = item.autor || item.author || 'El Tío Baza';
+                const date = item.fecha || item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Reciente');
+
+                return `
+                  <div class="news-3d-card" onclick='showDetailedNewsModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)}, ${JSON.stringify(author)}, ${JSON.stringify(date)}, ${JSON.stringify(category)})'>
+                    <div class="news-3d-media">
+                      <img src="${cover}" alt="${title}">
+                      <div style="position: absolute; top: 10px; left: 10px;">
+                        <span style="background: rgba(16,124,16,0.85); backdrop-filter: blur(4px); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">${category}</span>
+                      </div>
+                    </div>
+                    <div class="news-3d-content">
+                      <h3 style="margin: 0; font-size: 1.05rem; color: #fff; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${title}</h3>
+                      <p style="margin: 0; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${subtitle.replace(/<[^>]*>?/gm, '')}</p>
+                      <div class="news-3d-meta">
+                        <span><i data-lucide="user" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${author}</span>
+                        <span><i data-lucide="calendar" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${date}</span>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+              if (window.lucide) lucide.createIcons();
+            } else {
+              if (noticiasContainer) noticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay noticias disponibles.</p>';
+            }
+          }
+        } catch (e) {
+          console.warn('Endpoint de noticias no disponible o vacío', e);
+          const noticiasContainer = document.getElementById('homeNoticiasContainer');
+          if (noticiasContainer) noticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No se pudieron cargar las noticias.</p>';
         }
-      }
-    } catch (err) {
-      console.error('Error al cargar las últimas noticias en el home:', err);
-      const homeNoticiasContainer = document.getElementById('homeNoticiasContainer');
-      if (homeNoticiasContainer) {
-        homeNoticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No se pudieron cargar las noticias.</p>';
-      }
-    }
-
-
+        
         // 1. Cargar Posts para la sección "Destacado"
         try {
           let resPosts;
