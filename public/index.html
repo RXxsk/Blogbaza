@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" data-theme="dark">
 <head>
-  <script>
-  if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-    window.location.replace('/home');
-  }
-  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>El Tio Baza Blog</title>
@@ -43,6 +38,69 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
+    /* Estilos para la sección de Noticias 3D Transparente */
+    .news-3d-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      perspective: 1000px;
+    }
+
+    .news-3d-card {
+      position: relative;
+      background: rgba(30, 41, 59, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .news-3d-card:hover {
+      transform: translateY(-6px) rotateX(3deg) rotateY(-3deg) scale(1.02);
+      border-color: var(--primary-green, #107c10);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 124, 16, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .news-3d-media {
+      position: relative;
+      height: 180px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .news-3d-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+
+    .news-3d-card:hover .news-3d-media img {
+      transform: scale(1.1);
+    }
+
+    .news-3d-content {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .news-3d-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
     /* Estilos específicos para las nuevas secciones del Index */
     .featured-diagonal-card {
       position: relative;
@@ -451,13 +509,13 @@
   <!-- RESUMEN LO MÁS RECIENTE DE CADA SECCIÓN -->
   <main class="content-section">
     
-    <!-- Avance de Noticias -->
+    <!-- Avance de Noticias (Vista 3D Transparente) -->
     <div class="section-header">
       <h2 class="section-title"><i data-lucide="newspaper"></i> Últimas Noticias</h2>
       <a href="noticias.html" class="view-all">Ir a Noticias →</a>
     </div>
     
-    <div id="homeNoticiasContainer" class="news-ticker mb-4">
+    <div id="homeNoticiasContainer" class="news-3d-grid mb-4">
       <p style="color: var(--text-secondary);">Cargando últimas noticias...</p>
     </div>
 
@@ -866,7 +924,7 @@
     <a href="repos.html" class="mobile-nav-item"><i data-lucide="database"></i><span>Repos</span></a>
 <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
-  
+
 <script src="script.js"></script>
 <script>
     // Constante oficial de la API de Render
@@ -908,7 +966,26 @@
         .replace(/"/g, '&quot;');
     }
 
-  // Cargar dinámicamente Noticias, Destacados, Fuentes (Repositorios) y Carrusel de Videos
+    // Función para mostrar detalle de noticia en el modal
+    function showDetailedNewsModal(title, content, cover, author, date, category) {
+      const html = `
+        ${cover ? `<img src="${cover}" style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:15px;">` : ''}
+        <div style="margin-bottom:10px;">
+          <span style="background: rgba(16,124,16,0.2); color: var(--primary-green); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${category}</span>
+        </div>
+        <h2 style="margin-top:0; color:#fff; font-size:1.3rem;">${title}</h2>
+        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px; display: flex; gap: 15px;">
+          <span>Por: ${author}</span>
+          <span>Fecha: ${date}</span>
+        </div>
+        <div style="color: var(--text-secondary); font-size:0.95rem; line-height:1.6; max-height: 350px; overflow-y: auto;">
+          ${content}
+        </div>
+      `;
+      openUniversalModal(html);
+    }
+
+    // Cargar dinámicamente Noticias, Destacados, Fuentes (Repositorios) y Carrusel de Videos
     async function loadHomeDynamicSections() {
       try {
         // 1. Cargar Noticias para la sección "Últimas Noticias" (Efecto 3D Transparente)
@@ -924,9 +1001,10 @@
           if (resNoticias && resNoticias.ok) {
             const noticias = await resNoticias.json();
             const noticiasContainer = document.getElementById('homeNoticiasContainer');
-            const latestNoticias = Array.isArray(noticias) ? noticias.slice(0, 3) : [];
+            const noticiasList = Array.isArray(noticias) ? noticias : (noticias.noticias || []);
+            const latestNoticias = noticiasList.slice(0, 3);
 
-            if (latestNoticias.length > 0) {
+            if (latestNoticias.length > 0 && noticiasContainer) {
               noticiasContainer.innerHTML = latestNoticias.map(item => {
                 const title = item.titulo || item.title || 'Sin título';
                 const subtitle = item.subtitulo || item.descripcion || item.summary || 'Sin descripción disponible...';
@@ -956,8 +1034,8 @@
                 `;
               }).join('');
               if (window.lucide) lucide.createIcons();
-            } else {
-              if (noticiasContainer) noticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay noticias disponibles.</p>';
+            } else if (noticiasContainer) {
+              noticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay noticias disponibles.</p>';
             }
           }
         } catch (e) {
@@ -965,8 +1043,8 @@
           const noticiasContainer = document.getElementById('homeNoticiasContainer');
           if (noticiasContainer) noticiasContainer.innerHTML = '<p style="color: var(--text-secondary);">No se pudieron cargar las noticias.</p>';
         }
-        
-        // 1. Cargar Posts para la sección "Destacado"
+
+        // 2. Cargar Posts para la sección "Destacado"
         try {
           let resPosts;
           try {
@@ -1041,7 +1119,7 @@
               if (shareBtn) {
                 shareBtn.addEventListener('click', (e) => {
                   e.stopPropagation();
-                  sharePostFromHome(postId, title);
+                  sharePostFromHome(postId, title, cover);
                 });
               }
 
@@ -1053,7 +1131,7 @@
           console.error('Error al cargar posts destacados:', err);
         }
 
-        // 2. Cargar Repositorios para "Fuentes Recomendadas"
+        // 3. Cargar Repositorios para "Fuentes Recomendadas"
         try {
           let resRepos;
           try {
@@ -1093,7 +1171,7 @@
           console.error('Error al cargar repositorios:', err);
         }
 
-        // 3. Cargar Videos para el Carrusel
+        // 4. Cargar Videos para el Carrusel
         try {
           let resVideos;
           try {
@@ -1148,7 +1226,6 @@
 
     // Funciones de previsualización para el Modal
     function showPostModal(title, content, cover, postId) {
-      const shareUrl = window.location.origin + '/posts.html?id=' + (postId || '');
       const html = `
         ${cover ? `<img src="${cover}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : ''}
         <h2 style="margin-top:0; color:#fff; font-size:1.3rem;">${title}</h2>
@@ -1195,13 +1272,36 @@
       }, 5000); // Cambia cada 5 segundos
     }
 
-    // Función dedicada para compartir desde la sección de inicio
-    function sharePostFromHome(postId, title) {
-      const shareUrl = window.location.origin + '/posts.html?id=' + (postId || '');
+    // Función dedicada para compartir consultando la API y generando el link con la imagen del post
+    async function sharePostFromHome(postId, fallbackTitle, fallbackCover) {
+      let shareTitle = fallbackTitle || 'Publicación';
+      let shareImage = fallbackCover || '';
+
+      // Consulta a la API para verificar la información más actualizada del post
+      if (postId) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
+          if (res.ok) {
+            const data = await res.json();
+            const post = data.post || data;
+            shareTitle = post.titulo || post.title || shareTitle;
+            shareImage = post.coverUrl || post.banner || post.imagen || shareImage;
+          }
+        } catch (e) {
+          // Si falla la API individual se mantiene el respaldo local
+        }
+      }
+
+      // Construcción del enlace del post incluyendo el parámetro de la imagen para la vista previa
+      let shareUrl = window.location.origin + '/posts.html?id=' + encodeURIComponent(postId || '');
+      if (shareImage) {
+        shareUrl += '&img=' + encodeURIComponent(shareImage);
+      }
+
       if (navigator.share) {
         navigator.share({
-          title: title,
-          text: 'Echa un vistazo a este post: ' + title,
+          title: shareTitle,
+          text: 'Echa un vistazo a este post: ' + shareTitle,
           url: shareUrl
         }).catch(() => {});
       } else {
@@ -1210,6 +1310,6 @@
         });
       }
     }
- </script>
+</script>
 </body>
 </html>
