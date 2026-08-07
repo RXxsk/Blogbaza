@@ -14,6 +14,6 @@
     "content": "<h2 style=\"text-align: center;\">EN BREVE</h2>\n\n<div style=\"display: flex; justify-content: center; margin-top: 15px;\">\n  <a href=\"https://eltiobazablog.pages.dev/repos?id=1786061901640\" target=\"_blank\" style=\"\n    color: #107C10;\n    text-decoration: none;\n    font-size: 14px;\n    font-weight: 600;\n    padding: 12px 28px;\n    border-radius: 14px;\n    background: rgba(16, 124, 16, 0.1);\n    backdrop-filter: blur(10px);\n    -webkit-backdrop-filter: blur(10px);\n    border: 1px solid rgba(16, 124, 16, 0.2);\n    box-shadow: 0 4px 15px rgba(16, 124, 16, 0.15), inset 0 1px 1px rgba(255,255,255,0.4);\n    transition: all 0.2s ease;\n    display: inline-block;\n  \">\n    Ver Más \n  </a>\n</div>",
     "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
     "fecha": "04 ago 2026",
-    "vistas": 8
+    "vistas": 9
   }
 ]
