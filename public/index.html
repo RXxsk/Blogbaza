@@ -867,8 +867,8 @@
 <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
 
-  <script src="script.js"></script>
-      <script>
+<script src="script.js"></script>
+<script>
     // Constante oficial de la API de Render
     const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
     
@@ -982,23 +982,68 @@
             const featured = postsList.find(p => p.destacado) || postsList[0];
 
             if (featured && destContainer) {
+              const postId = featured._id || featured.id || '';
               const title = featured.titulo || featured.title || 'Sin título';
-              const subtitle = featured.subtitulo || featured.descripcion || featured.excerpt || 'Sin descripción disponible...';
+              const rawSubtitle = featured.subtitulo || featured.descripcion || featured.excerpt || 'Sin descripción disponible...';
               const cover = featured.coverUrl || featured.banner || 'blogpre.jpg';
-              const fullContent = featured.content || featured.contenido || subtitle;
+              const fullContent = featured.content || featured.contenido || rawSubtitle;
+
+              // Extraer texto puro para no mostrar etiquetas HTML ni código
+              const parser = new DOMParser();
+              const parsedDoc = parser.parseFromString(rawSubtitle, 'text/html');
+              let cleanSubtitle = parsedDoc.body.textContent || parsedDoc.body.innerText || '';
+              cleanSubtitle = cleanSubtitle.replace(/\\n/g, ' ').replace(/\s+/g, ' ').trim();
 
               destContainer.innerHTML = `
-                <div class="featured-diagonal-card" onclick='showPostModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)})'>
+                <div class="featured-diagonal-card" style="cursor: pointer;" onclick='showPostModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)}, ${JSON.stringify(postId)})'>
                   <div class="diagonal-media-wrapper">
                     <img src="${cover}" alt="${title}">
                   </div>
                   <div class="diagonal-content">
-                    <span class="tag" style="background: rgba(16,124,16,0.2); color: var(--primary-green); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${featured.categoria || featured.category || 'Destacado'}</span>
-                    <h3 style="margin: 10px 0 6px 0; font-size: 1.15rem; color: #fff;">${title}</h3>
-                    <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">${subtitle}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                      <span class="tag" style="background: rgba(16,124,16,0.2); color: var(--primary-green); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">${featured.categoria || featured.category || 'Destacado'}</span>
+                      
+                      <!-- Botón Compartir Aislado -->
+                      <button type="button" class="share-btn-home" style="
+                        color: #107C10;
+                        padding: 6px 10px;
+                        border-radius: 8px;
+                        background: rgba(16, 124, 16, 0.15);
+                        border: 1px solid rgba(16, 124, 16, 0.3);
+                        cursor: pointer;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        position: relative;
+                        z-index: 20;
+                      " title="Compartir este post">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                          <circle cx="18" cy="5" r="3"></circle>
+                          <circle cx="6" cy="12" r="3"></circle>
+                          <circle cx="18" cy="19" r="3"></circle>
+                          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <h3 style="margin: 10px 0 6px 0; font-size: 1.15rem; color: #fff;">${escapeHTML(title)}</h3>
+                    <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">${escapeHTML(cleanSubtitle)}</p>
                   </div>
                 </div>
               `;
+
+              // Listener directo para detener el clic de la previsualización al presionar compartir
+              const shareBtn = destContainer.querySelector('.share-btn-home');
+              if (shareBtn) {
+                shareBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  sharePostFromHome(postId, title, cover);
+                });
+              }
+
             } else if (destContainer) {
               destContainer.innerHTML = '<p style="color: var(--text-secondary);">No hay publicaciones destacadas.</p>';
             }
@@ -1101,7 +1146,7 @@
     }
 
     // Funciones de previsualización para el Modal
-    function showPostModal(title, content, cover) {
+    function showPostModal(title, content, cover, postId) {
       const html = `
         ${cover ? `<img src="${cover}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : ''}
         <h2 style="margin-top:0; color:#fff; font-size:1.3rem;">${title}</h2>
@@ -1147,6 +1192,45 @@
         if (window.lucide) lucide.createIcons();
       }, 5000); // Cambia cada 5 segundos
     }
-  </script>
+
+    // Función dedicada para compartir consultando la API y generando el link con la imagen del post
+    async function sharePostFromHome(postId, fallbackTitle, fallbackCover) {
+      let shareTitle = fallbackTitle || 'Publicación';
+      let shareImage = fallbackCover || '';
+
+      // Consulta a la API para verificar la información más actualizada del post
+      if (postId) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
+          if (res.ok) {
+            const data = await res.json();
+            const post = data.post || data;
+            shareTitle = post.titulo || post.title || shareTitle;
+            shareImage = post.coverUrl || post.banner || post.imagen || shareImage;
+          }
+        } catch (e) {
+          // Si falla la API individual se mantiene el respaldo local
+        }
+      }
+
+      // Construcción del enlace del post incluyendo el parámetro de la imagen para la vista previa
+      let shareUrl = window.location.origin + '/posts.html?id=' + encodeURIComponent(postId || '');
+      if (shareImage) {
+        shareUrl += '&img=' + encodeURIComponent(shareImage);
+      }
+
+      if (navigator.share) {
+        navigator.share({
+          title: shareTitle,
+          text: 'Echa un vistazo a este post: ' + shareTitle,
+          url: shareUrl
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(shareUrl).then(() => {
+          alert('¡Enlace del post copiado al portapapeles!\n' + shareUrl);
+        });
+      }
+    }
+ </script>
 </body>
 </html>
