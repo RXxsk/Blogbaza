@@ -612,378 +612,384 @@
 
 <!-- Scripts -->
   <script src="script.js"></script>
-    <script>
-    // Constante oficial de la API de Render
-    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
-    
-    // URL de respaldo apuntando directamente a tu carpeta data en GitHub
-    const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
+<script>
+  // Constante oficial de la API de Render
+  const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+  
+  // URL de respaldo apuntando directamente a tu carpeta data en GitHub
+  const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
-    let allPostsData = [];
-    let activePostCategory = 'all';
-    let activeViewStyle = 'detailed';
+  let allPostsData = [];
+  let activePostCategory = 'all';
+  let activeViewStyle = 'detailed';
 
-    const AVATAR_FRONTEND_MAP = {
-      'el tio baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
-      'el tío baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
-      'baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
-      'rxx8': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKPhcbxJpIBqKRVJ7R_FNOHclLLV2s_eA4caJBzDpm2Q&s=10',
-      'mannuee': 'https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj'
-    };
+  const AVATAR_FRONTEND_MAP = {
+    'el tio baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+    'el tío baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+    'baza': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10',
+    'rxx8': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSKPhcbxJpIBqKRVJ7R_FNOHclLLV2s_eA4caJBzDpm2Q&s=10',
+    'mannuee': 'https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj'
+  };
 
-    function resolveAuthorAvatar(authorName, avatarFromApi) {
-      if (avatarFromApi && avatarFromApi.startsWith('http')) {
-        return avatarFromApi;
-      }
-      const key = (authorName || '').toLowerCase().trim();
-      return AVATAR_FRONTEND_MAP[key] || AVATAR_FRONTEND_MAP['el tío baza'];
+  function resolveAuthorAvatar(authorName, avatarFromApi) {
+    if (avatarFromApi && avatarFromApi.startsWith('http')) {
+      return avatarFromApi;
     }
+    const key = (authorName || '').toLowerCase().trim();
+    return AVATAR_FRONTEND_MAP[key] || AVATAR_FRONTEND_MAP['el tío baza'];
+  }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) lucide.createIcons();
-      fetchAndRenderPosts();
-
-      const searchInput = document.getElementById('postSearchInput');
-      const clearBtn = document.getElementById('clearPostSearchBtn');
-
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const query = e.target.value.trim();
-          if (clearBtn) clearBtn.classList.toggle('hidden', query === '');
-          applyPostFilters();
-        });
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) lucide.createIcons();
+    fetchAndRenderPosts().then(() => {
+      // Auto-abrir post si la URL trae un ID (?id=123)
+      const urlParams = new URLSearchParams(window.location.search);
+      const postIdFromUrl = urlParams.get('id');
+      if (postIdFromUrl) {
+        openPostPreviewModal(postIdFromUrl);
       }
-
-      if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-          if (searchInput) {
-            searchInput.value = '';
-            clearBtn.classList.add('hidden');
-            applyPostFilters();
-          }
-        });
-      }
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closePostPreviewModal();
-      });
     });
 
-    async function fetchAndRenderPosts() {
-      const container = document.getElementById('postsListContainer');
+    const searchInput = document.getElementById('postSearchInput');
+    const clearBtn = document.getElementById('clearPostSearchBtn');
 
-      try {
-        let response;
-        try {
-          response = await fetch(`${API_BASE_URL}/api/posts`);
-          if (!response.ok) throw new Error();
-        } catch (e) {
-          // Si Render falla o está dormido, usamos el respaldo de GitHub directamente
-          response = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
-        }
-
-        if (!response.ok) throw new Error('No se pudo obtener el archivo de publicaciones');
-
-        const data = await response.json();
-        allPostsData = Array.isArray(data) ? data : (data.posts || data.data || []);
-
-        updatePostCategoryCounts(allPostsData);
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        if (clearBtn) clearBtn.classList.toggle('hidden', query === '');
         applyPostFilters();
+      });
+    }
 
-      } catch (error) {
-        console.error('Error al cargar publicaciones:', error);
-        if (container) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <i data-lucide="alert-triangle" class="empty-state-icon" style="color: #ef4444;"></i>
-              <h3>No se pudieron cargar las publicaciones</h3>
-              <p>Ocurrió un problema al comunicarse con el servidor o la API.</p>
-              <button class="btn-secondary" onclick="fetchAndRenderPosts()">Reintentar</button>
-            </div>
-          `;
-          if (window.lucide) lucide.createIcons();
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        if (searchInput) {
+          searchInput.value = '';
+          clearBtn.classList.add('hidden');
+          applyPostFilters();
         }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePostPreviewModal();
+    });
+  });
+
+  async function fetchAndRenderPosts() {
+    const container = document.getElementById('postsListContainer');
+
+    try {
+      let response;
+      try {
+        response = await fetch(`${API_BASE_URL}/api/posts`);
+        if (!response.ok) throw new Error();
+      } catch (e) {
+        response = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
       }
-    }
 
-    function updatePostCategoryCounts(postsList) {
-      const counts = { all: postsList.length, Tutoriales: 0, Guías: 0, Desarrollo: 0 };
+      if (!response.ok) throw new Error('No se pudo obtener el archivo de publicaciones');
 
-      postsList.forEach(post => {
-        const cat = post.categoria || post.category;
-        if (cat && counts.hasOwnProperty(cat)) counts[cat]++;
-      });
+      const data = await response.json();
+      allPostsData = Array.isArray(data) ? data : (data.posts || data.data || []);
 
-      Object.keys(counts).forEach(cat => {
-        const badge = document.getElementById(`count-${cat}`);
-        if (badge) badge.textContent = counts[cat];
-      });
-    }
-
-    function selectPostFilter(category, btnElement) {
-      activePostCategory = category;
-      const buttons = document.querySelectorAll('#postsFilterBar .filter-btn');
-      buttons.forEach(btn => btn.classList.remove('active'));
-      if (btnElement) btnElement.classList.add('active');
+      updatePostCategoryCounts(allPostsData);
       applyPostFilters();
-    }
 
-    function changePostViewStyle(style, btnElement) {
-      activeViewStyle = style;
-      const buttons = document.querySelectorAll('.view-style-toolbar .view-style-btn');
-      buttons.forEach(btn => btn.classList.remove('active'));
-      if (btnElement) btnElement.classList.add('active');
-
-      const container = document.getElementById('postsListContainer');
+    } catch (error) {
+      console.error('Error al cargar publicaciones:', error);
       if (container) {
-        container.className = '';
-        if (style === 'compact') container.classList.add('posts-compact-list');
-        else if (style === 'list') container.classList.add('posts-list-view');
-        else if (style === 'detailed') container.classList.add('posts-detailed-grid');
-      }
-
-      applyPostFilters();
-    }
-
-    function applyPostFilters() {
-      const container = document.getElementById('postsListContainer');
-      const searchInput = document.getElementById('postSearchInput');
-      const resultsText = document.getElementById('postsResultsText');
-
-      if (!container) return;
-
-      const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-      const filtered = allPostsData.filter(post => {
-        const category = post.categoria || post.category || '';
-        const title = (post.titulo || post.title || '').toLowerCase();
-        
-        const matchesCat = (activePostCategory === 'all') || (category.toLowerCase() === activePostCategory.toLowerCase());
-        const matchesSearch = !searchTerm || title.includes(searchTerm);
-
-        return matchesCat && matchesSearch;
-      });
-
-      if (resultsText) {
-        resultsText.textContent = `Mostrando ${filtered.length} publicación(es)`;
-      }
-
-      if (filtered.length === 0) {
         container.innerHTML = `
           <div class="empty-state">
-            <i data-lucide="file-text" class="empty-state-icon"></i>
-            <h3>No se encontraron resultados</h3>
-            <p>Intenta con otros términos en el título o cambia la categoría seleccionada.</p>
-          </div>
-        `;
-        if (window.lucide) lucide.createIcons();
-        return;
-      }
-
-      if (activeViewStyle === 'compact') {
-        container.innerHTML = filtered.map(post => {
-          const id = post._id || post.id || '';
-          const title = post.titulo || post.title || 'Sin título';
-          const category = post.categoria || post.category || 'General';
-          const author = post.autor || post.author || 'El Tío Baza';
-          const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
-          const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-
-          return `
-            <div class="post-compact-card" onclick="openPostPreviewModal('${id}')">
-              <div class="post-compact-main">
-                <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="post-compact-author-img" loading="lazy" />
-                <div class="post-compact-info">
-                  <div class="post-compact-title-row">
-                    <h3 class="post-compact-title">${escapeHTML(title)}</h3>
-                    <span class="post-compact-badge">${escapeHTML(category)}</span>
-                  </div>
-                  <div class="post-compact-meta">
-                    <span class="post-compact-meta-item">
-                      <i data-lucide="user" style="width: 12px; height: 12px;"></i>
-                      <span class="post-compact-meta-author">${escapeHTML(author)}</span>
-                    </span>
-                    <span class="post-compact-meta-item">
-                      <i data-lucide="calendar" style="width: 12px; height: 12px;"></i>
-                      <span>${escapeHTML(date)}</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div class="post-compact-action">
-                <i data-lucide="chevron-right" style="width: 20px; height: 20px; color: var(--primary-green);"></i>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-      } else if (activeViewStyle === 'list') {
-        container.innerHTML = filtered.map(post => {
-          const id = post._id || post.id || '';
-          const title = post.titulo || post.title || 'Sin título';
-          const category = post.categoria || post.category || 'General';
-          const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-          const image = post.coverUrl || post.cover || post.imagen || post.image || 'blogpre.jpg';
-          const summary = post.subtitulo || post.descripcion || post.excerpt || post.summary || post.content || 'Sin descripción disponible.';
-
-          return `
-            <div class="post-list-card" onclick="openPostPreviewModal('${id}')">
-              <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" class="post-list-thumb" loading="lazy" />
-              <div class="post-list-content">
-                <div style="display: flex; gap: 8px; align-items: center;">
-                  <span class="post-compact-badge">${escapeHTML(category)}</span>
-                  <span style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHTML(date)}</span>
-                </div>
-                <h3 class="post-list-title">${escapeHTML(title)}</h3>
-                <p class="post-list-excerpt">${escapeHTML(summary.replace(/<[^>]*>?/gm, ''))}</p>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-      } else if (activeViewStyle === 'detailed') {
-        container.innerHTML = filtered.map(post => {
-          const id = post._id || post.id || '';
-          const title = post.titulo || post.title || 'Sin título';
-          const category = post.categoria || post.category || 'General';
-          const author = post.autor || post.author || 'El Tío Baza';
-          const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-          const image = post.coverUrl || post.cover || post.imagen || post.image || 'blogpre.jpg';
-          const summary = post.subtitulo || post.descripcion || post.excerpt || post.summary || post.content || 'Sin descripción disponible.';
-
-          return `
-            <div class="post-detailed-card" onclick="openPostPreviewModal('${id}')">
-              <div class="post-detailed-media">
-                <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" loading="lazy" />
-                <div style="position: absolute; top: 10px; left: 10px;">
-                  <span class="post-compact-badge">${escapeHTML(category)}</span>
-                </div>
-              </div>
-              <div class="post-detailed-body">
-                <h3 class="post-detailed-title">${escapeHTML(title)}</h3>
-                <p class="post-detailed-excerpt">${escapeHTML(summary.replace(/<[^>]*>?/gm, ''))}</p>
-                <div class="post-detailed-footer">
-                  <span>Por ${escapeHTML(author)}</span>
-                  <span>${escapeHTML(date)}</span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('');
-      }
-
-      if (window.lucide) lucide.createIcons();
-    }
-
-    async function openPostPreviewModal(postId) {
-      const modal = document.getElementById('postPreviewModal');
-      const modalBody = document.getElementById('postModalBody');
-
-      if (!modal || !modalBody) return;
-
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-
-      // Primero buscamos en el arreglo local que ya se cargó
-      let postData = allPostsData.find(p => String(p._id || p.id) === String(postId));
-
-      if (!postData) {
-        modalBody.innerHTML = `
-          <div style="padding: 10px;">
-            <div class="skeleton-line short skeleton-anim" style="margin: 0 auto 16px auto; width: 120px;"></div>
-            <div class="skeleton-line long skeleton-anim" style="height: 32px; margin-bottom: 20px;"></div>
-            <div class="skeleton-line skeleton-anim" style="height: 220px; border-radius: 12px; margin-bottom: 24px;"></div>
-          </div>
-        `;
-        try {
-          // Intentamos buscar directamente en el respaldo completo de GitHub si no está en memoria
-          const fallbackRes = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
-          const fallbackData = await fallbackRes.json();
-          const list = Array.isArray(fallbackData) ? fallbackData : (fallbackData.posts || fallbackData.data || []);
-          postData = list.find(p => String(p._id || p.id) === String(postId));
-        } catch (e) {
-          console.error('Error al abrir modal del post:', e);
-        }
-      }
-
-      if (postData) {
-        renderModalContent(postData);
-      } else {
-        modalBody.innerHTML = `
-          <div style="text-align: center; padding: 30px 10px;">
-            <i data-lucide="alert-triangle" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
-            <h3>Error al cargar el post</h3>
-            <p style="color: var(--text-secondary); margin-top: 6px;">No se pudo recuperar la información del post.</p>
+            <i data-lucide="alert-triangle" class="empty-state-icon" style="color: #ef4444;"></i>
+            <h3>No se pudieron cargar las publicaciones</h3>
+            <p>Ocurrió un problema al comunicarse con el servidor o la API.</p>
+            <button class="btn-secondary" onclick="fetchAndRenderPosts()">Reintentar</button>
           </div>
         `;
         if (window.lucide) lucide.createIcons();
       }
     }
+  }
 
-    function renderModalContent(post) {
-      const modalBody = document.getElementById('postModalBody');
-      if (!modalBody) return;
+  function updatePostCategoryCounts(postsList) {
+    const counts = { all: postsList.length, Tutoriales: 0, Guías: 0, Desarrollo: 0 };
 
-      const title = post.titulo || post.title || 'Sin título';
-      const category = post.categoria || post.category || 'General';
-      const author = post.autor || post.author || 'El Tío Baza';
-      const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
-      const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
-      const image = post.coverUrl || post.cover || post.imagen || post.image || '';
-      const content = post.content || post.contenido || post.descripcion || post.subtitulo || '<p>No hay detalles adicionales disponibles para esta publicación.</p>';
+    postsList.forEach(post => {
+      const cat = post.categoria || post.category;
+      if (cat && counts.hasOwnProperty(cat)) counts[cat]++;
+    });
 
-      modalBody.innerHTML = `
-        <div class="modal-post-header-meta">
-          <span class="post-compact-badge">${escapeHTML(category)}</span>
-          <div class="post-compact-meta-item">
-            <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
-            <span>${escapeHTML(date)}</span>
-          </div>
-        </div>
+    Object.keys(counts).forEach(cat => {
+      const badge = document.getElementById(`count-${cat}`);
+      if (badge) badge.textContent = counts[cat];
+    });
+  }
 
-        <h1 class="modal-post-title">${escapeHTML(title)}</h1>
+  function selectPostFilter(category, btnElement) {
+    activePostCategory = category;
+    const buttons = document.querySelectorAll('#postsFilterBar .filter-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+    applyPostFilters();
+  }
 
-        <div class="modal-post-author-box">
-          <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="modal-post-author-avatar" />
-          <div class="modal-post-author-details">
-            <span class="post-compact-meta-author">${escapeHTML(author)}</span>
-            <span style="font-size: 0.8rem; color: var(--text-secondary);">Autor oficial</span>
-          </div>
-        </div>
+  function changePostViewStyle(style, btnElement) {
+    activeViewStyle = style;
+    const buttons = document.querySelectorAll('.view-style-toolbar .view-style-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
 
-        ${image ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" class="modal-post-featured-img" />` : ''}
+    const container = document.getElementById('postsListContainer');
+    if (container) {
+      container.className = '';
+      if (style === 'compact') container.classList.add('posts-compact-list');
+      else if (style === 'list') container.classList.add('posts-list-view');
+      else if (style === 'detailed') container.classList.add('posts-detailed-grid');
+    }
 
-        <div class="modal-post-content">
-          ${content}
+    applyPostFilters();
+  }
+
+  function applyPostFilters() {
+    const container = document.getElementById('postsListContainer');
+    const searchInput = document.getElementById('postSearchInput');
+    const resultsText = document.getElementById('postsResultsText');
+
+    if (!container) return;
+
+    const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    const filtered = allPostsData.filter(post => {
+      const category = post.categoria || post.category || '';
+      const title = (post.titulo || post.title || '').toLowerCase();
+      
+      const matchesCat = (activePostCategory === 'all') || (category.toLowerCase() === activePostCategory.toLowerCase());
+      const matchesSearch = !searchTerm || title.includes(searchTerm);
+
+      return matchesCat && matchesSearch;
+    });
+
+    if (resultsText) {
+      resultsText.textContent = `Mostrando ${filtered.length} publicación(es)`;
+    }
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <i data-lucide="file-text" class="empty-state-icon"></i>
+          <h3>No se encontraron resultados</h3>
+          <p>Intenta con otros términos en el título o cambia la categoría seleccionada.</p>
         </div>
       `;
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
 
+    if (activeViewStyle === 'compact') {
+      container.innerHTML = filtered.map(post => {
+        const id = post._id || post.id || '';
+        const title = post.titulo || post.title || 'Sin título';
+        const category = post.categoria || post.category || 'General';
+        const author = post.autor || post.author || 'El Tío Baza';
+        const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
+        const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+
+        return `
+          <div class="post-compact-card" onclick="openPostPreviewModal('${id}')">
+            <div class="post-compact-main">
+              <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="post-compact-author-img" loading="lazy" />
+              <div class="post-compact-info">
+                <div class="post-compact-title-row">
+                  <h3 class="post-compact-title">${escapeHTML(title)}</h3>
+                  <span class="post-compact-badge">${escapeHTML(category)}</span>
+                </div>
+                <div class="post-compact-meta">
+                  <span class="post-compact-meta-item">
+                    <i data-lucide="user" style="width: 12px; height: 12px;"></i>
+                    <span class="post-compact-meta-author">${escapeHTML(author)}</span>
+                  </span>
+                  <span class="post-compact-meta-item">
+                    <i data-lucide="calendar" style="width: 12px; height: 12px;"></i>
+                    <span>${escapeHTML(date)}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="post-compact-action">
+              <i data-lucide="chevron-right" style="width: 20px; height: 20px; color: var(--primary-green);"></i>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    } else if (activeViewStyle === 'list') {
+      container.innerHTML = filtered.map(post => {
+        const id = post._id || post.id || '';
+        const title = post.titulo || post.title || 'Sin título';
+        const category = post.categoria || post.category || 'General';
+        const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+        const image = post.coverUrl || post.cover || post.imagen || post.image || 'blogpre.jpg';
+        const summary = post.subtitulo || post.descripcion || post.excerpt || post.summary || post.content || 'Sin descripción disponible.';
+
+        return `
+          <div class="post-list-card" onclick="openPostPreviewModal('${id}')">
+            <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" class="post-list-thumb" loading="lazy" />
+            <div class="post-list-content">
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <span class="post-compact-badge">${escapeHTML(category)}</span>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">${escapeHTML(date)}</span>
+              </div>
+              <h3 class="post-list-title">${escapeHTML(title)}</h3>
+              <p class="post-list-excerpt">${escapeHTML(summary.replace(/<[^>]*>?/gm, ''))}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    } else if (activeViewStyle === 'detailed') {
+      container.innerHTML = filtered.map(post => {
+        const id = post._id || post.id || '';
+        const title = post.titulo || post.title || 'Sin título';
+        const category = post.categoria || post.category || 'General';
+        const author = post.autor || post.author || 'El Tío Baza';
+        const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+        const image = post.coverUrl || post.cover || post.imagen || post.image || 'blogpre.jpg';
+        const summary = post.subtitulo || post.descripcion || post.excerpt || post.summary || post.content || 'Sin descripción disponible.';
+
+        return `
+          <div class="post-detailed-card" onclick="openPostPreviewModal('${id}')">
+            <div class="post-detailed-media">
+              <img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" loading="lazy" />
+              <div style="position: absolute; top: 10px; left: 10px;">
+                <span class="post-compact-badge">${escapeHTML(category)}</span>
+              </div>
+            </div>
+            <div class="post-detailed-body">
+              <h3 class="post-detailed-title">${escapeHTML(title)}</h3>
+              <p class="post-detailed-excerpt">${escapeHTML(summary.replace(/<[^>]*>?/gm, ''))}</p>
+              <div class="post-detailed-footer">
+                <span>Por ${escapeHTML(author)}</span>
+                <span>${escapeHTML(date)}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  async function openPostPreviewModal(postId) {
+    const modal = document.getElementById('postPreviewModal');
+    const modalBody = document.getElementById('postModalBody');
+
+    if (!modal || !modalBody) return;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    let postData = allPostsData.find(p => String(p._id || p.id) === String(postId));
+
+    if (!postData) {
+      modalBody.innerHTML = `
+        <div style="padding: 10px;">
+          <div class="skeleton-line short skeleton-anim" style="margin: 0 auto 16px auto; width: 120px;"></div>
+          <div class="skeleton-line long skeleton-anim" style="height: 32px; margin-bottom: 20px;"></div>
+          <div class="skeleton-line skeleton-anim" style="height: 220px; border-radius: 12px; margin-bottom: 24px;"></div>
+        </div>
+      `;
+      try {
+        const fallbackRes = await fetch(`${FALLBACK_JSON_URL}/posts.json`);
+        const fallbackData = await fallbackRes.json();
+        const list = Array.isArray(fallbackData) ? fallbackData : (fallbackData.posts || fallbackData.data || []);
+        postData = list.find(p => String(p._id || p.id) === String(postId));
+      } catch (e) {
+        console.error('Error al abrir modal del post:', e);
+      }
+    }
+
+    if (postData) {
+      renderModalContent(postData);
+    } else {
+      modalBody.innerHTML = `
+        <div style="text-align: center; padding: 30px 10px;">
+          <i data-lucide="alert-triangle" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
+          <h3>Error al cargar el post</h3>
+          <p style="color: var(--text-secondary); margin-top: 6px;">No se pudo recuperar la información del post.</p>
+        </div>
+      `;
       if (window.lucide) lucide.createIcons();
     }
+  }
 
-    function closePostPreviewModal() {
-      const modal = document.getElementById('postPreviewModal');
-      if (modal) {
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    }
+  function renderModalContent(post) {
+    const modalBody = document.getElementById('postModalBody');
+    if (!modalBody) return;
 
-    function closePostPreviewModalOnOverlay(event) {
-      if (event.target.classList.contains('post-modal-overlay')) {
-        closePostPreviewModal();
-      }
-    }
+    // Guardamos la referencia del post activo para que el botón de compartir la consulte
+    window.currentActivePost = post;
 
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    const title = post.titulo || post.title || 'Sin título';
+    const category = post.categoria || post.category || 'General';
+    const author = post.autor || post.author || 'El Tío Baza';
+    const avatar = resolveAuthorAvatar(author, post.authorAvatar || post.avatar || post.avatarUrl);
+    const date = post.fecha || post.date || (post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Reciente');
+    const image = post.coverUrl || post.cover || post.imagen || post.image || '';
+    const content = post.content || post.contenido || post.descripcion || post.subtitulo || '<p>No hay detalles adicionales disponibles para esta publicación.</p>';
+
+    modalBody.innerHTML = `
+      <div class="modal-post-header-meta">
+        <span class="post-compact-badge">${escapeHTML(category)}</span>
+        <div class="post-compact-meta-item">
+          <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+          <span>${escapeHTML(date)}</span>
+        </div>
+      </div>
+
+      <h1 class="modal-post-title">${escapeHTML(title)}</h1>
+
+      <div class="modal-post-author-box">
+        <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="modal-post-author-avatar" />
+        <div class="modal-post-author-details">
+          <span class="post-compact-meta-author">${escapeHTML(author)}</span>
+          <span style="font-size: 0.8rem; color: var(--text-secondary);">Autor oficial</span>
+        </div>
+      </div>
+
+      ${image ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" class="modal-post-featured-img" />` : ''}
+
+      <div class="modal-post-content">
+        ${content}
+      </div>
+    `;
+
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function closePostPreviewModal() {
+    const modal = document.getElementById('postPreviewModal');
+    if (modal) {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
     }
-      
- </script>
+  }
+
+  function closePostPreviewModalOnOverlay(event) {
+    if (event.target.classList.contains('post-modal-overlay')) {
+      closePostPreviewModal();
+    }
+  }
+
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
 </body>
 </html>
