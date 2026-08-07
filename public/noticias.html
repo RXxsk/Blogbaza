@@ -102,117 +102,240 @@
   </nav>
 
   <script src="script.js"></script>
-  <script>
-    // Constante oficial de la API de Render
-    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+<script>
+  // Constante oficial de la API de Render
+  const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+  const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
-    let allNewsData = [];
+  let allNewsData = [];
+  let currentNewsMode = 'news'; // 'news' o 'xbox'
 
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.lucide) {
-        lucide.createIcons();
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+
+    // Configurar buscador y pestañas de modo si existen en la interfaz
+    const searchInput = document.getElementById('newsSearchInput');
+    const clearBtn = document.getElementById('clearNewsSearchBtn');
+    
+    if (searchInput) {
+      searchInput.addEventListener('input', () => {
+        renderFilteredNews();
+        if (clearBtn) clearBtn.classList.toggle('hidden', searchInput.value.trim() === '');
+      });
+    }
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.classList.add('hidden');
+        renderFilteredNews();
+      });
+    }
+
+    // Cargar directamente las noticias desde la API del admin
+    fetchAndRenderNoticias();
+  });
+
+  /**
+   * Petición de noticias conectada a la API del admin backend (con fallback local)
+   */
+  async function fetchAndRenderNoticias() {
+    const container = document.getElementById('noticiasGridContainer');
+    const resultsText = document.getElementById('newsResultsText');
+
+    try {
+      let response;
+      try {
+        response = await fetch(`${API_BASE_URL}/api/noticias`);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+      } catch (err) {
+        try {
+          const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
+          response = await fetch(localApi);
+          if (!response.ok) throw new Error();
+        } catch (e2) {
+          response = await fetch(`${FALLBACK_JSON_URL}/noticias.json`);
+        }
       }
 
-      // Cargar directamente las noticias desde la API del admin
-      fetchAndRenderNoticias();
+      const data = await response.json();
+      allNewsData = Array.isArray(data) ? data : (data.noticias || []);
+
+      renderFilteredNews();
+
+    } catch (error) {
+      console.error('Error al cargar noticias de la API:', error);
+      if (container) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+            <i data-lucide="alert-triangle" class="empty-state-icon" style="color: #ef4444; width: 48px; height: 48px; margin-bottom: 12px;"></i>
+            <h3>No se pudieron cargar las noticias</h3>
+            <p>Verifica la conexión con el servidor o la API del admin.</p>
+            <button class="btn-secondary" onclick="fetchAndRenderNoticias()" style="margin-top: 15px; padding: 8px 16px; cursor: pointer;">Reintentar</button>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  }
+
+  // Cambiar entre modo "News" y "Xbox Portal"
+  function switchNewsMode(mode, btnElement) {
+    currentNewsMode = mode;
+    const modeButtons = document.querySelectorAll('.news-mode-btn');
+    modeButtons.forEach(btn => btn.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+    renderFilteredNews();
+  }
+
+  // Renderizar y filtrar noticias con vista previa, buscador e imagen
+  function renderFilteredNews() {
+    const container = document.getElementById('noticiasGridContainer');
+    const resultsText = document.getElementById('newsResultsText');
+    const searchInput = document.getElementById('newsSearchInput');
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    if (!container) return;
+
+    // Aplicar filtros por modo y texto de búsqueda
+    const filtered = allNewsData.filter(item => {
+      const category = (item.categoria || item.category || 'general').toLowerCase();
+      const title = (item.titulo || item.title || '').toLowerCase();
+      const content = (item.contenido || item.description || '').toLowerCase();
+
+      const matchesMode = (currentNewsMode === 'news') ? true : (category.includes('xbox') || title.includes('xbox'));
+      const matchesSearch = !query || title.includes(query) || content.includes(query);
+
+      return matchesMode && matchesSearch;
     });
 
-    /**
-     * Petición de noticias conectada a la API del admin backend (con fallback local)
-     */
-    async function fetchAndRenderNoticias() {
-      const container = document.getElementById('noticiasGridContainer');
-      const resultsText = document.getElementById('newsResultsText');
-
-      try {
-        let response;
-        try {
-          // Usamos la API tal cual se hace en el index con el endpoint completo
-          response = await fetch(`${API_BASE_URL}/api/noticias`);
-          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        } catch (err) {
-          try {
-            const localApi = typeof API_URL !== 'undefined' ? `${API_URL}/noticias` : '/api/noticias';
-            response = await fetch(localApi);
-            if (!response.ok) throw new Error();
-          } catch (e2) {
-            response = await fetch('data/noticias.json');
-          }
-        }
-
-        const data = await response.json();
-        allNewsData = Array.isArray(data) ? data : (data.noticias || []);
-
-        if (resultsText) {
-          resultsText.textContent = `Mostrando ${allNewsData.length} noticia(s)`;
-        }
-
-        if (allNewsData.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <i data-lucide="newspaper" class="empty-state-icon"></i>
-              <h3>No se encontraron noticias</h3>
-              <p>No hay publicaciones disponibles en este momento.</p>
-            </div>
-          `;
-          if (window.lucide) lucide.createIcons();
-          return;
-        }
-
-        // Renderizar las noticias obtenidas de la API del admin
-        container.innerHTML = allNewsData.map(item => {
-          const category = item.categoria || item.category || 'General';
-          const title = item.titulo || item.title || 'Noticia sin título';
-          const content = item.contenido || item.description || '';
-          const date = item.fecha || item.date || 'Reciente';
-
-          let badgeClass = '';
-          if (category.toLowerCase() === 'mantenimiento') badgeClass = 'warning';
-          if (category.toLowerCase() === 'lanzamientos') badgeClass = 'info';
-
-          return `
-            <article class="news-item">
-              <span class="news-badge ${badgeClass}">${escapeHTML(category)}</span>
-              <div class="news-content" style="flex: 1;">
-                <h4>${escapeHTML(title)}</h4>
-                <p>${escapeHTML(content)}</p>
-                <div class="news-date">
-                  <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
-                  <span>${escapeHTML(date)}</span>
-                </div>
-              </div>
-            </article>
-          `;
-        }).join('');
-
-        if (window.lucide) {
-          lucide.createIcons();
-        }
-
-      } catch (error) {
-        console.error('Error al cargar noticias de la API:', error);
-        if (container) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <i data-lucide="alert-triangle" class="empty-state-icon" style="color: #ef4444;"></i>
-              <h3>No se pudieron cargar las noticias</h3>
-              <p>Verifica la conexión con el servidor o la API del admin.</p>
-              <button class="btn-secondary" onclick="fetchAndRenderNoticias()">Reintentar</button>
-            </div>
-          `;
-          if (window.lucide) lucide.createIcons();
-        }
-      }
+    if (resultsText) {
+      resultsText.textContent = `Mostrando ${filtered.length} noticia(s)`;
     }
 
-    function escapeHTML(str) {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+          <i data-lucide="newspaper" class="empty-state-icon" style="width: 48px; height: 48px; margin-bottom: 12px; color: var(--text-secondary);"></i>
+          <h3>No se encontraron noticias</h3>
+          <p style="color: var(--text-secondary);">Intenta con otros términos o cambia de modo.</p>
+        </div>
+      `;
+      if (window.lucide) lucide.createIcons();
+      return;
     }
-  </script>
+
+    // Asignar la clase del grid 3D transparente de la sección de inicio
+    container.className = 'news-3d-grid mb-4';
+
+    container.innerHTML = filtered.map(item => {
+      const newsId = item._id || item.id || '';
+      const category = item.categoria || item.category || 'General';
+      const title = item.titulo || item.title || 'Noticia sin título';
+      const content = item.contenido || item.description || '';
+      const date = item.fecha || item.date || 'Reciente';
+      const image = item.coverUrl || item.imagen || item.image || '';
+
+      let badgeClass = '';
+      if (category.toLowerCase() === 'mantenimiento') badgeClass = 'warning';
+      if (category.toLowerCase() === 'lanzamientos') badgeClass = 'info';
+
+      return `
+        <article class="news-item" style="position: relative; display: flex; flex-direction: column; gap: 12px; cursor: pointer;" onclick="openNewsPreview('${newsId}', ${JSON.stringify(title)}, ${JSON.stringify(content)}, ${JSON.stringify(image)})">
+          
+          ${image ? `<div style="width: 100%; height: 150px; border-radius: 10px; overflow: hidden;"><img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" style="width: 100%; height: 100%; object-fit: cover;"></div>` : ''}
+          
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="news-badge ${badgeClass}">${escapeHTML(category)}</span>
+            
+            <!-- Botón de compartir a base del ID -->
+            <button onclick="
+              event.stopPropagation();
+              shareNewsItem('${newsId}', ${JSON.stringify(title)});
+            " style="
+              color: #107C10;
+              padding: 6px 10px;
+              border-radius: 8px;
+              background: rgba(16, 124, 16, 0.15);
+              border: 1px solid rgba(16, 124, 16, 0.3);
+              cursor: pointer;
+              display: inline-flex;
+              align-items: center;
+              gap: 4px;
+              font-size: 0.75rem;
+              font-weight: 600;
+              z-index: 10;
+            " title="Compartir esta noticia">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="news-content" style="flex: 1;">
+            <h4 style="margin: 0 0 8px 0; color: #fff;">${escapeHTML(title)}</h4>
+            <p style="margin: 0 0 12px 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4;">${escapeHTML(content.replace(/<[^>]*>?/gm, ''))}</p>
+            <div class="news-date" style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted);">
+              <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
+              <span>${escapeHTML(date)}</span>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+
+  // Función para abrir la previsualización modal de la noticia al hacer clic
+  function openNewsPreview(newsId, title, content, image) {
+    if (typeof openUniversalModal === 'function') {
+      const html = `
+        ${image ? `<img src="${image}" style="width:100%; height:180px; object-fit:cover; border-radius:8px; margin-bottom:15px;">` : ''}
+        <h2 style="margin-top:0; color:#fff; font-size:1.3rem;">${title}</h2>
+        <div style="color: var(--text-secondary); font-size:0.95rem; line-height:1.6; max-height: 350px; overflow-y: auto;">
+          ${content}
+        </div>
+      `;
+      openUniversalModal(html);
+    } else {
+      alert(title + '\n\n' + content);
+    }
+  }
+
+  // Función para compartir generando el enlace corto con el ID
+  function shareNewsItem(newsId, title) {
+    const shareUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(newsId);
+
+    if (navigator.share) {
+      navigator.share({
+        title: title,
+        text: 'Echa un vistazo a esta noticia: ' + title,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('¡Enlace de la noticia copiado al portapapeles!\n' + shareUrl);
+      });
+    }
+  }
+
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
 </body>
 </html>
