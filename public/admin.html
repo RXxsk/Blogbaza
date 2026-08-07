@@ -614,14 +614,14 @@
               </div>
 
               <div class="form-group" id="coverUrlBox">
-                <label><i class="fa-solid fa-image"></i> URL de Imagen de Portada</label>
-                <input type="text" id="itemCoverUrl" class="form-input" placeholder="https://ejemplo.com/imagen.jpg">
+                <label id="coverUrlLabel"><i class="fa-solid fa-image"></i> URL de Imagen de Portada</label>
+                <input type="text" id="itemCoverUrl" class="form-input" placeholder="https://ejemplo.com/imagen.jpg o URL de Twitter">
               </div>
 
               <!-- ZONA DE ESCRITURA EXTENDIDA -->
               <div class="form-group" id="contentBox">
-                <label><i class="fa-solid fa-code"></i> Cuerpo del Post / Contenido Extendido (HTML Soportado)</label>
-                <textarea id="itemContent" class="form-textarea" placeholder="Escribe o pega el contenido completo aquí. detallado..."></textarea>
+                <label id="contentLabel"><i class="fa-solid fa-code"></i> Cuerpo del Post / Contenido Extendido (HTML Soportado)</label>
+                <textarea id="itemContent" class="form-textarea" placeholder="Escribe o pega el contenido completo aquí..."></textarea>
               </div>
             </div>
 
@@ -805,10 +805,10 @@
 
       try {
         const res = await fetch(`${API_URL}/api/login`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ username, password })
-});
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
         const data = await res.json();
 
         if (res.ok && data.success) {
@@ -867,7 +867,9 @@
       const type = contentType.value;
       const categoryLabel = document.getElementById('categoryLabel');
       const coverUrlBox = document.getElementById('coverUrlBox');
+      const coverUrlLabel = document.getElementById('coverUrlLabel');
       const contentBox = document.getElementById('contentBox');
+      const contentLabel = document.getElementById('contentLabel');
       const itemCategory = document.getElementById('itemCategory');
 
       if (type === 'videos') {
@@ -885,8 +887,12 @@
         
         categoryLabel.textContent = 'Sub-Tag / Etiqueta de Noticia';
         newsSubTagSelect.classList.remove('hidden');
-        coverUrlBox.classList.add('hidden');
-        contentBox.classList.add('hidden');
+        
+        // Habilitar campos de imagen y contenido opcional para noticias
+        coverUrlBox.classList.remove('hidden');
+        coverUrlLabel.innerHTML = '<i class="fa-solid fa-image"></i> URL de Imagen / Twitter (Opcional)';
+        contentBox.classList.remove('hidden');
+        contentLabel.innerHTML = '<i class="fa-solid fa-code"></i> Texto Adicional o Código Twitter (Opcional)';
 
         if (!itemCategory.value) {
           itemCategory.value = newsSubTagSelect.value !== 'custom' ? newsSubTagSelect.value : '';
@@ -899,7 +905,9 @@
         categoryLabel.textContent = 'Categoría';
         newsSubTagSelect.classList.add('hidden');
         coverUrlBox.classList.remove('hidden');
+        coverUrlLabel.innerHTML = '<i class="fa-solid fa-image"></i> URL de Imagen de Portada';
         contentBox.classList.remove('hidden');
+        contentLabel.innerHTML = '<i class="fa-solid fa-code"></i> Cuerpo del Post / Contenido Extendido (HTML Soportado)';
       }
     });
 
@@ -915,7 +923,7 @@
     });
 
     // Crear o Editar Publicación
-    document.getElementById('createForm').addEventListener('submit', async (e) => {
+   document.getElementById('createForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const type = contentType.value;
       const editingId = document.getElementById('editingItemId').value;
@@ -946,6 +954,8 @@
       } else if (type === 'noticias') {
         payload.subtitulo = document.getElementById('itemSubtitle').value.trim();
         payload.categoria = document.getElementById('itemCategory').value.trim() || '📌 Aviso';
+        payload.coverUrl = document.getElementById('itemCoverUrl').value.trim();
+        payload.content = document.getElementById('itemContent').value;
         payload.badgeColor = 'green';
       } else if (type === 'repos') {
         payload.categoria = document.getElementById('repoCategory').value;
@@ -1081,6 +1091,8 @@
         document.getElementById('itemContent').value = item.content || '';
       } else if (type === 'noticias') {
         document.getElementById('itemSubtitle').value = item.subtitulo || '';
+        document.getElementById('itemCoverUrl').value = item.coverUrl || '';
+        document.getElementById('itemContent').value = item.content || '';
         const cat = item.categoria || item.category || '📌 Aviso';
         document.getElementById('itemCategory').value = cat;
 
@@ -1180,4 +1192,3 @@
   </script>
 </body>
 </html>
-
