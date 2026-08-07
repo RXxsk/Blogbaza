@@ -441,245 +441,329 @@
     <a href="about.html" class="mobile-nav-item"><i data-lucide="info"></i><span>Acerca</span></a>
   </nav>
 
-  <!-- SCRIPT DE LÓGICA DE TEMA, LUCIDE Y API DE REPOS CON MODAL -->
-    <script src="script.js"></script>
-  <script>
-    // Constante oficial de la API de Render
-    const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
-    
-    // URL de respaldo apuntando directamente carpeta data en GitHub
-    const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
+<!-- SCRIPT DE LÓGICA DE TEMA, LUCIDE Y API DE REPOS CON MODAL -->
+<script src="script.js"></script>
+<script>
+  // Constante oficial de la API de Render
+  const API_BASE_URL = 'https://rxtiobaza-data.onrender.com';
+  
+  // URL de respaldo apuntando directamente carpeta data en GitHub
+  const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      if (window.lucide) lucide.createIcons();
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (window.lucide) lucide.createIcons();
 
-      const container = document.getElementById('reposContainer');
-      const searchInput = document.getElementById('searchInput');
-      const filterBtns = document.querySelectorAll('.filter-btn');
-      const viewStyleBtns = document.querySelectorAll('.view-style-btn');
-      const clearBtn = document.getElementById('clearSearchBtn');
-      const modal = document.getElementById('repoModal');
-      const closeModalBtn = document.getElementById('closeRepoModal');
-      const modalBody = document.getElementById('modalBodyContent');
+    const container = document.getElementById('reposContainer');
+    const searchInput = document.getElementById('searchInput');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const viewStyleBtns = document.querySelectorAll('.view-style-btn');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    const modal = document.getElementById('repoModal');
+    const closeModalBtn = document.getElementById('closeRepoModal');
+    const modalBody = document.getElementById('modalBodyContent');
 
-      let allRepos = [];
-      let currentFilter = 'all';
-      let currentViewStyle = 'apps'; // 'apps' o 'compact'
+    let allRepos = [];
+    let currentFilter = 'all';
+    let currentViewStyle = 'apps'; // 'apps' o 'compact'
 
-      // 1. CARGAR DATOS DESDE LA API DE RENDER O RESPALDO DE GITHUB
-      async function fetchRepos() {
-        let reposData = [];
+    // 1. CARGAR DATOS DESDE LA API DE RENDER O RESPALDO DE GITHUB
+    async function fetchRepos() {
+      let reposData = [];
 
+      try {
         try {
-          try {
-            // Intento 1: Servidor principal en Render
-            const response = await fetch(`${API_BASE_URL}/api/repos`);
-            if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-            reposData = await response.json();
-          } catch (err) {
-            console.warn('Render no disponible para repos, cargando respaldo desde GitHub...');
-            // Intento 2 (Respaldo): Archivo JSON estático alojado en GitHub
-            const fallbackResponse = await fetch(`${FALLBACK_JSON_URL}/repos.json`);
-            if (!fallbackResponse.ok) throw new Error('Error al cargar respaldo de GitHub');
-            reposData = await fallbackResponse.json();
-          }
-
-          allRepos = Array.isArray(reposData) ? reposData : (reposData.repos || []);
-          
-          renderRepos();
-          updateCounters();
-        } catch (error) {
-          console.error('Error al cargar repositorios (Render y GitHub fallaron):', error);
-          container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Error al cargar los repositorios desde el servidor o el respaldo.</p>`;
+          // Intento 1: Servidor principal en Render
+          const response = await fetch(`${API_BASE_URL}/api/repos`);
+          if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+          reposData = await response.json();
+        } catch (err) {
+          console.warn('Render no disponible para repos, cargando respaldo desde GitHub...');
+          // Intento 2 (Respaldo): Archivo JSON estático alojado en GitHub
+          const fallbackResponse = await fetch(`${FALLBACK_JSON_URL}/repos.json`);
+          if (!fallbackResponse.ok) throw new Error('Error al cargar respaldo de GitHub');
+          reposData = await fallbackResponse.json();
         }
-      }
 
-      // 2. RENDERIZAR TARJETAS EN PANTALLA SEGÚN EL ESTILO DE VISTA ACTIVO Y CONDICIONANDO LOS ENLACES
-      function renderRepos() {
-        const query = searchInput.value.toLowerCase().trim();
+        allRepos = Array.isArray(reposData) ? reposData : (reposData.repos || []);
         
-        container.className = currentViewStyle === 'compact' ? 'repos-grid-compact' : 'repos-grid-apps';
+        renderRepos();
+        updateCounters();
 
-        const filtered = allRepos.filter(item => {
-          const category = (item.categoria || item.category || 'xbox').toLowerCase();
-          const title = (item.titulo || item.title || '').toLowerCase();
-          const excerpt = (item.descripcion || item.excerpt || '').toLowerCase();
-
-          const matchesCategory = (currentFilter === 'all' || category === currentFilter);
-          const matchesQuery = (title.includes(query) || excerpt.includes(query));
-
-          return matchesCategory && matchesQuery;
-        });
-
-        if (filtered.length === 0) {
-          container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No se encontraron repositorios disponibles.</p>`;
-          document.getElementById('resultsCount').textContent = `Se encontraron 0 herramientas`;
-          clearBtn.classList.toggle('hidden', query === '');
-          return;
+        // Verificar si la URL trae un ID para abrir la previsualización del repo automáticamente
+        const urlParams = new URLSearchParams(window.location.search);
+        const repoIdFromUrl = urlParams.get('id');
+        if (repoIdFromUrl) {
+          const targetRepo = allRepos.find(r => String(r._id || r.id) === String(repoIdFromUrl));
+          if (targetRepo) {
+            openModal(targetRepo);
+          }
         }
 
-        container.innerHTML = filtered.map((item, index) => {
-          const cat = item.categoria || item.category || 'XBOX';
-          const version = item.version ? `v${item.version}` : '';
-          const title = item.titulo || item.title || 'Sin título';
-          const desc = item.descripcion || item.excerpt || '';
-          const sizeOrBadge = item.size || item.badge || 'Open Source';
-          
-          // Verificación estricta de enlaces disponibles
-          const rawDownloadUrl = item.downloadUrl ? item.downloadUrl.trim() : '';
-          const hasDownload = rawDownloadUrl !== '' && rawDownloadUrl !== '#' && rawDownloadUrl !== 'undefined';
-          
-          const rawWebUrl = item.webUrl || item.website || '';
-          const rawWebUrlTrim = rawWebUrl ? rawWebUrl.trim() : '';
-          const hasWeb = rawWebUrlTrim !== '' && rawWebUrlTrim !== '#' && rawWebUrlTrim !== 'undefined';
+      } catch (error) {
+        console.error('Error al cargar repositorios (Render y GitHub fallaron):', error);
+        container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Error al cargar los repositorios desde el servidor o el respaldo.</p>`;
+      }
+    }
 
-          const logoUrl = item.logoUrl || item.avatar || '';
+    // 2. RENDERIZAR TARJETAS EN PANTALLA SEGÚN EL ESTILO DE VISTA ACTIVO Y CONDICIONANDO LOS ENLACES
+    function renderRepos() {
+      const query = searchInput.value.toLowerCase().trim();
+      
+      container.className = currentViewStyle === 'compact' ? 'repos-grid-compact' : 'repos-grid-apps';
 
-          if (currentViewStyle === 'compact') {
-            return `
-              <article class="post-card clickable-card" data-index="${index}" data-category="${cat}">
-                <div>
-                  ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="width: 32px; height: 32px; object-fit: cover; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border-color, #333);">` : ''}
-                  <div>
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
-                      <span class="post-category" style="font-size: 0.68rem; padding: 2px 6px;">${cat.toUpperCase()}</span>
-                      ${version ? `<span class="post-date" style="font-size: 0.7rem;">${version}</span>` : ''}
-                    </div>
-                    <h3 class="post-title">${title}</h3>
-                  </div>
-                </div>
-                <div class="post-footer" onclick="event.stopPropagation()">
-                  ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" title="Sitio Oficial"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Sitio</a>` : ''}
-                  ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener">Descargar <i data-lucide="download" style="width: 14px; height: 14px;"></i></a>` : ''}
-                </div>
-              </article>
-            `;
-          } else {
-            return `
-              <article class="post-card clickable-card" data-index="${index}" data-category="${cat}">
-                <div>
-                  <div class="post-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                      ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="width: 28px; height: 28px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color, #333);">` : ''}
-                      <span class="post-category">${cat.toUpperCase()}</span>
-                    </div>
-                    ${version ? `<span class="post-date">${version}</span>` : ''}
-                  </div>
-                  <h3 class="post-title" style="margin-bottom: 8px; font-size: 1.1rem;">${title}</h3>
-                  <p class="post-excerpt" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">${desc}</p>
-                </div>
-                <div class="post-footer" onclick="event.stopPropagation()">
-                  <span class="read-time" style="font-size: 0.8rem; color: var(--text-muted);"><i data-lucide="hard-drive" style="width: 14px; height: 14px; vertical-align: middle;"></i> ${sizeOrBadge}</span>
-                  <div style="display: flex; gap: 8px; align-items: center;">
-                    ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" title="Sitio Oficial"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Sitio</a>` : ''}
-                    ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener">Descargar <i data-lucide="download" style="width: 14px; height: 14px;"></i></a>` : ''}
-                  </div>
-                </div>
-              </article>
-            `;
-          }
-        }).join('');
+      const filtered = allRepos.filter(item => {
+        const category = (item.categoria || item.category || 'xbox').toLowerCase();
+        const title = (item.titulo || item.title || '').toLowerCase();
+        const excerpt = (item.descripcion || item.excerpt || '').toLowerCase();
 
-        if (window.lucide) lucide.createIcons();
+        const matchesCategory = (currentFilter === 'all' || category === currentFilter);
+        const matchesQuery = (title.includes(query) || excerpt.includes(query));
+
+        return matchesCategory && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No se encontraron repositorios disponibles.</p>`;
+        document.getElementById('resultsCount').textContent = `Se encontraron 0 herramientas`;
         clearBtn.classList.toggle('hidden', query === '');
-        document.getElementById('resultsCount').textContent = `Se encontraron ${filtered.length} herramientas`;
-
-        document.querySelectorAll('.clickable-card').forEach(card => {
-          card.addEventListener('click', () => {
-            const idx = card.getAttribute('data-index');
-            const data = filtered[idx];
-            openModal(data);
-          });
-        });
+        return;
       }
 
-      // 3. ABRIR VENTANA MODAL CON INFORMACIÓN EXTENDIDA Y ENLACES CONDICIONADOS
-      function openModal(item) {
+      container.innerHTML = filtered.map((item, index) => {
+        const cat = item.categoria || item.category || 'XBOX';
+        const version = item.version ? `v${item.version}` : '';
         const title = item.titulo || item.title || 'Sin título';
-        const desc = item.descripcion || item.excerpt || 'Sin descripción detallada.';
-        const extendedDesc = item.extendedDesc || item.content || desc;
-        const banner = item.bannerUrl || item.coverUrl || '';
-        const logo = item.logoUrl || item.avatar || '';
-        const author = item.autor || item.author || 'El Tio Baza';
+        const desc = item.descripcion || item.excerpt || '';
+        const sizeOrBadge = item.size || item.badge || 'Open Source';
+        
+        // Verificación estricta de enlaces disponibles
+        const rawDownloadUrl = item.downloadUrl ? item.downloadUrl.trim() : '';
+        const hasDownload = rawDownloadUrl !== '' && rawDownloadUrl !== '#' && rawDownloadUrl !== 'undefined';
         
         const rawWebUrl = item.webUrl || item.website || '';
         const rawWebUrlTrim = rawWebUrl ? rawWebUrl.trim() : '';
         const hasWeb = rawWebUrlTrim !== '' && rawWebUrlTrim !== '#' && rawWebUrlTrim !== 'undefined';
 
-        const rawDownloadUrl = item.downloadUrl ? item.downloadUrl.trim() : '';
-        const hasDownload = rawDownloadUrl !== '' && rawDownloadUrl !== '#' && rawDownloadUrl !== 'undefined';
+        const logoUrl = item.logoUrl || item.avatar || '';
 
-        const version = item.version ? `v${item.version}` : '';
+        if (currentViewStyle === 'compact') {
+          return `
+            <article class="post-card clickable-card" data-index="${index}" data-category="${cat}">
+              <div>
+                ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="width: 32px; height: 32px; object-fit: cover; border-radius: 8px; flex-shrink: 0; border: 1px solid var(--border-color, #333);">` : ''}
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                    <span class="post-category" style="font-size: 0.68rem; padding: 2px 6px;">${cat.toUpperCase()}</span>
+                    ${version ? `<span class="post-date" style="font-size: 0.7rem;">${version}</span>` : ''}
+                  </div>
+                  <h3 class="post-title">${title}</h3>
+                </div>
+              </div>
+              <div class="post-footer" onclick="event.stopPropagation()">
+                ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" title="Sitio Oficial"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Sitio</a>` : ''}
+                ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener">Descargar <i data-lucide="download" style="width: 14px; height: 14px;"></i></a>` : ''}
+              </div>
+            </article>
+          `;
+        } else {
+          return `
+            <article class="post-card clickable-card" data-index="${index}" data-category="${cat}">
+              <div>
+                <div class="post-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="width: 28px; height: 28px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color, #333);">` : ''}
+                    <span class="post-category">${cat.toUpperCase()}</span>
+                  </div>
+                  ${version ? `<span class="post-date">${version}</span>` : ''}
+                </div>
+                <h3 class="post-title" style="margin-bottom: 8px; font-size: 1.1rem;">${title}</h3>
+                <p class="post-excerpt" style="font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary);">${desc}</p>
+              </div>
+              <div class="post-footer" onclick="event.stopPropagation()">
+                <span class="read-time" style="font-size: 0.8rem; color: var(--text-muted);"><i data-lucide="hard-drive" style="width: 14px; height: 14px; vertical-align: middle;"></i> ${sizeOrBadge}</span>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" title="Sitio Oficial"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Sitio</a>` : ''}
+                  ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener">Descargar <i data-lucide="download" style="width: 14px; height: 14px;"></i></a>` : ''}
+                </div>
+              </div>
+            </article>
+          `;
+        }
+      }).join('');
 
-        modalBody.innerHTML = `
-          ${banner ? `<img src="${banner}" alt="Banner" class="repo-modal-banner">` : ''}
-          <div class="repo-modal-header-flex">
+      if (window.lucide) lucide.createIcons();
+      clearBtn.classList.toggle('hidden', query === '');
+      document.getElementById('resultsCount').textContent = `Se encontraron ${filtered.length} herramientas`;
+
+      document.querySelectorAll('.clickable-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const idx = card.getAttribute('data-index');
+          const data = filtered[idx];
+          openModal(data);
+        });
+      });
+    }
+
+    // 3. ABRIR VENTANA MODAL CON INFORMACIÓN EXTENDIDA Y ENLACES CONDICIONADOS
+    function openModal(item) {
+      window.currentActiveRepo = item; // Referencia global del repo abierto
+
+      const repoId = item._id || item.id || '';
+      const title = item.titulo || item.title || 'Sin título';
+      const desc = item.descripcion || item.excerpt || 'Sin descripción detallada.';
+      const extendedDesc = item.extendedDesc || item.content || desc;
+      const banner = item.bannerUrl || item.coverUrl || '';
+      const logo = item.logoUrl || item.avatar || '';
+      const author = item.autor || item.author || 'El Tio Baza';
+      
+      const rawWebUrl = item.webUrl || item.website || '';
+      const rawWebUrlTrim = rawWebUrl ? rawWebUrl.trim() : '';
+      const hasWeb = rawWebUrlTrim !== '' && rawWebUrlTrim !== '#' && rawWebUrlTrim !== 'undefined';
+
+      const rawDownloadUrl = item.downloadUrl ? item.downloadUrl.trim() : '';
+      const hasDownload = rawDownloadUrl !== '' && rawDownloadUrl !== '#' && rawDownloadUrl !== 'undefined';
+
+      const version = item.version ? `v${item.version}` : '';
+
+      modalBody.innerHTML = `
+        ${banner ? `<img src="${banner}" alt="Banner" class="repo-modal-banner">` : ''}
+        <div class="repo-modal-header-flex" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <div style="display: flex; align-items: center; gap: 12px;">
             ${logo ? `<img src="${logo}" alt="Logo" class="repo-modal-logo">` : ''}
             <div>
               <h2 style="margin: 0; font-size: 1.3rem; color: var(--text-main);">${title} ${version ? `<span style="font-size: 0.9rem; color: var(--primary-green); font-weight: 600;">(${version})</span>` : ''}</h2>
               <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: var(--text-muted);">Creador / Autor: <strong>${author}</strong></p>
             </div>
           </div>
-          <div style="margin-bottom: 24px; color: var(--text-main); line-height: 1.6; font-size: 0.95rem;">
-            <p>${extendedDesc.replace(/\n/g, '<br>')}</p>
-          </div>
-          <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--border-color, #333); padding-top: 18px;">
-            ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener" style="flex: 1; padding: 12px; text-align: center; justify-content: center;">Descargar Archivo <i data-lucide="download" style="width: 16px; height: 16px;"></i></a>` : ''}
-            ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" style="flex: 1; padding: 12px; text-align: center; justify-content: center;">Visitar Sitio Oficial <i data-lucide="external-link" style="width: 16px; height: 16px;"></i></a>` : ''}
-          </div>
-        `;
 
-        if (window.lucide) lucide.createIcons();
-        modal.classList.add('active');
-      }
+          <!-- Botón Compartir Integrado en la Modal -->
+          <button onclick="shareActiveRepoModal()" style="
+            color: #107C10;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 12px;
+            background: rgba(16, 124, 16, 0.12);
+            border: 1px solid rgba(16, 124, 16, 0.25);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+          " title="Compartir repositorio">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            Compartir
+          </button>
+        </div>
+        <div style="margin-bottom: 24px; color: var(--text-main); line-height: 1.6; font-size: 0.95rem;">
+          <p>${extendedDesc.replace(/\n/g, '<br>')}</p>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; border-top: 1px solid var(--border-color, #333); padding-top: 18px;">
+          ${hasDownload ? `<a href="${rawDownloadUrl}" class="repo-action-btn btn-download" target="_blank" rel="noopener" style="flex: 1; padding: 12px; text-align: center; justify-content: center;">Descargar Archivo <i data-lucide="download" style="width: 16px; height: 16px;"></i></a>` : ''}
+          ${hasWeb ? `<a href="${rawWebUrl}" class="repo-action-btn btn-official" target="_blank" rel="noopener" style="flex: 1; padding: 12px; text-align: center; justify-content: center;">Visitar Sitio Oficial <i data-lucide="external-link" style="width: 16px; height: 16px;"></i></a>` : ''}
+        </div>
+      `;
 
-      function closeModal() {
-        modal.classList.remove('active');
-      }
+      if (window.lucide) lucide.createIcons();
+      modal.classList.add('active');
+    }
 
-      closeModalBtn.addEventListener('click', closeModal);
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) closeModal();
-      });
+    function closeModal() {
+      modal.classList.remove('active');
+    }
 
-      // 4. ACTUALIZAR CONTADORES DE LOS BOTONES DE FILTRO DINÁMICAMENTE
-      function updateCounters() {
-        document.getElementById('countAll').textContent = allRepos.length;
-        document.getElementById('countXbox').textContent = allRepos.filter(i => (i.categoria || i.category) === 'xbox').length;
-        document.getElementById('countScripts').textContent = allRepos.filter(i => (i.categoria || i.category) === 'scripts').length;
-        document.getElementById('countUtils').textContent = allRepos.filter(i => (i.categoria || i.category) === 'utilidades').length;
-      }
-
-      // EVENTOS DE BÚSQUEDA, FILTROS Y CAMBIO DE ESTILOS DE VISTA
-      searchInput.addEventListener('input', renderRepos);
-      
-      clearBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        renderRepos();
-        searchInput.focus();
-      });
-
-      filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          filterBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentFilter = btn.getAttribute('data-filter');
-          renderRepos();
-        });
-      });
-
-      viewStyleBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          viewStyleBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentViewStyle = btn.getAttribute('data-view');
-          renderRepos();
-        });
-      });
-
-      // Ejecutar carga inicial
-      fetchRepos();
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
     });
-  </script>
+
+    // 4. ACTUALIZAR CONTADORES DE LOS BOTONES DE FILTRO DINÁMICAMENTE
+    function updateCounters() {
+      document.getElementById('countAll').textContent = allRepos.length;
+      document.getElementById('countXbox').textContent = allRepos.filter(i => (i.categoria || i.category) === 'xbox').length;
+      document.getElementById('countScripts').textContent = allRepos.filter(i => (i.categoria || i.category) === 'scripts').length;
+      document.getElementById('countUtils').textContent = allRepos.filter(i => (i.categoria || i.category) === 'utilidades').length;
+    }
+
+    // EVENTOS DE BÚSQUEDA, FILTROS Y CAMBIO DE ESTILOS DE VISTA
+    searchInput.addEventListener('input', renderRepos);
+    
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      renderRepos();
+      searchInput.focus();
+    });
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.getAttribute('data-filter');
+        renderRepos();
+      });
+    });
+
+    viewStyleBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        viewStyleBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentViewStyle = btn.getAttribute('data-view');
+        renderRepos();
+      });
+    });
+
+    // Ejecutar carga inicial
+    fetchRepos();
+  });
+
+  // FUNCIÓN DEDICADA PARA COMPARTIR EL REPOSITORIO ACTIVO CONSULTANDO SU API E IMAGEN
+  async function shareActiveRepoModal() {
+    const item = window.currentActiveRepo || {};
+    const repoId = item._id || item.id || '';
+    let shareTitle = item.titulo || item.title || document.title;
+    let shareImage = item.bannerUrl || item.coverUrl || item.logoUrl || item.avatar || '';
+
+    // Consultar API de Render para garantizar que traiga el banner o imagen actualizada
+    if (repoId) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/repos/${repoId}`);
+        if (res.ok) {
+          const data = await res.json();
+          const fetchedRepo = data.repo || data;
+          shareTitle = fetchedRepo.titulo || fetchedRepo.title || shareTitle;
+          shareImage = fetchedRepo.bannerUrl || fetchedRepo.coverUrl || fetchedRepo.logoUrl || shareImage;
+        }
+      } catch (e) {
+        // En caso de fallo de red se utilizan los datos del objeto cargado
+      }
+    }
+
+    // Construir enlace directo que redirige a la modal del repo incluyendo la imagen encoded
+    let shareUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(repoId);
+    if (shareImage) {
+      shareUrl += '&img=' + encodeURIComponent(shareImage);
+    }
+
+    if (navigator.share) {
+      navigator.share({
+        title: shareTitle,
+        text: 'Mira esta herramienta/repositorio: ' + shareTitle,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('¡Enlace del repositorio copiado al portapapeles!\n' + shareUrl);
+      });
+    }
+  }
+</script>
+
 </body>
 </html>
