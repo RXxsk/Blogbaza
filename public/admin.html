@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controlador Admin — El Tío Baza</title>
+  <title>Dashboard Central — El Tío Baza Admin</title>
   
   <!-- Fuentes Google -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,246 +16,459 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* Estilos adaptados para la interfaz del Panel Admin */
-    .admin-wrapper {
-      max-width: 1000px;
-      margin: 30px auto 100px auto;
-      padding: 0 16px;
+    /* ==========================================================
+       ESTILOS IPHONE GLASS 3D & XBOX NEON - ULTRA FLUIDO 60FPS
+       (Animaciones sutiles, ligeras, frescas y de alto rendimiento)
+       ========================================================== */
+    :root {
+      --admin-bg-deep: #030712;
+      --admin-glass: rgba(13, 20, 36, 0.72);
+      --admin-glass-hover: rgba(20, 32, 56, 0.88);
+      --admin-glass-card: rgba(8, 14, 28, 0.78);
+      --admin-border: rgba(0, 255, 102, 0.22);
+      --admin-border-glow: rgba(0, 255, 102, 0.55);
+      --admin-neon: #10ff75;
+      --admin-neon-glow: rgba(16, 255, 117, 0.28);
+      --admin-accent-cyan: #22d3ee;
+      --admin-accent-purple: #c084fc;
+      --admin-shadow-3d: 0 14px 35px -8px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.18);
+      --iphone-radius: 26px;
     }
 
-    /* PANTALLA DE LOGIN */
+    /* Scrollbar súper fluido y personalizado */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(3, 7, 18, 0.95);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(16, 255, 117, 0.25);
+      border-radius: 10px;
+      border: 2px solid rgba(3, 7, 18, 0.95);
+      transition: background 0.2s ease;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--admin-neon);
+      box-shadow: 0 0 10px var(--admin-neon);
+    }
+
+    body {
+      background-color: var(--admin-bg-deep);
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(16, 255, 117, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(34, 211, 238, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(192, 132, 252, 0.03) 0%, transparent 60%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+      /* Optimizaciones de hardware para 60fps reales */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .admin-wrapper {
+      max-width: 1280px;
+      margin: 25px auto 120px auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: smoothReveal 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes smoothReveal {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================================
+       PANTALLA DE LOGIN - ESTILO IPHONE GLASS 3D COMPACTO
+       ========================================================== */
     .login-box {
-      max-width: 400px;
-      margin: 60px auto;
-      background: var(--card-bg, #1e293b);
-      border: 1px solid var(--accent-green, #107c41);
-      border-radius: 16px;
-      padding: 30px 24px;
-      box-shadow: 0 10px 30px rgba(0, 255, 102, 0.1);
+      width: 100%;
+      max-width: 420px;
+      margin: 70px auto;
+      background: var(--admin-glass);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid var(--admin-border);
+      border-radius: var(--iphone-radius);
+      padding: 38px 30px;
+      box-shadow: var(--admin-shadow-3d), 0 0 25px rgba(16, 255, 117, 0.08);
       text-align: center;
+      position: relative;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .login-box:hover {
+      border-color: var(--admin-border-glow);
+      box-shadow: var(--admin-shadow-3d), 0 0 35px var(--admin-neon-glow);
+    }
+
+    .login-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--admin-neon), transparent);
+      animation: neonScan 4s linear infinite;
+    }
+
+    @keyframes neonScan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
     }
 
     .login-box h2 {
       font-family: 'Comfortaa', cursive;
-      color: var(--accent-green-bright, #00ff66);
-      margin-bottom: 15px;
+      color: var(--admin-neon);
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
+      text-shadow: 0 0 14px var(--admin-neon-glow);
     }
 
+    /* CAMPOS Y FORMULARIOS COMPACTOS Y DETALLADOS */
     .form-group {
       margin-bottom: 18px;
       text-align: left;
     }
 
     .form-group label {
-      display: block;
+      display: flex;
+      align-items: center;
+      gap: 7px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       margin-bottom: 6px;
-      color: var(--text-muted, #94a3b8);
+      color: #94a3b8;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
     }
 
     .form-input, .form-select, .form-textarea {
       width: 100%;
-      padding: 12px 14px;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border-color, #334155);
-      border-radius: 8px;
-      color: var(--text-color, #fff);
+      padding: 13px 16px;
+      background: rgba(5, 10, 20, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      color: #fff;
       font-family: 'Afacad Flux', sans-serif;
-      font-size: 0.95rem;
+      font-size: 1rem;
       box-sizing: border-box;
-      transition: all 0.2s ease;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-input:hover, .form-select:hover, .form-textarea:hover {
+      border-color: rgba(16, 255, 117, 0.3);
+      background: rgba(8, 14, 28, 0.95);
     }
 
     .form-input:focus, .form-select:focus, .form-textarea:focus {
       outline: none;
-      border-color: var(--accent-green-bright, #00ff66);
-      box-shadow: 0 0 8px rgba(0, 255, 102, 0.2);
+      border-color: var(--admin-neon);
+      box-shadow: 0 0 15px var(--admin-neon-glow), inset 0 0 6px rgba(16, 255, 117, 0.15);
+      background: rgba(3, 7, 15, 0.98);
     }
 
+    /* ==========================================================
+       ZONA DE ESCRITURA EXTENDIDA, CÓMODA Y FLUIDA
+       ========================================================== */
+    .form-textarea {
+      min-height: 200px;
+      resize: vertical;
+      line-height: 1.6;
+      font-size: 1.05rem;
+      font-family: 'Share Tech Mono', monospace;
+      background: rgba(3, 6, 14, 0.92);
+      border: 1px solid rgba(16, 255, 117, 0.2);
+    }
+
+    .form-textarea:focus {
+      border-color: var(--admin-neon);
+      box-shadow: 0 0 20px rgba(16, 255, 117, 0.25), inset 0 0 10px rgba(16, 255, 117, 0.1);
+    }
+
+    #repoExtendedDesc {
+      min-height: 260px;
+    }
+
+    /* GRID DE AUTOR Y AVATAR COMPACTO 3D */
     .author-avatar-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      background: rgba(15, 23, 42, 0.4);
-      padding: 15px;
-      border-radius: 10px;
-      border: 1px dashed var(--accent-green, #107c41);
+      gap: 14px;
+      background: rgba(4, 8, 18, 0.65);
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(16, 255, 117, 0.18);
       margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 3px rgba(255,255,255,0.05);
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       .author-avatar-grid {
         grid-template-columns: 1fr;
       }
     }
 
+    /* BOTONES ESTILO NEÓN 3D XBOX */
     .btn-admin {
       width: 100%;
-      background: var(--accent-green, #107c41);
-      color: #fff;
+      background: linear-gradient(135deg, #10ff75 0%, #059669 100%);
+      background-size: 200% auto;
+      color: #030712;
       border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.95rem;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-weight: 800;
+      font-size: 1.05rem;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(16, 124, 65, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      box-shadow: 0 6px 20px rgba(16, 255, 117, 0.25);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
     }
 
     .btn-admin:hover {
-      background: #14934d;
       transform: translateY(-1px);
+      box-shadow: 0 8px 25px rgba(16, 255, 117, 0.4);
     }
 
-    .btn-admin:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
+    .btn-admin:active {
+      transform: translateY(0);
     }
 
     .btn-cancel {
-      background: #475569;
+      background: rgba(15, 23, 42, 0.85);
+      color: #f87171;
       margin-top: 10px;
       box-shadow: none;
+      border: 1px solid rgba(248, 113, 113, 0.35);
     }
 
     .btn-cancel:hover {
-      background: #64748b;
+      background: rgba(248, 113, 113, 0.2);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
     }
 
-    /* DASHBOARD ADAPTATIVO */
+    /* DASHBOARD Y HEADER */
+    #dashboardSection {
+      width: 100%;
+    }
+
     .admin-header-panel {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid var(--border-color, #334155);
+      margin-bottom: 22px;
+      padding: 20px 28px;
+      background: var(--admin-glass);
+      border: 1px solid var(--admin-border);
+      border-radius: var(--iphone-radius);
+      backdrop-filter: blur(20px) saturate(160%);
+      box-shadow: var(--admin-shadow-3d);
       flex-wrap: wrap;
-      gap: 15px;
+      gap: 16px;
     }
 
+    /* TABS SUPERIORES CENTRADAS Y ESTILIZADAS */
     .admin-tabs {
       display: flex;
-      gap: 10px;
+      justify-content: center;
+      gap: 14px;
       margin-bottom: 25px;
-      border-bottom: 1px solid var(--border-color, #334155);
-      padding-bottom: 10px;
-      overflow-x: auto;
+      flex-wrap: wrap;
     }
 
     .tab-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted, #94a3b8);
-      padding: 10px 18px;
+      background: var(--admin-glass);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      padding: 12px 26px;
       font-family: 'Share Tech Mono', monospace;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       cursor: pointer;
-      border-radius: 6px;
-      white-space: nowrap;
-      transition: all 0.2s ease;
+      border-radius: 14px;
+      transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .tab-btn:hover {
+      color: #fff;
+      background: var(--admin-glass-hover);
+      border-color: rgba(16, 255, 117, 0.35);
     }
 
     .tab-btn.active {
-      background: rgba(16, 124, 65, 0.2);
-      color: var(--accent-green-bright, #00ff66);
-      border: 1px solid var(--accent-green, #107c41);
+      background: linear-gradient(135deg, rgba(16, 255, 117, 0.22) 0%, rgba(5, 150, 105, 0.3) 100%);
+      color: var(--admin-neon);
+      border-color: var(--admin-neon);
+      box-shadow: 0 4px 15px var(--admin-neon-glow);
+      font-weight: bold;
     }
 
+    /* TARJETA PRINCIPAL DEL FORMULARIO 3D IPHONE */
     .admin-card {
-      background: var(--card-bg, #1e293b);
-      border: 1px solid var(--border-color, #334155);
-      border-radius: 12px;
-      padding: 24px;
+      background: var(--admin-glass);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid var(--admin-border);
+      border-radius: var(--iphone-radius);
+      padding: 38px 42px;
       margin-bottom: 25px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      box-shadow: var(--admin-shadow-3d);
     }
 
+    /* ==========================================================
+       CONTROLADORES DE EDICIÓN Y GESTIÓN - ULTRA DETALLADOS Y COMPACTOS
+       ========================================================== */
     .item-list-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 16px;
-      background: rgba(15, 23, 42, 0.5);
-      border: 1px solid var(--border-color, #334155);
-      border-radius: 8px;
-      margin-bottom: 12px;
-      gap: 15px;
+      padding: 18px 24px;
+      background: var(--admin-glass-card);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      margin-bottom: 14px;
+      gap: 20px;
       flex-wrap: wrap;
+      transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+      box-shadow: inset 0 1px 2px rgba(255,255,255,0.03), 0 3px 12px rgba(0,0,0,0.25);
+    }
+
+    .item-list-row:hover {
+      border-color: var(--admin-border-glow);
+      transform: translateY(-1px);
+      background: rgba(14, 24, 44, 0.92);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(16, 255, 117, 0.1);
     }
 
     .item-info {
       flex: 1;
-      min-width: 200px;
+      min-width: 260px;
     }
 
     .item-info h4 {
       margin: 0 0 6px 0;
       color: #fff;
-      font-size: 1rem;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .item-info span {
-      font-size: 0.8rem;
-      color: var(--text-muted, #94a3b8);
+      font-size: 0.88rem;
+      color: #94a3b8;
       display: block;
-      line-height: 1.4;
+      line-height: 1.45;
+      font-family: 'Share Tech Mono', monospace;
     }
 
     .item-actions {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
+      align-items: center;
     }
 
+    /* BOTONES DE ACCIÓN EN CONTROLADORES DETALLADOS */
     .btn-action {
-      background: transparent;
-      border: 1px solid var(--border-color, #334155);
-      color: var(--text-muted, #94a3b8);
-      padding: 6px 12px;
-      border-radius: 6px;
+      background: rgba(10, 16, 32, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      padding: 9px 16px;
+      border-radius: 12px;
       cursor: pointer;
-      font-size: 0.8rem;
-      transition: all 0.2s ease;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
 
-    .btn-action.star { color: #eab308; border-color: #eab308; }
-    .btn-action.star.active { background: #eab308; color: #000; }
-    .btn-action.edit { color: #3b82f6; border-color: #3b82f6; }
-    .btn-action.edit:hover { background: #3b82f6; color: #fff; }
-    .btn-action.delete { color: #ef4444; border-color: #ef4444; }
-    .btn-action.delete:hover { background: #ef4444; color: #fff; }
+    .btn-action:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-action.star { color: #facc15; border-color: rgba(250, 204, 21, 0.4); }
+    .btn-action.star:hover { background: rgba(250, 204, 21, 0.2); box-shadow: 0 0 12px rgba(250, 204, 21, 0.3); }
+    .btn-action.star.active { background: #facc15; color: #030712; font-weight: bold; border-color: #facc15; box-shadow: 0 0 15px rgba(250, 204, 21, 0.5); }
+    
+    .btn-action.edit { color: var(--admin-accent-cyan); border-color: rgba(34, 211, 238, 0.4); }
+    .btn-action.edit:hover { background: rgba(34, 211, 238, 0.2); color: #fff; box-shadow: 0 0 15px rgba(34, 211, 238, 0.3); }
+    
+    .btn-action.delete { color: #f87171; border-color: rgba(248, 113, 113, 0.4); }
+    .btn-action.delete:hover { background: rgba(248, 113, 113, 0.2); color: #fff; box-shadow: 0 0 15px rgba(248, 113, 113, 0.3); }
 
     .hidden { display: none !important; }
+
+    /* ==========================================================
+       RESPONSIVO PERFECTO Y ADAPTABLE MÓVIL / ESCRITORIO
+       ========================================================== */
+    @media (max-width: 768px) {
+      .admin-wrapper {
+        padding: 0 12px;
+        margin: 15px auto 110px auto;
+      }
+      .login-box {
+        margin: 30px 10px;
+        padding: 28px 18px;
+        border-radius: 22px;
+      }
+      .admin-card {
+        padding: 24px 16px;
+        border-radius: 22px;
+      }
+      .admin-header-panel {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 18px 16px;
+        border-radius: 22px;
+      }
+      .item-list-row {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 16px;
+      }
+      .item-actions {
+        justify-content: center;
+      }
+      .tab-btn {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+      }
+    }
   </style>
 </head>
 <body>
 
-  <!-- BARRA DE NAVEGACIÓN SUPERIOR (ESCRITORIO & MÓVIL) -->
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
   <header class="navbar">
     <div class="nav-container">
       
-      <!-- Logo / Identidad Admin -->
       <a href="index.html" class="nav-logo">
         <div class="avatar-badge">
           <i class="fa-brands fa-xbox logo-icon"></i>
@@ -263,7 +476,6 @@
         <span>El Tio Baza <span class="logo-accent">Admin</span></span>
       </a>
 
-      <!-- Navegación de Escritorio -->
       <nav class="nav-sections desktop-only">
         <a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i> Ir a la Web</a>
         <a href="posts.html" class="nav-link">Posts</a>
@@ -272,7 +484,6 @@
       </nav>
 
       <div style="display: flex; align-items: center; gap: 10px;">
-        <!-- Botón de Tema con Foco (💡) y Animación -->
         <button id="themeToggleBtn" class="theme-btn" aria-label="Cambiar tema">
           <i data-lucide="lightbulb" class="icon-bulb"></i>
         </button>
@@ -285,14 +496,14 @@
     </div>
   </header>
 
-  <!-- CONTENEDOR PRINCIPAL -->
+  <!-- CONTENEDOR PRINCIPAL FLUIDO Y 3D -->
   <main class="admin-wrapper">
 
     <!-- 1. PANTALLA DE LOGIN -->
     <section id="loginSection" class="login-box">
-      <h2><i class="fa-brands fa-xbox"></i> Acceso Admin</h2>
-      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
-        Ingresa tus credenciales para administrar el portal.
+      <h2><i class="fa-brands fa-xbox"></i> Acceso Central</h2>
+      <p style="color: #94a3b8; font-size: 0.88rem; margin-bottom: 22px;">
+        Introduce tus credenciales para administrar el portal.
       </p>
 
       <form id="loginForm">
@@ -308,17 +519,17 @@
           <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
         </button>
       </form>
-      <div id="loginError" style="color: #ef4444; margin-top: 15px; font-size: 0.85rem;" class="hidden"></div>
+      <div id="loginError" style="color: #f87171; margin-top: 12px; font-size: 0.85rem;" class="hidden"></div>
     </section>
 
-    <!-- 2. PANEL ADMINISTRATIVO (DASHBOARD) -->
+    <!-- 2. DASHBOARD DE ADMINISTRACIÓN -->
     <section id="dashboardSection" class="hidden">
       
       <div class="admin-header-panel">
         <div>
-          <h1 style="font-family: 'Comfortaa', cursive; margin: 0 0 5px 0; font-size: 1.6rem;">Controlador de Contenido</h1>
-          <span style="color: var(--accent-green-bright); font-family: 'Share Tech Mono', monospace; font-size: 0.85rem;">
-            <i class="fa-solid fa-circle-check"></i> Sesión Autenticada
+          <h1 style="font-family: 'Comfortaa', cursive; margin: 0 0 4px 0; font-size: 1.6rem; color: #fff;">Panel de Control</h1>
+          <span style="color: var(--admin-neon); font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; text-shadow: 0 0 8px var(--admin-neon-glow);">
+            <i class="fa-solid fa-circle-check"></i> Sesión Segura Activa
           </span>
         </div>
         <button id="logoutBtn" class="btn-action delete">
@@ -326,7 +537,7 @@
         </button>
       </div>
 
-      <!-- TABS DE NAVEGACIÓN DENTRO DEL ADMIN -->
+      <!-- TABS DE NAVEGACIÓN SUPERIOR CENTRADAS -->
       <div class="admin-tabs">
         <button id="tabBtnCreate" class="tab-btn active" data-tab="create">
           <i class="fa-solid fa-plus-circle"></i> <span id="tabCreateText">Publicar Nuevo</span>
@@ -336,19 +547,18 @@
         </button>
       </div>
 
-      <!-- TAB 1: FORMULARIO DE PUBLICACIÓN / EDICIÓN -->
+      <!-- TAB 1: FORMULARIO DE CREACIÓN / EDICIÓN -->
       <div id="tabCreate" class="tab-content">
         <div class="admin-card">
-          <h3 id="formCardTitle" style="margin-top:0; font-family: 'Comfortaa', cursive; color: var(--accent-green-bright); font-size: 1.2rem;">
+          <h3 id="formCardTitle" style="margin-top:0; font-family: 'Comfortaa', cursive; color: var(--admin-neon); font-size: 1.3rem; margin-bottom: 24px; display: flex; align-items: center; gap: 10px;">
             <i class="fa-solid fa-pen-to-square"></i> Crear Nueva Publicación
           </h3>
           
           <form id="createForm">
-            <!-- Campo oculto para guardar el ID si estamos editando -->
             <input type="hidden" id="editingItemId" value="">
 
             <div class="form-group">
-              <label>Tipo de Contenido</label>
+              <label><i class="fa-solid fa-layer-group"></i> Tipo de Contenido</label>
               <select id="contentType" class="form-select">
                 <option value="posts">📝 Post / Artículo de Blog</option>
                 <option value="noticias">📰 Noticia Rápida</option>
@@ -357,10 +567,10 @@
               </select>
             </div>
 
-            <!-- SECCIÓN: SELECCIÓN DE AUTOR Y AVATAR -->
+            <!-- SECCIÓN DE AUTOR Y AVATAR -->
             <div class="author-avatar-grid">
               <div class="form-group" style="margin-bottom: 0;">
-                <label><i class="fa-solid fa-user-ninja"></i> Autor de la publicación</label>
+                <label><i class="fa-solid fa-user-ninja"></i> Autor</label>
                 <select id="itemAuthor" class="form-select" onchange="updateDefaultAvatar(this.value)">
                   <option value="RXx8">RXx8</option>
                   <option value="El Tio Baza" selected>El Tio Baza</option>
@@ -369,7 +579,7 @@
               </div>
 
               <div class="form-group" style="margin-bottom: 0;">
-                <label><i class="fa-solid fa-image-portrait"></i> Avatar para mostrar</label>
+                <label><i class="fa-solid fa-image-portrait"></i> Avatar</label>
                 <select id="itemAvatar" class="form-select">
                   <option value="Avatar RXx8">Avatar RXx8</option>
                   <option value="Avatar Baza" selected>Avatar Baza</option>
@@ -379,23 +589,21 @@
             </div>
 
             <div class="form-group">
-              <label>Título / Encabezado</label>
-              <input type="text" id="itemTitle" class="form-input" placeholder="Ej: Nuevo Release de Xb Aurora..." required>
+              <label><i class="fa-solid fa-heading"></i> Título / Encabezado</label>
+              <input type="text" id="itemTitle" class="form-input" placeholder="Ej: Nueva Actualización de Xbox..." required>
             </div>
 
-            <!-- Campos dinámicos para Posts y Noticias -->
+            <!-- CAMPOS DINÁMICOS POSTS / NOTICIAS -->
             <div id="postFields">
               <div class="form-group">
-                <label>Subtítulo / Resumen Corto</label>
+                <label><i class="fa-solid fa-align-left"></i> Subtítulo / Resumen Corto</label>
                 <input type="text" id="itemSubtitle" class="form-input" placeholder="Breve descripción del artículo">
               </div>
 
               <div class="form-group">
-                <!-- Etiqueta dinámica de categoría/Sub-tag -->
-                <label id="categoryLabel">Categoría</label>
+                <label id="categoryLabel"><i class="fa-solid fa-tag"></i> Categoría</label>
                 <input type="text" id="itemCategory" class="form-input" placeholder="Tutoriales, Modding, Software...">
                 
-                <!-- Contenedor para Sub-Tag / Aviso específico de Noticias -->
                 <select id="newsSubTagSelect" class="form-select hidden" style="margin-top: 8px;">
                   <option value="📌 Aviso" selected>📌 Aviso</option>
                   <option value="🔄 Actualización">🔄 Actualización</option>
@@ -406,32 +614,33 @@
               </div>
 
               <div class="form-group" id="coverUrlBox">
-                <label>URL de Imagen de Portada</label>
+                <label><i class="fa-solid fa-image"></i> URL de Imagen de Portada</label>
                 <input type="text" id="itemCoverUrl" class="form-input" placeholder="https://ejemplo.com/imagen.jpg">
               </div>
 
+              <!-- ZONA DE ESCRITURA EXTENDIDA -->
               <div class="form-group" id="contentBox">
-                <label>Cuerpo del Post (Soporta etiquetas HTML como &lt;h2&gt;, &lt;p&gt;, &lt;code&gt;)</label>
-                <textarea id="itemContent" class="form-textarea" rows="8" placeholder="Escribe el contenido completo aquí..."></textarea>
+                <label><i class="fa-solid fa-code"></i> Cuerpo del Post / Contenido Extendido (HTML Soportado)</label>
+                <textarea id="itemContent" class="form-textarea" placeholder="Escribe o pega el contenido completo aquí. detallado..."></textarea>
               </div>
             </div>
 
-            <!-- Campos dinámicos para Videos -->
+            <!-- CAMPOS DINÁMICOS VIDEOS -->
             <div id="videoFields" class="hidden">
               <div class="form-group">
-                <label>ID de Video de YouTube</label>
+                <label><i class="fa-brands fa-youtube"></i> ID de Video de YouTube</label>
                 <input type="text" id="youtubeId" class="form-input" placeholder="Ej: dQw4w9WgXcQ (solo el ID)">
               </div>
               <div class="form-group">
-                <label>Descripción del Video</label>
-                <textarea id="videoDesc" class="form-textarea" rows="3" placeholder="Detalles sobre este video..."></textarea>
+                <label><i class="fa-solid fa-file-lines"></i> Descripción del Video</label>
+                <textarea id="videoDesc" class="form-textarea" rows="4" placeholder="Detalles sobre este video..."></textarea>
               </div>
             </div>
 
-            <!-- Campos dinámicos avanzados para Repositorios -->
+            <!-- CAMPOS DINÁMICOS REPOSITORIOS -->
             <div id="reposFields" class="hidden">
               <div class="form-group">
-                <label>Categoría del Repositorio (Filtro web)</label>
+                <label><i class="fa-solid fa-filter"></i> Categoría del Repositorio</label>
                 <select id="repoCategory" class="form-select">
                   <option value="xbox">🎮 Emu / Consolas (xbox)</option>
                   <option value="scripts">💻 BIOS & DEP (scripts)</option>
@@ -439,36 +648,36 @@
                 </select>
               </div>
               <div class="form-group">
-                <label>Versión del Software / Tool</label>
+                <label><i class="fa-solid fa-code-branch"></i> Versión del Software</label>
                 <input type="text" id="repoVersion" class="form-input" placeholder="Ej: v1.0.4 o Release Final">
               </div>
               <div class="form-group">
-                <label>Badge / Tamaño (Se muestra en la tarjeta)</label>
+                <label><i class="fa-solid fa-weight-scale"></i> Badge / Tamaño</label>
                 <input type="text" id="repoSize" class="form-input" placeholder="Ej: 15.4 MB o Open Source">
               </div>
               <div class="form-group">
-                <label>Enlace de Descarga (GitHub, MediaFire, Mega, etc.)</label>
+                <label><i class="fa-solid fa-download"></i> Enlace de Descarga</label>
                 <input type="text" id="repoDownloadUrl" class="form-input" placeholder="https://github.com/... o enlace directo">
               </div>
               <div class="form-group">
-                <label>URL del Logo Pequeño (Esquina de la tarjeta)</label>
+                <label><i class="fa-solid fa-icons"></i> URL del Logo Pequeño</label>
                 <input type="text" id="repoLogoUrl" class="form-input" placeholder="https://ejemplo.com/logo.png">
               </div>
               <div class="form-group">
-                <label>URL de Imagen Banner (Horizontal para la ventana modal)</label>
+                <label><i class="fa-solid fa-panorama"></i> URL de Imagen Banner</label>
                 <input type="text" id="repoBannerUrl" class="form-input" placeholder="https://ejemplo.com/banner.jpg">
               </div>
               <div class="form-group">
-                <label>URL del Sitio Web Oficial del Creador (Opcional)</label>
-                <input type="text" id="repoWebUrl" class="form-input" placeholder="https://github.com/tu-usuario">
+                <label><i class="fa-solid fa-globe"></i> Sitio Web Oficial (Opcional)</label>
+                <input type="text" id="repoWebUrl" class="form-input" placeholder="https://github.com/usuario">
               </div>
               <div class="form-group">
-                <label>Descripción Corta (Vista previa en la tarjeta)</label>
-                <textarea id="repoDesc" class="form-textarea" rows="2" placeholder="Breve explicación visible en la tarjeta..."></textarea>
+                <label><i class="fa-solid fa-text-width"></i> Descripción Corta</label>
+                <textarea id="repoDesc" class="form-textarea" rows="3" placeholder="Breve explicación visible en la tarjeta..."></textarea>
               </div>
               <div class="form-group">
-                <label>Información Detallada / Extensa (Se muestra al hacer clic en la ventana emergente)</label>
-                <textarea id="repoExtendedDesc" class="form-textarea" rows="5" placeholder="Instrucciones completas, características, notas del desarrollador..."></textarea>
+                <label><i class="fa-solid fa-file-code"></i> Información Detallada / del Repositorio</label>
+                <textarea id="repoExtendedDesc" class="form-textarea" placeholder="Instrucciones completas, características, notas del desarrollador.."></textarea>
               </div>
             </div>
 
@@ -486,9 +695,11 @@
       <!-- TAB 2: GESTOR DE CONTENIDOS -->
       <div id="tabManage" class="tab-content hidden">
         <div class="admin-card">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-            <h3 style="margin:0; font-family: 'Comfortaa', cursive;"><i class="fa-solid fa-folder-open"></i> Contenido Registrado</h3>
-            <select id="manageTypeSelect" class="form-select" style="width: 180px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 12px;">
+            <h3 style="margin:0; font-family: 'Comfortaa', cursive; color: #fff; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-folder-open"></i> Contenido Registrado y Controladores
+            </h3>
+            <select id="manageTypeSelect" class="form-select" style="width: 220px;">
               <option value="posts">Posts</option>
               <option value="noticias">Noticias</option>
               <option value="videos">Videos</option>
@@ -497,7 +708,6 @@
           </div>
 
           <div id="itemsContainer">
-            <!-- Los elementos se renderizan dinámicamente -->
           </div>
         </div>
       </div>
@@ -516,7 +726,7 @@
 
   <!-- FOOTER -->
   <footer class="footer">
-    <p>© 2026 El Tio Baza Blog. Panel de Administración Centralizado.</p>
+    <p>© 2026 El Tio Baza Blog. Panel de Administración.</p>
   </footer>
 
   <script>
