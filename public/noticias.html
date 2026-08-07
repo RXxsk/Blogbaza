@@ -115,7 +115,7 @@
       lucide.createIcons();
     }
 
-    // Configurar buscador y pestañas de modo si existen en la interfaz
+    // Configurar buscador en tiempo real
     const searchInput = document.getElementById('newsSearchInput');
     const clearBtn = document.getElementById('clearNewsSearchBtn');
     
@@ -134,8 +134,20 @@
       });
     }
 
-    // Cargar directamente las noticias desde la API del admin
-    fetchAndRenderNoticias();
+    // Cargar noticias desde la API con soporte para auto-abrir por ID (?id=...)
+    fetchAndRenderNoticias().then(() => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const newsIdFromUrl = urlParams.get('id');
+      if (newsIdFromUrl && allNewsData.length > 0) {
+        const targetNews = allNewsData.find(n => String(n._id || n.id) === String(newsIdFromUrl));
+        if (targetNews) {
+          const title = targetNews.titulo || targetNews.title || 'Noticia';
+          const content = targetNews.contenido || targetNews.description || '';
+          const image = targetNews.coverUrl || targetNews.imagen || targetNews.image || '';
+          openNewsPreview(newsIdFromUrl, title, content, image);
+        }
+      }
+    });
   });
 
   /**
@@ -143,7 +155,6 @@
    */
   async function fetchAndRenderNoticias() {
     const container = document.getElementById('noticiasGridContainer');
-    const resultsText = document.getElementById('newsResultsText');
 
     try {
       let response;
@@ -190,7 +201,7 @@
     renderFilteredNews();
   }
 
-  // Renderizar y filtrar noticias con vista previa, buscador e imagen
+  // Renderizar y filtrar noticias manteniendo el diseño 3D original
   function renderFilteredNews() {
     const container = document.getElementById('noticiasGridContainer');
     const resultsText = document.getElementById('newsResultsText');
@@ -199,7 +210,6 @@
 
     if (!container) return;
 
-    // Aplicar filtros por modo y texto de búsqueda
     const filtered = allNewsData.filter(item => {
       const category = (item.categoria || item.category || 'general').toLowerCase();
       const title = (item.titulo || item.title || '').toLowerCase();
@@ -227,7 +237,7 @@
       return;
     }
 
-    // Asignar la clase del grid 3D transparente de la sección de inicio
+    // Asegurar estructura de grid 3D transparente idéntica a la home
     container.className = 'news-3d-grid mb-4';
 
     container.innerHTML = filtered.map(item => {
@@ -243,32 +253,32 @@
       if (category.toLowerCase() === 'lanzamientos') badgeClass = 'info';
 
       return `
-        <article class="news-item" style="position: relative; display: flex; flex-direction: column; gap: 12px; cursor: pointer;" onclick="openNewsPreview('${newsId}', ${JSON.stringify(title)}, ${JSON.stringify(content)}, ${JSON.stringify(image)})">
+        <article class="news-item" style="cursor: pointer;" onclick="openNewsPreview('${newsId}', ${JSON.stringify(title)}, ${JSON.stringify(content)}, ${JSON.stringify(image)})">
           
-          ${image ? `<div style="width: 100%; height: 150px; border-radius: 10px; overflow: hidden;"><img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" style="width: 100%; height: 100%; object-fit: cover;"></div>` : ''}
-          
-          <div style="display: flex; justify-content: space-between; align-items: center;">
+          ${image ? `<div style="width: 100%; height: 140px; border-radius: 8px; overflow: hidden; margin-bottom: 10px;"><img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" style="width: 100%; height: 100%; object-fit: cover;"></div>` : ''}
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <span class="news-badge ${badgeClass}">${escapeHTML(category)}</span>
             
-            <!-- Botón de compartir a base del ID -->
+            <!-- Botón de compartir aislado por ID -->
             <button onclick="
               event.stopPropagation();
               shareNewsItem('${newsId}', ${JSON.stringify(title)});
             " style="
               color: #107C10;
-              padding: 6px 10px;
-              border-radius: 8px;
+              padding: 4px 8px;
+              border-radius: 6px;
               background: rgba(16, 124, 16, 0.15);
               border: 1px solid rgba(16, 124, 16, 0.3);
               cursor: pointer;
               display: inline-flex;
               align-items: center;
               gap: 4px;
-              font-size: 0.75rem;
+              font-size: 0.7rem;
               font-weight: 600;
               z-index: 10;
-            " title="Compartir esta noticia">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            " title="Compartir noticia">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="18" cy="5" r="3"></circle>
                 <circle cx="6" cy="12" r="3"></circle>
                 <circle cx="18" cy="19" r="3"></circle>
@@ -279,9 +289,9 @@
           </div>
 
           <div class="news-content" style="flex: 1;">
-            <h4 style="margin: 0 0 8px 0; color: #fff;">${escapeHTML(title)}</h4>
-            <p style="margin: 0 0 12px 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.4;">${escapeHTML(content.replace(/<[^>]*>?/gm, ''))}</p>
-            <div class="news-date" style="display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted);">
+            <h4 style="margin: 6px 0; color: #fff;">${escapeHTML(title)}</h4>
+            <p style="margin: 0 0 10px 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.4;">${escapeHTML(content.replace(/<[^>]*>?/gm, ''))}</p>
+            <div class="news-date">
               <i data-lucide="calendar" style="width: 14px; height: 14px;"></i>
               <span>${escapeHTML(date)}</span>
             </div>
@@ -295,7 +305,7 @@
     }
   }
 
-  // Función para abrir la previsualización modal de la noticia al hacer clic
+  // Previsualización de la noticia en modal universal
   function openNewsPreview(newsId, title, content, image) {
     if (typeof openUniversalModal === 'function') {
       const html = `
@@ -311,7 +321,7 @@
     }
   }
 
-  // Función para compartir generando el enlace corto con el ID
+  // Compartir mediante URL limpia con ID
   function shareNewsItem(newsId, title) {
     const shareUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(newsId);
 
