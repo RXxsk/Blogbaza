@@ -928,9 +928,10 @@
     const modalBody = document.getElementById('postModalBody');
     if (!modalBody) return;
 
-    // Guardamos la referencia del post activo para que el botón de compartir la consulte
+    // Guardamos la referencia del post activo para que la consulte cualquier función
     window.currentActivePost = post;
 
+    const postId = post._id || post.id || '';
     const title = post.titulo || post.title || 'Sin título';
     const category = post.categoria || post.category || 'General';
     const author = post.autor || post.author || 'El Tío Baza';
@@ -950,12 +951,39 @@
 
       <h1 class="modal-post-title">${escapeHTML(title)}</h1>
 
-      <div class="modal-post-author-box">
-        <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="modal-post-author-avatar" />
-        <div class="modal-post-author-details">
-          <span class="post-compact-meta-author">${escapeHTML(author)}</span>
-          <span style="font-size: 0.8rem; color: var(--text-secondary);">Autor oficial</span>
+      <div class="modal-post-author-box" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="${escapeHTML(avatar)}" alt="${escapeHTML(author)}" class="modal-post-author-avatar" />
+          <div class="modal-post-author-details">
+            <span class="post-compact-meta-author">${escapeHTML(author)}</span>
+            <span style="font-size: 0.8rem; color: var(--text-secondary);">Autor oficial</span>
+          </div>
         </div>
+
+        <!-- Botón Compartir Integrado en la Previsualización Modal -->
+        <button onclick="shareActiveModalPost()" style="
+          color: #107C10;
+          font-size: 13px;
+          font-weight: 600;
+          padding: 8px 14px;
+          border-radius: 12px;
+          background: rgba(16, 124, 16, 0.12);
+          border: 1px solid rgba(16, 124, 16, 0.25);
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.2s ease;
+        " title="Compartir publicación">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#107C10" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Compartir
+        </button>
       </div>
 
       ${image ? `<img src="${escapeHTML(image)}" alt="${escapeHTML(title)}" class="modal-post-featured-img" />` : ''}
@@ -966,6 +994,47 @@
     `;
 
     if (window.lucide) lucide.createIcons();
+  }
+
+  // Función dedicada para compartir la publicación activa desde el Modal consultando la API
+  async function shareActiveModalPost() {
+    const post = window.currentActivePost || {};
+    const postId = post._id || post.id || '';
+    let shareTitle = post.titulo || post.title || document.title;
+    let shareImage = post.coverUrl || post.cover || post.imagen || post.image || '';
+
+    // Consultar la API para asegurar los datos y la portada más reciente
+    if (postId) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/posts/${postId}`);
+        if (res.ok) {
+          const data = await res.json();
+          const fetchedPost = data.post || data;
+          shareTitle = fetchedPost.titulo || fetchedPost.title || shareTitle;
+          shareImage = fetchedPost.coverUrl || fetchedPost.banner || fetchedPost.imagen || shareImage;
+        }
+      } catch (e) {
+        // En caso de fallo se preservan los valores locales
+      }
+    }
+
+    // Generación del enlace directo con el identificador e imagen encoded
+    let shareUrl = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(postId);
+    if (shareImage) {
+      shareUrl += '&img=' + encodeURIComponent(shareImage);
+    }
+
+    if (navigator.share) {
+      navigator.share({
+        title: shareTitle,
+        text: 'Echa un vistazo a esta publicación: ' + shareTitle,
+        url: shareUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('¡Enlace de la publicación copiado al portapapeles!\n' + shareUrl);
+      });
+    }
   }
 
   function closePostPreviewModal() {
