@@ -11,7 +11,7 @@
     "subtitulo": "",
     "categoria": "General",
     "coverUrl": "",
-    "content": "<H2> HOLA <H2>\n\n<p><br>\n    <a href=\"google.com\" style=\"color: #107C10; text-decoration: none; font-size: 14px; font-weight: 500;\">\n      Click Aquí \n    </a>\n  </p>",
+    "content": "<H2> HOLA <H2>\n\n<p><br>\n    <a src=\"google.com\" style=\"color: #107C10; text-decoration: none; font-size: 14px; font-weight: 500;\">\n      Click Aquí \n    </a>\n  </p>",
     "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
     "fecha": "07 ago 2026"
   },
