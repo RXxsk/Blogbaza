@@ -64,8 +64,15 @@
       flex-direction: column;
       cursor: pointer;
       transform-style: preserve-3d;
+      backface-visibility: hidden;
+      z-index: 1;
       transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease, border-color 0.4s ease;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* Asegurar que el clic recaiga siempre sobre la tarjeta principal */
+    .news-3d-card * {
+      pointer-events: none;
     }
 
     .news-3d-card:hover {
@@ -1021,7 +1028,7 @@
                 const date = item.fecha || item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Reciente');
 
                 return `
-                  <div class="news-3d-card" onclick='showDetailedNewsModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)}, ${JSON.stringify(author)}, ${JSON.stringify(date)}, ${JSON.stringify(category)})'>
+                  <div class="news-3d-card" onclick='event.stopPropagation(); showDetailedNewsModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)}, ${JSON.stringify(author)}, ${JSON.stringify(date)}, ${JSON.stringify(category)})'>
                     <div class="news-3d-media">
                       <img src="${cover}" alt="${title}">
                       <div style="position: absolute; top: 10px; left: 10px;">
