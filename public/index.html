@@ -70,11 +70,6 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
-    /* Asegurar que el clic recaiga siempre sobre la tarjeta principal */
-    .news-3d-card * {
-      pointer-events: none;
-    }
-
     .news-3d-card:hover {
       transform: translateY(-6px) rotateX(3deg) rotateY(-3deg) scale(1.02);
       border-color: var(--primary-green, #107c10);
@@ -946,6 +941,9 @@
     // URL de respaldo apuntando directamente a tu carpeta data en GitHub
     const FALLBACK_JSON_URL = 'https://raw.githubusercontent.com/RXxsk/Blogbaza/main/data';
 
+    // Variable global segura para almacenar las noticias cargadas
+    let globalNoticiasList = [];
+
     // Inicialización de íconos de Lucide
     document.addEventListener('DOMContentLoaded', () => {
       if (window.lucide) lucide.createIcons();
@@ -979,8 +977,19 @@
         .replace(/"/g, '&quot;');
     }
 
-    // Función para mostrar detalle de noticia en el modal
-    function showDetailedNewsModal(title, content, cover, author, date, category) {
+    // Función segura para mostrar detalle de noticia usando el índice del arreglo global
+    function openNewsByIndex(index) {
+      const item = globalNoticiasList[index];
+      if (!item) return;
+
+      const title = item.titulo || item.title || 'Sin título';
+      const subtitle = item.subtitulo || item.descripcion || item.summary || '';
+      const fullContent = item.content || item.contenido || subtitle;
+      const cover = item.coverUrl || item.image || item.imagen || 'blogpre.jpg';
+      const category = item.categoria || item.category || 'Noticia';
+      const author = item.autor || item.author || 'El Tío Baza';
+      const date = item.fecha || item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Reciente');
+
       const html = `
         ${cover ? `<img src="${cover}" style="width:100%; height:200px; object-fit:cover; border-radius:12px; margin-bottom:15px;">` : ''}
         <div style="margin-bottom:10px;">
@@ -992,7 +1001,7 @@
           <span>Fecha: ${date}</span>
         </div>
         <div style="color: var(--text-secondary); font-size:0.95rem; line-height:1.6; max-height: 350px; overflow-y: auto;">
-          ${content}
+          ${fullContent}
         </div>
       `;
       openUniversalModal(html);
@@ -1015,28 +1024,30 @@
             const noticias = await resNoticias.json();
             const noticiasContainer = document.getElementById('homeNoticiasContainer');
             const noticiasList = Array.isArray(noticias) ? noticias : (noticias.noticias || []);
+            
+            // Guardamos en la variable global de forma segura
+            globalNoticiasList = noticiasList;
             const latestNoticias = noticiasList.slice(0, 3);
 
             if (latestNoticias.length > 0 && noticiasContainer) {
-              noticiasContainer.innerHTML = latestNoticias.map(item => {
+              noticiasContainer.innerHTML = latestNoticias.map((item, idx) => {
                 const title = item.titulo || item.title || 'Sin título';
                 const subtitle = item.subtitulo || item.descripcion || item.summary || 'Sin descripción disponible...';
-                const fullContent = item.content || item.contenido || subtitle;
                 const cover = item.coverUrl || item.image || item.imagen || 'blogpre.jpg';
                 const category = item.categoria || item.category || 'Noticia';
                 const author = item.autor || item.author || 'El Tío Baza';
                 const date = item.fecha || item.date || (item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Reciente');
 
                 return `
-                  <div class="news-3d-card" onclick='event.stopPropagation(); showDetailedNewsModal(${JSON.stringify(title)}, ${JSON.stringify(fullContent)}, ${JSON.stringify(cover)}, ${JSON.stringify(author)}, ${JSON.stringify(date)}, ${JSON.stringify(category)})'>
+                  <div class="news-3d-card" onclick="openNewsByIndex(${idx})">
                     <div class="news-3d-media">
-                      <img src="${cover}" alt="${title}">
+                      <img src="${cover}" alt="${escapeHTML(title)}">
                       <div style="position: absolute; top: 10px; left: 10px;">
                         <span style="background: rgba(16,124,16,0.85); backdrop-filter: blur(4px); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;">${category}</span>
                       </div>
                     </div>
                     <div class="news-3d-content">
-                      <h3 style="margin: 0; font-size: 1.05rem; color: #fff; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${title}</h3>
+                      <h3 style="margin: 0; font-size: 1.05rem; color: #fff; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHTML(title)}</h3>
                       <p style="margin: 0; font-size: 0.83rem; color: var(--text-secondary); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${subtitle.replace(/<[^>]*>?/gm, '')}</p>
                       <div class="news-3d-meta">
                         <span><i data-lucide="user" style="width: 12px; height: 12px; vertical-align: middle;"></i> ${author}</span>
