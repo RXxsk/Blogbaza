@@ -1,7 +1,7 @@
 [
   {
     "id": "1786252055900",
-    "titulo": "Juego Gratis Por Tiempo Ilimitado en XBOX",
+    "titulo": "Juego Gratis de Bethesda: Wolfenstein®: Enemy Territory",
     "autor": "RXx8",
     "author": "RXx8",
     "avatar": "https://avatars.githubusercontent.com/u/60585034?v=4",
@@ -10,8 +10,8 @@
     "timestamp": "2026-08-09T05:07:34.464Z",
     "subtitulo": "Reclamalo por aquí..",
     "categoria": "XBOX Store",
-    "coverUrl": "https://assets.nintendo.com/image/upload/q_auto/f_auto/store/software/switch2/70010000120229/e7de3ad0a81739f1dca28e2cf46aca0f5d7ac695e15985618eda8fe1f04e1b5e",
-    "content": "<h1>Link Directo Región</h1>\n<div style=\"display: flex; justify-content: center; margin-top: 15px;\">\n  <a href=\"https://www.xbox.com/bs-Latn-BA/games/store/grim-trials/9pmwr0f45mgw\" target=\"_blank\" style=\"\n    color: #107C10;\n    text-decoration: none;\n    font-size: 14px;\n    font-weight: 600;\n    padding: 12px 28px;\n    border-radius: 14px;\n    background: rgba(16, 124, 16, 0.1);\n    backdrop-filter: blur(10px);\n    -webkit-backdrop-filter: blur(10px);\n    border: 1px solid rgba(16, 124, 16, 0.2);\n    box-shadow: 0 4px 15px rgba(16, 124, 16, 0.15), inset 0 1px 1px rgba(255,255,255,0.4);\n    transition: all 0.2s ease;\n    display: inline-block;\n  \">\n    XBOX Store\n  </a>\n</div>",
+    "coverUrl": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1873030/header.jpg?t=1666295006",
+    "content": "<div style=\"display: flex; justify-content: center; margin-top: 15px;\">\n  <a href=\"https://www.xbox.com/bs-Latn-BA/games/store/grim-trials/9pmwr0f45mgw\" target=\"_blank\" style=\"\n    color: #107C10;\n    text-decoration: none;\n    font-size: 14px;\n    font-weight: 600;\n    padding: 12px 28px;\n    border-radius: 14px;\n    background: rgba(16, 124, 16, 0.1);\n    backdrop-filter: blur(10px);\n    -webkit-backdrop-filter: blur(10px);\n    border: 1px solid rgba(16, 124, 16, 0.2);\n    box-shadow: 0 4px 15px rgba(16, 124, 16, 0.15), inset 0 1px 1px rgba(255,255,255,0.4);\n    transition: all 0.2s ease;\n    display: inline-block;\n  \">\n    XBOX Store\n  </a>\n</div>",
     "badgeColor": "green",
     "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
     "fecha": "09 ago 2026"
