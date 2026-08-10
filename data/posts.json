@@ -1,5 +1,21 @@
 [
   {
+    "id": "1786404520844",
+    "titulo": "La hazaña hacker que está llevando el ecosistema de Xbox a Linux",
+    "autor": "RXx8",
+    "author": "RXx8",
+    "avatar": "https://avatars.githubusercontent.com/u/60585034?v=4",
+    "authorAvatar": "https://avatars.githubusercontent.com/u/60585034?v=4",
+    "createdAt": "2026-08-10T23:28:39.775Z",
+    "timestamp": "2026-08-10T23:28:39.775Z",
+    "subtitulo": "Fuentes: RXx8",
+    "categoria": "XBOX Linux",
+    "coverUrl": "https://pbs.twimg.com/amplify_video_thumb/2086882163937452032/img/unyjPWIvC2XaduT6.jpg",
+    "content": "Rompiendo las cadenas de Windows. El proyecto de código abierto Xodus está intentando lo que parecía imposible: llevar el ecosistema de juegos de Xbox PC a Linux. Los desarrolladores ya cruzaron los primeros grandes muros al sincronizar el inicio de sesión de Microsoft y las descargas. Aunque todavía falta domar los servicios internos de la plataforma, el objetivo final es gigante. Esto abriría la puerta para que millones de jugadores disfruten de sus juegos de Xbox en dispositivos portátiles como la Steam Deck sin depender del streaming.",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
+    "fecha": "10 ago 2026"
+  },
+  {
     "id": "1785835005967",
     "titulo": "Emulation Station Xbox S/X",
     "autor": "RXx8",
