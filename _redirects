@@ -1,8 +1,4 @@
-/    /Home    301
-/index.html/      /home     200
-/index.html       /Home     200
-/index.html/      /Home    200
-/index.html       /home     200
+/home/    /Home    301
 
 # --- REDIRECCIONES DE POSTS ---
 /Post/      /posts.html     301
