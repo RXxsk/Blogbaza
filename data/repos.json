@@ -17,7 +17,7 @@
     "bannerUrl": "",
     "webUrl": "",
     "descripcion": "Tutorial explicado en Youtube",
-    "extendedDesc": "<div style=\"position: relative; width: 100%; max-width: 800px; margin: 20px auto; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);\">\n    <iframe \n        src=\"https://youtube.com\" \n        style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;\"\n        allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" \n        allowfullscreen>\n    </iframe>\n</div>",
+    "extendedDesc": "<a href=\"https://youtu.be\" target=\"_blank\" style=\"display: block; position: relative; width: 100%; max-width: 800px; margin: 20px auto; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); background: url('https://www.youtube.com/embed/T9dfpIZhQ3U?si=fcFNZ0VWblSjtJn5') center/cover no-repeat; text-decoration: none;\">\n    <div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #ff0000; color: #ffffff; padding: 14px 28px; font-size: 18px; font-weight: bold; font-family: Arial, sans-serif; border-radius: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); text-align: center; white-space: nowrap;\">\n        Ver Tutorial\n    </div>\n</a>",
     "avatarUrl": "https://avatars.githubusercontent.com/u/60585034?v=4",
     "fecha": "29 ago 2026"
   },
