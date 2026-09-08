@@ -1,5 +1,27 @@
 [
   {
+    "id": "1788838321981",
+    "titulo": "Dependencias Debug",
+    "autor": "Mannuee",
+    "author": "Mannuee",
+    "avatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "authorAvatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "createdAt": "2026-09-08T03:32:00.804Z",
+    "timestamp": "2026-09-08T03:32:00.804Z",
+    "categoria": "xbox",
+    "category": "xbox",
+    "version": "v14",
+    "size": "3  MB",
+    "downloadUrl": "https://shrinkme.click/MicrosoftVCLibsx64Debug",
+    "logoUrl": "https://raw.githubusercontent.com/mannuuplds-hub/iconos/refs/heads/main/VCLIBS%20ICON.png",
+    "bannerUrl": "https://raw.githubusercontent.com/mannuuplds-hub/iconos/refs/heads/main/VLIBS%20BANNER.png",
+    "webUrl": "",
+    "descripcion": "Dependencias DEBUG",
+    "extendedDesc": "para uso de Cemu",
+    "avatarUrl": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "fecha": "08 sept 2026"
+  },
+  {
     "id": "1788832322238",
     "titulo": "Cemu BETA",
     "autor": "Mannuee",
