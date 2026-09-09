@@ -1,5 +1,27 @@
 [
   {
+    "id": "1788928466845",
+    "titulo": "XuperTv",
+    "autor": "El Tio Baza",
+    "author": "El Tio Baza",
+    "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10",
+    "authorAvatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10",
+    "createdAt": "2026-09-09T04:34:25.411Z",
+    "timestamp": "2026-09-09T04:34:25.411Z",
+    "categoria": "scripts",
+    "category": "scripts",
+    "version": "6.5.7",
+    "size": "50 MB",
+    "downloadUrl": "https://www.mediafire.com/file/ikq6njkv9lv39n1/XuperMobileNF-6.5.7-ModByNF.apk/file",
+    "logoUrl": "https://xuper-tvapk.org/wp-content/uploads/2026/09/xuper-tv-icon-1.png",
+    "bannerUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQMtv-MIRk6XIMt8rx42h6VIhMq-dpkwg62MK2rHa8Sx8CLlbaSuAOdSQ&s=10",
+    "webUrl": "",
+    "descripcion": "Android",
+    "extendedDesc": "Xuper TV para Android es una aplicación que combina un reproductor IPTV (para cargar listas M3U o Xtream Codes) con el formato de streaming no oficial distribuido por APK. Permite acceder a canales en vivo, deportes, películas y series mediante una interfaz sencilla y liviana para TV Boxes y celulares, aunque al instalarse fuera de Google Play implica riesgos de seguridad y privacidad.",
+    "avatarUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSR5QBZS-JdOQ6BiXC_usrCPWQ04zwUEPCHS0oxcqKHcg&s=10",
+    "fecha": "09 sept 2026"
+  },
+  {
     "id": "1788838321981",
     "titulo": "Dependencias Debug",
     "autor": "Mannuee",
