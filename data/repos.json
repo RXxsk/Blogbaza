@@ -1,5 +1,27 @@
 [
   {
+    "id": "1789710506611",
+    "titulo": "Xemu BETA",
+    "autor": "Mannuee",
+    "author": "Mannuee",
+    "avatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "authorAvatar": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "createdAt": "2026-09-18T05:48:25.855Z",
+    "timestamp": "2026-09-18T05:48:25.855Z",
+    "categoria": "xbox",
+    "category": "xbox",
+    "version": "1.0.9.8",
+    "size": "45 MB",
+    "downloadUrl": "https://github.com/rodrigoandrigo/xemu/releases/tag/1.0.0.98",
+    "logoUrl": "https://avatars.githubusercontent.com/u/61253676?s=280&v=4",
+    "bannerUrl": "https://cdn2.steamgriddb.com/grid/709dc5f3d08bd364fe0d6dfac125c489.png",
+    "webUrl": "https://github.com/rodrigoandrigo",
+    "descripcion": "Xemu XBOX OG Port",
+    "extendedDesc": "¿Es posible ejecutar juegos de la Xbox original de 2001 en una Xbox Series X mediante el modo desarrollador (Dev Mode)? Sí, gracias al port UWP de Xemu, aunque el proyecto se encuentra en un estado experimental.\n\nEl puerto actual demuestra el potencial de la consola para mover el emulador de código abierto, la experiencia aún presenta caídas de rendimiento, fallos gráficos y falta de optimización en la mayoría de títulos. Sin embargo, al ser un desarrollo activo con margen de mejora, sienta las bases de lo que podría convertirse en una excelente vía para rescatar el catálogo clásico que quedó fuera del programa oficial de retrocompatibilidad.",
+    "avatarUrl": "https://yt3.googleusercontent.com/7LBoB1HAKUQRANtVR5btTczpra-1vNCbgeHnfl4b6PUviP4LWqxD9Ez6kLyL1GvoRSk0vB1Vdg=s160-c-k-c0x00ffffff-no-rj",
+    "fecha": "18 sept 2026"
+  },
+  {
     "id": "1788928466845",
     "titulo": "XuperTv",
     "autor": "El Tio Baza",
